@@ -1,0 +1,46 @@
+name: 数据自动更新
+
+on:
+  schedule:
+    # 北京时间工作日 11:00
+    - cron: '0 3 * * 1-5'
+    # 北京时间工作日 14:10
+    - cron: '10 6 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 检出仓库
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 采集实时数据
+        run: python3 cloud_fetcher.py
+
+      - name: 运行数据匹配
+        run: python3 data_pipeline.py --input data/market_input.json --output data/daily.json
+
+      - name: 采集基金历史业绩
+        run: python3 fund_history_fetcher.py
+
+      - name: 存档历史
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          mkdir -p data/history
+          cp data/daily.json "data/history/${DATE}.json"
+
+      - name: 提交更新
+        run: |
+          git config user.name "数据机器人"
+          git config user.email "bot@fund-advisor.local"
+          git add data/market_input.json data/daily.json data/history/ data/fund_history.json data/fund_nav_history.json
+          git diff --cached --quiet || git commit -m "📊 数据更新 $(date +'%Y-%m-%d %H:%M')"
+          git push

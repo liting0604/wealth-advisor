@@ -1,0 +1,2879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="智能投顾">
+<meta name="theme-color" content="#c41230">
+<meta name="description" content="智能投顾系统 - 客户资产配置与产品推荐">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23c41230'/%3E%3Ctext x='96' y='128' text-anchor='middle' font-size='100' fill='white'%3E🏦%3C/text%3E%3C/svg%3E">
+<title>智能投顾系统 - 客户资产配置与产品推荐 v2.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<style>
+:root { --red: #c41230; --dark: #1a1a2e; --gray: #6b7280; --bg: #f8f9fa; --card: #ffffff; --border: #e5e7eb; --green: #059669; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--dark); min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px; position: sticky; top: 0; z-index: 100; }
+.header h1 { font-size: 1.2rem; font-weight: 700; }
+.header .ver { color: var(--red); font-weight: 700; }
+.container { max-width: 800px; margin: 0 auto; padding: 16px; }
+.card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid var(--border); }
+.card-title { font-size: 1rem; font-weight: 700; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid var(--red); color: var(--dark); }
+label { display: block; font-size: 0.8rem; color: var(--gray); margin-bottom: 3px; font-weight: 600; }
+input, select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; background: var(--bg); outline: none; transition: border .2s; }
+input:focus, select:focus { border-color: var(--red); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 24px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; transition: all .2s; }
+.btn-primary { background: var(--red); color: white; }
+.btn-primary:hover { background: #a00e28; }
+.btn-outline { background: white; color: var(--red); border: 2px solid var(--red); }
+.btn-outline:hover { background: #fef2f2; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.prod-card { background: var(--bg); border-radius: 10px; padding: 14px; margin-bottom: 10px; border-left: 3px solid var(--red); }
+.prod-card .name { font-weight: 700; font-size: 0.95rem; }
+.prod-card .meta { font-size: 0.75rem; color: var(--gray); margin: 4px 0; }
+.prod-card .ret { font-size: 1.1rem; font-weight: 700; color: var(--red); }
+.prod-card .reason { font-size: 0.8rem; color: var(--gray); margin-top: 6px; font-style: italic; }
+.cat-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+.cat-fund { background: #fef3c7; color: #92400e; }
+.cat-insurance { background: #dbeafe; color: #1e40af; }
+.cat-finance { background: #d1fae5; color: #065f46; }
+.cat-deposit { background: #e5e7eb; color: #374151; }
+.cat-fx { background: #ede9fe; color: #5b21b6; }
+.cat-struct { background: #fce7f3; color: #9d174d; }
+.tabs { display: flex; gap: 0; margin-bottom: 16px; }
+.tab { flex: 1; padding: 10px; text-align: center; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid var(--border); color: var(--gray); transition: all .2s; }
+.tab.active { color: var(--red); border-bottom-color: var(--red); }
+.spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.report { font-size: 0.85rem; line-height: 1.7; overflow: visible; }
+.report h2 { font-size: 1.05rem; font-weight: 700; margin: 18px 0 10px; color: var(--dark); }
+.report h3 { font-size: 0.95rem; font-weight: 700; margin: 14px 0 8px; }
+.report table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
+.report table th { background: var(--dark); color: white; padding: 8px; text-align: left; font-size: 0.75rem; }
+.report table td { padding: 8px; border: 1px solid var(--border); }
+.report table tr:nth-child(even) { background: var(--bg); }
+.report blockquote { border-left: 3px solid var(--red); padding: 8px 14px; margin: 10px 0; background: #fef2f2; color: var(--gray); font-size: 0.82rem; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.summary-row:last-child { border-bottom: none; }
+.summary-val { font-weight: 700; font-size: 1.4rem; color: var(--red); }
+.custom-prod { background: #fffbeb; border: 1px dashed #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+.code-tag { font-family: monospace; font-size: 0.75rem; background: #f3f4f6; padding: 1px 6px; border-radius: 3px; color: var(--gray); }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--dark); color: white; padding: 10px 24px; border-radius: 8px; font-size: 0.85rem; z-index: 999; opacity: 0; transition: opacity .3s; }
+.toast.show { opacity: 1; }
+
+/* 刷新按钮动画 */
+.refresh-spin { animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+#btnRefresh { transition: background .2s; }
+#btnRefresh:hover { background: rgba(255,255,255,0.25) !important; }
+#btnRefresh:active { transform: scale(0.96); }
+
+/* 市场速览卡片 */
+.bias-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
+.bias-card { background: var(--bg); border-radius: 10px; padding: 12px 10px; text-align: center; border: 1px solid var(--border); transition: transform .15s; }
+.bias-card:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.bias-card .bias-label { font-size: 0.72rem; color: var(--gray); margin-bottom: 4px; font-weight: 600; }
+.bias-card .bias-value { font-size: 1rem; font-weight: 700; }
+.bias-card .bias-value.bull { color: var(--red); }
+.bias-card .bias-value.bear { color: var(--green); }
+.bias-card .bias-value.neutral { color: var(--gray); }
+
+.news-card { background: var(--bg); border-radius: 10px; padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
+.news-card .news-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+.news-card .news-summary { font-size: 0.78rem; color: var(--gray); margin-bottom: 8px; }
+.news-card .news-capital { font-size: 0.78rem; color: var(--red); margin-bottom: 6px; padding: 8px 10px; background: #fef2f2; border-radius: 6px; border-left: 3px solid var(--red); }
+.news-card .news-plain { font-size: 0.8rem; color: var(--dark); padding: 8px 10px; background: #f8fafc; border-radius: 6px; }
+.news-cat { display: inline-block; font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-bottom: 6px; }
+.news-cat.macro { background: #fef3c7; color: #92400e; }
+.news-cat.industry { background: #dbeafe; color: #1e40af; }
+.news-cat.company { background: #ede9fe; color: #5b21b6; }
+.news-cat.geopolitics { background: #fce7f3; color: #9d174d; }
+
+.hotspot-tag { display: inline-block; font-size: 0.7rem; padding: 3px 10px; background: #fff; border: 1px solid var(--border); border-radius: 16px; margin: 3px 4px 3px 0; color: var(--dark); }
+.hotspot-tag strong { color: var(--red); }
+
+.reminder-box { background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 12px 14px; margin-top: 10px; font-size: 0.8rem; }
+.reminder-box .reminder-title { font-weight: 700; color: var(--red); margin-bottom: 6px; }
+.reminder-box li { margin-bottom: 4px; color: var(--gray); }
+
+/* ===== 移动端响应式 ===== */
+@media (max-width: 768px) {
+  .header { padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 10px; }
+  .header h1 { font-size: 1rem; }
+  .header .ver { font-size: 0.75rem; }
+  .container { padding: 8px 8px 80px 8px; max-width: 100%; }
+  .card { padding: 14px; margin-bottom: 10px; border-radius: 10px; }
+  .card-title { font-size: 0.95rem; margin-bottom: 10px; }
+  .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 8px; }
+  .tabs { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 0; }
+  .tab { flex: none; padding: 10px 18px; font-size: 0.82rem; white-space: nowrap; }
+  .btn { font-size: 0.9rem; border-radius: 8px; }
+  .btn-primary { width: 100%; padding: 14px; }
+  input, select { font-size: 16px; padding: 12px; }
+  .prod-card { padding: 12px; margin-bottom: 8px; }
+  .prod-card .name { font-size: 0.9rem; }
+  .prod-card .meta { font-size: 0.7rem; }
+  .prod-card .ret { font-size: 1rem; }
+  .report { font-size: 0.8rem; line-height: 1.65; }
+  .report table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; font-size: 0.72rem; white-space: nowrap; }
+  .report h2 { font-size: 0.95rem; }
+  .report h3 { font-size: 0.85rem; }
+  .report blockquote { font-size: 0.78rem; }
+  .summary-row { flex-wrap: wrap; }
+  .summary-val { font-size: 1.2rem; }
+  .toast { bottom: 90px; font-size: 0.8rem; }
+  .custom-prod { padding: 10px; }
+  .code-tag { font-size: 0.7rem; }
+  label { font-size: 0.75rem; }
+  
+  /* 结果/报告页按钮行 */
+  #tab-result > div:first-child, #tab-report > div:first-child {
+    flex-wrap: wrap; gap: 6px; align-items: flex-start;
+  }
+  #tab-result button, #tab-report button {
+    font-size: 0.78rem; padding: 8px 14px;
+  }
+  
+  /* 品类选择器 */
+  #catPicker { gap: 4px; flex-wrap: wrap; }
+  #catPicker button { font-size: 0.72rem; padding: 5px 10px; border-radius: 6px; }
+
+  /* 市场速览移动适配 */
+  .bias-grid { grid-template-columns: repeat(3, 1fr); }
+  .bias-card { padding: 10px 8px; }
+  .bias-card .bias-label { font-size: 0.68rem; }
+  .bias-card .bias-value { font-size: 0.9rem; }
+  .hotspot-tag { font-size: 0.68rem; padding: 2px 8px; }
+  .news-card { padding: 12px; }
+  .news-card .news-title { font-size: 0.85rem; }
+  
+  /* 移动端底部导航 */
+  .mobile-bottom-nav { display: flex; }
+  
+  /* 隐藏桌面侧元素 */
+  .desktop-only { display: none !important; }
+}
+
+/* 移动端底部导航栏 */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  background: #fff; border-top: 1px solid var(--border);
+  box-shadow: 0 -1px 8px rgba(0,0,0,0.06);
+  padding: 6px 0 env(safe-area-inset-bottom, 8px);
+}
+.mobile-nav-item {
+  flex: 1; text-align: center; padding: 8px 4px 4px; cursor: pointer;
+  font-size: 10px; color: var(--gray); transition: all .15s;
+  border-radius: 6px; margin: 0 2px;
+}
+.mobile-nav-item.active { color: var(--red); font-weight: 700; }
+.mobile-nav-item .nav-icon { font-size: 22px; display: block; margin-bottom: 2px; line-height: 1; }
+.mobile-nav-item:active { background: #fef2f2; }
+
+/* 桌面端保证隐藏 */
+@media (min-width: 769px) { .mobile-bottom-nav { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+      <h1>🏦 智能投顾系统 <span class="ver">v2.0</span></h1>
+      <p style="font-size:0.75rem;opacity:0.7;" id="headerBuild">客户资产配置与产品推荐 · 云端版 · build 20260619-0856</p>
+    </div>
+    <button onclick="refreshData()" id="btnRefresh" style="background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:8px 14px;cursor:pointer;font-size:0.8rem;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+      <span id="refreshIcon">🔄</span><span id="refreshLabel">刷新</span>
+    </button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('dashboard')">📊 仪表盘</div>
+    <div class="tab" onclick="switchTab('news')">📰 资讯</div>
+    <div class="tab" onclick="switchTab('market')">📡 市场</div>
+    <div class="tab" onclick="switchTab('fund')">📈 基金估值</div>
+    <div class="tab" onclick="switchTab('clients')">👥 客户管理</div>
+    <div class="tab" onclick="switchTab('ai')">🤖 AI助手</div>
+    <div class="tab" onclick="switchTab('input')">📋 客户画像</div>
+    <div class="tab" onclick="switchTab('result')">📊 推荐结果</div>
+    <div class="tab" onclick="switchTab('report')">📝 配置报告</div>
+  </div>
+
+  <!-- Tab 0: 仪表盘 -->
+  <div id="tab-dashboard">
+    <div id="dashboardContent"></div>
+  </div>
+
+  <!-- Tab 1: 资讯 -->
+  <div id="tab-news">
+    <div id="newsContent"></div>
+  </div>
+
+  <!-- Tab 2: 市场 -->
+  <div id="tab-market" style="display:none;">
+    <div id="marketContent"></div>
+  </div>
+
+  <!-- Tab 2: 输入 -->
+  <div id="tab-input" style="display:none;">
+    <div class="card">
+      <div class="card-title">客户基本信息</div>
+      <div class="grid-2">
+        <div><label>风险等级</label><select id="riskLevel"><option>PR1</option><option>PR2</option><option selected>PR3</option><option>PR4</option><option>PR5</option></select></div>
+        <div><label>可投资资产（万元）</label><input type="number" id="assets" value="100" min="1" max="99999"></div>
+        <div><label>投资期限</label><select id="horizon"><option value="90">短期（3个月内）</option><option value="365" selected>中期（1年内）</option><option value="1095">中长期（1-3年）</option><option value="3650">长期（3年以上）</option></select></div>
+        <div><label>流动性需求</label><select id="liquidity"><option>低</option><option selected>中</option><option>高</option></select></div>
+      </div>
+      <div style="margin-top:12px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:0;">
+          <input type="checkbox" id="isPrivateBank" style="width:auto;"> 私银客户
+        </label>
+      </div>
+      <div style="margin-top:12px;">
+        <label style="font-size:0.8rem;color:var(--gray);font-weight:600;margin-bottom:8px;display:block;">每类产品数量（可分别设置）</label>
+        <div class="grid-2" id="perCatSelectors">
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">🛡 保险</label><select class="per-cat-sel" data-cat="保险" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">📈 基金</label><select class="per-cat-sel" data-cat="基金" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">💼 理财</label><select class="per-cat-sel" data-cat="理财" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">💰 存款</label><select class="per-cat-sel" data-cat="存款" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">📐 结构性</label><select class="per-cat-sel" data-cat="结构性存款" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;"><label style="font-size:0.78rem;color:var(--dark);font-weight:600;margin-bottom:0;min-width:60px;">🌍 外币</label><select class="per-cat-sel" data-cat="外币存款" style="width:auto;padding:6px 28px 6px 10px;font-size:0.82rem;"><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <label style="font-size:0.8rem;color:var(--gray);font-weight:600;margin-bottom:6px;display:block;">产品偏好品类（点击切换，至少保留一个）</label>
+        <div id="catPicker" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">自定义产品（可选）</div>
+      <p style="font-size:0.75rem;color:var(--gray);margin-bottom:10px;">添加行内特色产品或客户指定产品，每品类最多3个</p>
+      <div id="customProducts"></div>
+      <button class="btn btn-outline" onclick="addCustomProduct()" style="margin-top:10px;font-size:0.8rem;">+ 添加自定义产品</button>
+    </div>
+
+    <button class="btn btn-primary" onclick="runMatch()" style="width:100%;padding:14px;font-size:1rem;" id="btnMatch">
+      🔍 开始智能匹配推荐
+    </button>
+  </div>
+
+  <!-- Tab 2: 推荐结果 -->
+  <div id="tab-result" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-weight:700;">匹配产品 <span id="resultTotal" style="color:var(--red);">0</span> 款 | 已选 <span id="resultCount" style="color:#059669;">0</span> 款</div>
+      <div>
+        <button class="btn btn-outline" onclick="switchTab('input')" style="font-size:0.8rem;padding:6px 14px;">← 返回修改</button>
+        <button class="btn btn-outline" onclick="viewReport()" style="font-size:0.8rem;padding:6px 14px;">📝 查看报告</button>
+        <button class="btn btn-primary" onclick="exportPPT()" id="btnExportPPT" style="font-size:0.8rem;padding:6px 14px;">📥 导出PPT</button>
+        <button class="btn btn-outline" onclick="showClientSummary()" style="font-size:0.8rem;padding:6px 14px;color:#059669;border-color:#059669;">📱 客户摘要</button>
+      </div>
+    </div>
+    <div id="resultArea"></div>
+  </div>
+
+  <!-- Tab 3: 报告 -->
+  <div id="tab-report" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-weight:700;">📝 配置建议书</div>
+      <div>
+        <button class="btn btn-outline" onclick="switchTab('result')" style="font-size:0.8rem;padding:6px 14px;">← 返回产品</button>
+        <button class="btn btn-primary" onclick="exportPPT()" style="font-size:0.8rem;padding:6px 14px;">📥 导出PPT</button>
+      </div>
+    </div>
+    <div class="card report" id="reportArea"></div>
+  </div>
+
+  <!-- Tab: 客户管理 -->
+  <div id="tab-clients" style="display:none;">
+    <div id="clientsContent"></div>
+  </div>
+
+  <!-- Tab: AI助手 -->
+  <div id="tab-ai" style="display:none;">
+    <div id="aiContent"></div>
+  </div>
+
+  <!-- Tab: 基金估值 -->
+  <div id="tab-fund" style="display:none;">
+    <div id="fundContent"></div>
+  </div>
+</div>
+
+<!-- 移动端底部导航 -->
+<div class="mobile-bottom-nav" id="mobileNav">
+  <div class="mobile-nav-item active" onclick="switchTab('dashboard')" data-tab="dashboard">
+    <span class="nav-icon">📊</span>仪表盘
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('news')" data-tab="news">
+    <span class="nav-icon">📰</span>资讯
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('market')" data-tab="market">
+    <span class="nav-icon">📡</span>市场
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('input')" data-tab="input">
+    <span class="nav-icon">📋</span>画像
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('result')" data-tab="result">
+    <span class="nav-icon">📊</span>推荐
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('report')" data-tab="report">
+    <span class="nav-icon">📝</span>报告
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('fund')" data-tab="fund">
+    <span class="nav-icon">📈</span>估值
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('clients')" data-tab="clients">
+    <span class="nav-icon">👥</span>客户
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('ai')" data-tab="ai">
+    <span class="nav-icon">🤖</span>AI
+  </div>
+  <div class="mobile-nav-item" onclick="exportPPT()" id="mobileExportBtn">
+    <span class="nav-icon">📥</span>导出
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="modalHost"></div>
+
+<!-- 客户摘要弹窗 -->
+<div id="summaryModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;padding:16px;">
+  <div style="background:#fff;border-radius:12px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;border-radius:12px 12px 0 0;">
+      <span style="font-weight:700;font-size:1rem;">📱 客户方案摘要</span>
+      <button onclick="closeSummary()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray);line-height:1;">×</button>
+    </div>
+    <div id="summaryContent" style="padding:20px;font-size:0.9rem;line-height:1.8;color:var(--dark);white-space:pre-wrap;"></div>
+    <div style="padding:12px 20px;border-top:1px solid #e5e7eb;display:flex;gap:8px;">
+      <button onclick="copySummary()" id="btnCopySummary" style="flex:1;padding:10px;border-radius:8px;border:none;font-size:0.85rem;font-weight:600;background:var(--red);color:#fff;cursor:pointer;">📋 一键复制</button>
+      <button onclick="closeSummary()" style="padding:10px 20px;border-radius:8px;border:1px solid #e5e7eb;font-size:0.85rem;background:#fff;color:var(--gray);cursor:pointer;">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 产品数据
+// ============================================================
+const PRODUCTS = [{"product_id": "006834", "product_name": "工银尊享短债A", "product_category": "基金", "sub_category": "中短债基 低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["中短债基", "低波"], "highlights": "纯债策略，波动极低，适合稳健底仓", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "006834", "fund_type": "中短债基", "style_label": "低波"}}, {"product_id": "022007", "product_name": "国泰利民安悦30天", "product_category": "基金", "sub_category": "中短债基 低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["中短债基", "低波"], "highlights": "30天持有期短债，流动性好，收益稳健", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "022007", "fund_type": "中短债基", "style_label": "低波"}}, {"product_id": "017592", "product_name": "汇添富添添乐双盈A", "product_category": "基金", "sub_category": "二级债基 中低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["二级债基", "中低波"], "highlights": "二级债基，债打底+少量权益增强收益", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "017592", "fund_type": "二级债基", "style_label": "中低波"}}, {"product_id": "016869", "product_name": "景顺长城稳健增益A", "product_category": "基金", "sub_category": "二级债基 中低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["二级债基", "中低波"], "highlights": "固收为主+股票增强，回撤控制好", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "016869", "fund_type": "二级债基", "style_label": "中低波"}}, {"product_id": "164808", "product_name": "工银四季收益债券", "product_category": "基金", "sub_category": "一级债基 中低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["一级债基", "中低波"], "highlights": "一级债基，可投可转债，稳健增收", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "164808", "fund_type": "一级债基", "style_label": "中低波"}}, {"product_id": "018448", "product_name": "中欧琪和A", "product_category": "基金", "sub_category": "偏债混合 中低波", "issuer": "", "risk_level": "PR2", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["偏债混合", "中低波"], "highlights": "偏债混合，股票仓位不超过30%，平衡收益与回撤", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "018448", "fund_type": "偏债混合", "style_label": "中低波"}}, {"product_id": "481009", "product_name": "工银沪深300A", "product_category": "基金", "sub_category": "指数（宽基） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基）", "高波", "沪深300"], "highlights": "跟踪沪深300，A股核心蓝筹代表", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "481009", "fund_type": "指数（宽基）", "style_label": "沪深300"}}, {"product_id": "021231", "product_name": "工银中证A50", "product_category": "基金", "sub_category": "指数（宽基） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基）", "高波"], "highlights": "中证A50，均衡覆盖各行业龙头", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "021231", "fund_type": "指数（宽基）", "style_label": "高波"}}, {"product_id": "022442", "product_name": "工银中证A500", "product_category": "基金", "sub_category": "指数（宽基） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基）", "高波"], "highlights": "中证A500，行业中性宽基指数", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "022442", "fund_type": "指数（宽基）", "style_label": "高波"}}, {"product_id": "016942", "product_name": "工银中证1000指数增强", "product_category": "基金", "sub_category": "指数（宽基量化） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基量化）", "高波"], "highlights": "中证1000指增，小盘成长风格", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "016942", "fund_type": "指数（宽基量化）", "style_label": "高波"}}, {"product_id": "012080", "product_name": "易方达中证500量化增强A", "product_category": "基金", "sub_category": "指数（宽基量化） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基量化）", "高波"], "highlights": "中证500量化增强，中盘均衡", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "012080", "fund_type": "指数（宽基量化）", "style_label": "高波"}}, {"product_id": "011614", "product_name": "工银上证科创50ETF联接A", "product_category": "基金", "sub_category": "科创 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["科创", "高波", "指数（宽基）"], "highlights": "科创50，硬科技核心指数", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "011614", "fund_type": "科创", "style_label": "指数（宽基）"}}, {"product_id": "481012", "product_name": "工银深证红利ETF联接", "product_category": "基金", "sub_category": "指数（宽基） 高波", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基）", "高波", "红利"], "highlights": "深证红利，高股息+稳定现金流", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "481012", "fund_type": "指数（宽基）", "style_label": "红利"}}, {"product_id": "000218", "product_name": "国泰黄金ETF联接A", "product_category": "基金", "sub_category": "指数（主题） 黄金", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（主题）", "黄金"], "highlights": "黄金ETF联接，避险+抗通胀配置", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "000218", "fund_type": "指数（主题）", "style_label": "黄金"}}, {"product_id": "020356", "product_name": "华夏半导体材料设备ETF联接A", "product_category": "基金", "sub_category": "指数（主题） 半导体", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（主题）", "半导体"], "highlights": "半导体设备材料，国产替代核心", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "020356", "fund_type": "指数（主题）", "style_label": "半导体"}}, {"product_id": "007674", "product_name": "工银产业升级股票A", "product_category": "基金", "sub_category": "AI 主动权益（科技）", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["AI", "主动权益（科技）", "半导体"], "highlights": "科技+周期双主线，AI+化工灵活切换", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "007674", "fund_type": "AI", "style_label": "半导体"}}, {"product_id": "009707", "product_name": "工银新兴制造混合A", "product_category": "基金", "sub_category": "半导体 主动权益（科技）", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["半导体", "主动权益（科技）"], "highlights": "聚焦新兴制造业，半导体+高端装备", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "009707", "fund_type": "半导体", "style_label": "主动权益（科技）"}}, {"product_id": "015873", "product_name": "广发国证新能源车电池ETF联接A", "product_category": "基金", "sub_category": "指数（主题） 新能源", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（主题）", "新能源"], "highlights": "新能源车电池产业链，高景气赛道", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "015873", "fund_type": "指数（主题）", "style_label": "新能源"}}, {"product_id": "000793", "product_name": "工银高端制造股票", "product_category": "基金", "sub_category": "科技 主动权益（科技）", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["科技", "主动权益（科技）", "新能源"], "highlights": "高端制造主题，科技+新能源双驱动", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "000793", "fund_type": "科技", "style_label": "新能源"}}, {"product_id": "000979", "product_name": "景顺长城沪港深精选", "product_category": "基金", "sub_category": "AI 科技", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["AI", "科技", "主动权益（科技）", "港股"], "highlights": "沪港深三地精选，AI+光通信龙头重仓", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "000979", "fund_type": "AI", "style_label": "港股"}}, {"product_id": "019933", "product_name": "工银国证港股通科技ETF联接A", "product_category": "基金", "sub_category": "指数（主题） 港股", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（主题）", "港股", "科技"], "highlights": "港股科技龙头，腾讯阿里等新经济代表", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "019933", "fund_type": "指数（主题）", "style_label": "科技"}}, {"product_id": "000989", "product_name": "嘉实全球互联网美元现汇", "product_category": "基金", "sub_category": "QDII 科技", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["QDII", "科技", "互联网"], "highlights": "QDII美元份额，全球互联网龙头布局", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "000989", "fund_type": "QDII", "style_label": "互联网"}}, {"product_id": "001048", "product_name": "富国新兴产业股票A", "product_category": "基金", "sub_category": "主动权益（科技） AI", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（科技）", "AI"], "highlights": "专注新兴产业，AI/大模型方向重仓", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "001048", "fund_type": "主动权益（科技）", "style_label": "AI"}}, {"product_id": "002168", "product_name": "嘉实智能汽车股票", "product_category": "基金", "sub_category": "主动权益（能源） 新能源", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（能源）", "新能源"], "highlights": "智能汽车产业链，电动化+智能化", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "002168", "fund_type": "主动权益（能源）", "style_label": "新能源"}}, {"product_id": "003069", "product_name": "光大创业板量化优选A", "product_category": "基金", "sub_category": "指数（宽基量化） 创业板", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基量化）", "创业板"], "highlights": "创业板量化增强，成长风格弹性大", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "003069", "fund_type": "指数（宽基量化）", "style_label": "创业板"}}, {"product_id": "010115", "product_name": "易方达远见成长A", "product_category": "基金", "sub_category": "主动权益（科技） AI", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（科技）", "AI"], "highlights": "远见成长，前瞻布局AI+数字经济", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "010115", "fund_type": "主动权益（科技）", "style_label": "AI"}}, {"product_id": "019829", "product_name": "华夏数字产业混合A", "product_category": "基金", "sub_category": "主动权益（科技）", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（科技）"], "highlights": "数字经济主题，覆盖AI+信创+数据要素", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "019829", "fund_type": "主动权益（科技）", "style_label": "主动权益（科技）"}}, {"product_id": "025328", "product_name": "诺安稳健回报混合A", "product_category": "基金", "sub_category": "算力 主动权益（科技）", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["算力", "主动权益（科技）"], "highlights": "AI算力方向，光模块+服务器核心持仓", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "025328", "fund_type": "算力", "style_label": "主动权益（科技）"}}, {"product_id": "720001", "product_name": "财通价值动量混合", "product_category": "基金", "sub_category": "算力 主动权益（科技）", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["算力", "主动权益（科技）"], "highlights": "AI算力产业链重仓，弹性极大", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "720001", "fund_type": "算力", "style_label": "主动权益（科技）"}}, {"product_id": "018112", "product_name": "工银北证50成份指数A", "product_category": "基金", "sub_category": "指数（宽基） 北证", "issuer": "", "risk_level": "PR4", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["指数（宽基）", "北证"], "highlights": "北证50，专精特新小巨人聚集地", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "018112", "fund_type": "指数（宽基）", "style_label": "北证"}}, {"product_id": "000480", "product_name": "东方红新动力混合A", "product_category": "基金", "sub_category": "主动权益（均衡）", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（均衡）"], "highlights": "均衡配置，价值+成长灵活切换", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "000480", "fund_type": "主动权益（均衡）", "style_label": "主动权益（均衡）"}}, {"product_id": "001990", "product_name": "中欧数据挖掘多因子A", "product_category": "基金", "sub_category": "主动权益（均衡）", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（均衡）"], "highlights": "量化多因子模型，全市场选股", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "001990", "fund_type": "主动权益（均衡）", "style_label": "主动权益（均衡）"}}, {"product_id": "002943", "product_name": "广发多因子混合", "product_category": "基金", "sub_category": "主动权益（均衡）", "issuer": "", "risk_level": "PR3", "min_investment": 0, "expected_return_low": 0, "expected_return_high": 0, "term_days": 0, "is_principal_guaranteed": 0, "is_dividend": 0, "liquidity_type": "T+1", "min_holding_days": 0, "commission_rate": 0.15, "private_bank_only": 0, "currency": "CNY", "tags": ["主动权益（均衡）"], "highlights": "多因子策略，风格均衡分散风险", "data_source": "generated", "last_updated": "2026-07-01", "extra_fields": {"fund_code": "002943", "fund_type": "主动权益（均衡）", "style_label": "主动权益（均衡）"}}];
+
+// ============================================================
+// 市场上下文（静态快照）
+// ============================================================
+let MARKET = {"date": "2026-06-09 12:28", "macro": {"title": "宏观经济速览", "lpr_1y": "3.10%", "lpr_5y": "3.60%", "trend": "LPR持续下行，货币政策维持稳健宽松，降息降准仍有空间", "cpi_status": "物价温和回升，通缩风险可控", "pmi_status": "制造业PMI处于扩张区间，经济温和复苏"}, "deposit_rate": {"title": "存款利率趋势判断", "current": "1年期定存基准约1.1%，3年期约1.5%", "trend": "持续下行", "outlook": "在LPR持续下调和银行净息差收窄背景下，存款利率中长期下行趋势明确。预计未来1-2年内，1年期定存利率可能跌破1.0%，3年期跌破1.3%。锁定当前相对较高利率的储蓄型保险产品具有较强配置价值。", "key_factors": ["央行降息降准周期延续，贷款利率下调带动存款利率被动下行", "银行净息差已压缩至历史低位（约1.5%），进一步压缩存款成本是银行经营的必然选择", "10年期国债收益率走低，长期利率锚下移"]}, "capital_market": {"title": "资本市场长期展望", "policy_stance": "中央经济工作会议明确\"持续深化资本市场投融资综合改革\"，\"十五五\"规划强调\"提高资本市场制度包容性\"，政策导向从融资端向投融资平衡转变，中长期资金入市渠道持续拓宽。", "key_policies": ["推动保险、养老金等长线资金入市，改善市场投资者结构", "深化注册制改革，提升上市公司质量", "加强投资者保护，完善退市制度", "鼓励上市公司分红回购，提升股东回报"], "market_outlook": "A股估值处于历史中低位，盈利周期触底回升，结构性机会丰富。核心驱动力：经济温和复苏+流动性宽松+产业升级。关注方向：新质生产力（AI/半导体/机器人）、消费复苏、高股息红利。"}, "sector_rotation": {"title": "板块轮动与投资主线", "current_hotspots": [{"sector": "AI算力/半导体", "driver": "国产替代加速+全球AI军备竞赛", "momentum": "强"}, {"sector": "机器人/自动化", "driver": "政策支持+产业规模化落地", "momentum": "强"}, {"sector": "新能源/新材料", "driver": "技术突破+出口竞争力提升", "momentum": "中强"}, {"sector": "高股息红利", "driver": "低利率环境下资金避险需求", "momentum": "中"}, {"sector": "消费复苏", "driver": "政策刺激+居民收入预期改善", "momentum": "中"}], "risk_factors": ["中美利差倒挂、人民币汇率波动", "地缘政治不确定性", "房地产链复苏节奏偏慢"]}, "asset_prices": {"title": "大类资产表现", "a_share": {"index": "上证指数", "level": "4040-4100点区间", "trend": "震荡偏强", "ytd": "+约5%"}, "bond": {"cn_10y": "约1.65%", "us_10y": "约4.49%", "trend": "中债收益率低位运行，美债高位震荡"}, "gold": {"price": "约4328美元/盎司", "trend": "高位回落（较年初跌约22%）", "outlook": "短期承压，中长期避险需求仍存"}, "fx": {"usd_cny": "约6.77", "dxy": "约99.2", "trend": "人民币温和升值，美元走弱"}}, "generated_at": "2026-06-09T12:28:08.866430", "timestamp": 1780979288.866503};
+
+// 尝试从 daily.json 加载最新市场数据
+(async function loadMarketData() {
+  try {
+    const resp = await fetch('data/daily.json?' + Date.now());
+    if (!resp.ok) return;
+    const daily = await resp.json();
+    if (daily.market) {
+      MARKET = daily.market;
+      console.log('[数据] 已加载 (' + (daily.date || '') + ')');
+      const verEl = document.getElementById('headerBuild');
+      if (verEl && daily.date) verEl.textContent = '客户资产配置与产品推荐 · 云端版 · 数据 ' + daily.date;
+    }
+    if (daily.news && daily.news.length > 0) window._dailyNews = daily.news;
+    if (daily.daily_outlook) window._dailyOutlook = daily.daily_outlook;
+    const mc = document.getElementById('marketContent');
+    if (mc && mc.dataset.rendered === 'true') { mc.dataset.rendered = ''; renderMarketTab(); }
+    if (daily.date) window._lastDataDate = daily.date;
+  } catch(e) { console.warn('[数据] 加载失败:', e.message); }
+})();
+
+async function fetchLiveMarket() {
+  try {
+    const resp = await fetch('https://push2.eastmoney.com/api/qt/ulist.np/get?fltt=2&fields=f2,f3,f12,f14&secids=1.000001,0.GFEXAU,1.USDCNH&_='+Date.now());
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const items = data.data?.diff || [];
+    const sse = items.find(i=>i.f12==='000001');
+    const gold = items.find(i=>i.f12==='GFEXAU');
+    const fx = items.find(i=>i.f12==='USDCNH');
+    return {
+      sse: sse ? sse.f2.toFixed(0) : '',
+      sseChg: sse ? (sse.f3>=0?'+':'')+sse.f3.toFixed(2)+'%' : '',
+      gold: gold ? (gold.f2/31.1035).toFixed(0) : '',
+      fx: fx ? fx.f2.toFixed(2) : ''
+    };
+  } catch(e) { return null; }
+}
+
+// ============================================================
+// 手动刷新 + 定时自动刷新
+// ============================================================
+async function refreshData(showToast) {
+  const btn = document.getElementById('btnRefresh');
+  const icon = document.getElementById('refreshIcon');
+  const label = document.getElementById('refreshLabel');
+  
+  if (btn.disabled) return;
+  btn.disabled = true;
+  icon.className = 'refresh-spin';
+  label.textContent = '刷新中...';
+  
+  try {
+    // 实时行情（东方财富浏览器直连）
+    const live = await fetchLiveMarket();
+    
+    const resp = await fetch('data/daily.json?' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const daily = await resp.json();
+    
+    let changed = false;
+    if (daily.market) {
+      MARKET = daily.market;
+      // 用实时数据覆盖
+      if (live && live.sse) {
+        if (!MARKET.asset_prices) MARKET.asset_prices = {};
+        if (!MARKET.asset_prices.a_share) MARKET.asset_prices.a_share = {};
+        MARKET.asset_prices.a_share.level = '约'+live.sse+'点';
+        MARKET.asset_prices.a_share.change = live.sseChg||'';
+        if (!MARKET.asset_prices.gold) MARKET.asset_prices.gold = {};
+        MARKET.asset_prices.gold.level = '约'+live.gold+'元/克';
+        if (!MARKET.asset_prices.fx) MARKET.asset_prices.fx = {};
+        MARKET.asset_prices.fx.level = '约'+live.fx;
+      }
+      changed = true;
+    }
+    if (daily.news && daily.news.length > 0) {
+      window._dailyNews = daily.news;
+      changed = true;
+    }
+    if (daily.daily_outlook) {
+      window._dailyOutlook = daily.daily_outlook;
+      changed = true;
+    }
+    
+    // 更新 header 日期
+    const verEl = document.getElementById('headerBuild');
+    if (verEl && daily.date) {
+      verEl.textContent = '客户资产配置与产品推荐 · 云端版 · build 20260619-0856 · 数据 ' + daily.date;
+    }
+    
+    // 强制刷新市场Tab（重置缓存）
+    const marketContent = document.getElementById('marketContent');
+    if (marketContent) marketContent.dataset.rendered = '';
+    renderMarketTab();
+    
+    icon.className = '';
+    label.textContent = '刷新';
+    if (showToast !== false) toast('✅ 数据已更新 (' + (daily.date || '') + ')');
+    console.log('[刷新] 数据更新成功，' + (daily.date || ''));
+  } catch (e) {
+    icon.className = '';
+    label.textContent = '刷新';
+    if (showToast !== false) toast('⚠ 刷新失败，请稍后重试');
+    console.error('[刷新] 失败:', e.message);
+  }
+  btn.disabled = false;
+}
+
+// 每 30 分钟自动检测数据更新
+let _lastDataDate = '';
+setInterval(async function() {
+  try {
+    const resp = await fetch('data/daily.json?' + Date.now());
+    if (!resp.ok) return;
+    const daily = await resp.json();
+    const newDate = daily.date || '';
+    if (newDate && newDate !== _lastDataDate) {
+      console.log('[自动刷新] 检测到新数据: ' + newDate);
+      _lastDataDate = newDate;
+      if (daily.market) MARKET = daily.market;
+      if (daily.news && daily.news.length > 0) window._dailyNews = daily.news;
+      if (daily.daily_outlook) window._dailyOutlook = daily.daily_outlook;
+      const mc = document.getElementById('marketContent');
+      if (mc) mc.dataset.rendered = '';
+      renderMarketTab();
+      const verEl = document.getElementById('headerBuild');
+      if (verEl) verEl.textContent = '客户资产配置与产品推荐 · 云端版 · build 20260619-0856 · 数据 ' + newDate;
+    }
+  } catch(e) { /* 静默失败 */ }
+}, 30 * 60 * 1000);
+
+// 页面加载后自动渲染首页（资讯Tab）
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() { renderDashboard(); }, 300);
+});
+
+// ============================================================
+// 常量
+// ============================================================
+const RISK_ORDER = ["PR1","PR2","PR3","PR4","PR5"];
+const PRIORITY_INSURERS = ["工银安盛","中国人寿","人保寿险","大家人寿","瑞众人寿","中汇人寿"];
+const ALL_CATS = ['保险','基金','理财','存款','结构性存款','外币存款'];
+const CAT_LABELS = {"基金":"基金","保险":"保险","理财":"理财","存款":"存款","结构性存款":"结构性存款","外币存款":"外币存款"};
+const CAT_BADGE_CLASS = {"基金":"cat-fund","保险":"cat-insurance","理财":"cat-finance","存款":"cat-deposit","结构性存款":"cat-struct","外币存款":"cat-fx"};
+const CAT_COLORS = {保险:'#7c3aed',基金:'#2563eb',理财:'#db2777',存款:'#16a34a',结构性存款:'#b45309',外币存款:'#4f46e5'};
+const ALLOCATION = {
+  "PR1":{"存款/货币":"60-80%","保险":"10-20%","理财":"10-20%","基金":"0-10%"},
+  "PR2":{"存款/货币":"40-50%","保险":"10-20%","理财":"20-30%","基金":"10-20%"},
+  "PR3":{"存款/货币":"20-30%","保险":"10-20%","理财":"25-35%","基金":"20-35%"},
+  "PR4":{"存款/货币":"10-20%","保险":"5-15%","理财":"20-30%","基金":"35-50%"},
+  "PR5":{"存款/货币":"5-10%","保险":"5-10%","理财":"15-25%","基金":"50-70%"},
+};
+
+// ============================================================
+// 市场分析辅助函数（与 Python market_analyzer.py 对应）
+// ============================================================
+function getInvestorInsights(profile) {
+  const riskLevel = (profile && profile.risk_level) || 'PR3';
+  return {
+    insurance_rationale: buildInsuranceRationale(),
+    fund_rationale: buildFundRationale(riskLevel),
+    deposit_rationale: buildDepositRationale(),
+    wealth_rationale: buildWealthRationale(riskLevel),
+  };
+}
+
+function buildInsuranceRationale() {
+  const dr = MARKET.deposit_rate || {};
+  const outlook = dr.outlook || '';
+  return '### 为什么现在配置保险？\n\n' +
+    '**核心逻辑：锁定利率，对抗下行**\n\n' +
+    '当前银行存款利率已降至历史低位（1年期仅约1.1%），且在LPR持续下调和银行净息差承压背景下，利率下行趋势短期难以逆转。\n\n' +
+    outlook + '\n\n' +
+    '**配置建议**：\n\n' +
+    '- 追求确定性收益的客户：优先关注**固定收益型年金险/两全险**，锁定当前相对较高的保证利率\n' +
+    '- 有长期传承需求的客户：关注**增额终身寿险**，现金价值稳健增长\n' +
+    '- 私银客户：可考虑**分红型/万能型产品**，在保底基础上获取浮动收益';
+}
+
+function buildFundRationale(riskLevel) {
+  const cm = MARKET.capital_market || {};
+  const sr = MARKET.sector_rotation || {};
+  const hotspots = (sr.current_hotspots || []);
+  const hotspotsText = hotspots.map(s => '- **'+s.sector+'**：'+s.driver+'（动量：'+s.momentum+'）').join('\n');
+  const riskText = {
+    'PR1': '建议以债券型/货币型基金为主，权益仓位控制在10%以内',
+    'PR2': '建议债券型基金为主（60-70%），辅以少量优质混合型/指数型基金',
+    'PR3': '建议股债平衡配置（各50%左右），精选行业主题基金参与结构性机会',
+    'PR4': '建议以权益类基金为主（60-80%），聚焦高景气赛道，承受适度波动',
+    'PR5': '建议积极配置权益类基金（80%+），集中布局高成长板块',
+  }[riskLevel] || '建议股债平衡配置';
+
+  return '### 为什么现在配置基金？\n\n' +
+    '**核心逻辑：政策支持+估值合理+结构性机会**\n\n' +
+    '**一、政策面：资本市场定位空前重要**\n\n' +
+    (cm.policy_stance || '') + '\n\n' +
+    '**二、市场面：当前六大投资主线**\n\n' +
+    hotspotsText + '\n\n' +
+    '**三、估值面：性价比处于历史较好水平**\n\n' +
+    'A股主要指数估值处于历史中低位区间，盈利周期触底回升信号明确，为长期布局提供了较好的安全边际。\n\n' +
+    '**针对您'+riskLevel+'风险等级的配置策略**：'+riskText;
+}
+
+function buildDepositRationale() {
+  return '### 流动性管理建议\n\n' +
+    '当前市场环境下，建议保留适当比例的高流动性资产（活期存款/货币基金）用于：\n' +
+    '- 日常支出和应急储备（建议3-6个月生活支出）\n' +
+    '- 捕捉市场调整带来的低位布局机会\n' +
+    '- 大额短期资金可关注**结构性存款**，保本基础上获取浮动收益\n\n' +
+    '在当前低利率环境下，不建议将过多资金长期存放于活期存款，适度进行资产配置是提升整体收益的必要选择。';
+}
+
+function buildWealthRationale(riskLevel) {
+  const tips = {
+    'PR1': '以固收类理财为主，关注每日开放型产品和短期定开型产品，兼顾流动性和收益',
+    'PR2': '以固收类理财为主，关注每日开放型产品和短期定开型产品，兼顾流动性和收益',
+    'PR3': '固收+策略产品是性价比之选，可在稳健基础上小幅提升收益弹性',
+    'PR4': '可关注混合类/权益类理财产品，分享资本市场成长红利',
+    'PR5': '可关注混合类/权益类理财产品，分享资本市场成长红利',
+  };
+  return '### 理财配置逻辑\n\n' +
+    '银行理财产品在当前利率下行环境中，凭借相对稳定的收益和较低波动，仍是稳健型客户的核心配置工具。\n\n' +
+    '- **PR1-PR2客户**：以固收类理财为主，关注每日开放型产品和短期定开型产品，兼顾流动性和收益\n' +
+    '- **PR3客户**：固收+策略产品是性价比之选，可在稳健基础上小幅提升收益弹性\n' +
+    '- **PR4-PR5客户**：可关注混合类/权益类理财产品，分享资本市场成长红利';
+}
+
+// ============================================================
+// 全局状态
+// ============================================================
+let lastResult = null;
+let lastProfile = null;
+let customProducts = [];
+let customIdCounter = 0;
+let prefCats = new Set(ALL_CATS);
+let sids = new Set();
+
+// ============================================================
+// UI 逻辑
+// ============================================================
+function switchTab(tab) {
+  ['input','result','report','market','news','fund','clients','ai','dashboard'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
+  });
+  document.querySelectorAll('.tab').forEach((el,i) => {
+    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report'][i]===tab);
+  });
+  // 同步移动端底部导航
+  document.querySelectorAll('.mobile-nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+  // 市场 tab 自动渲染
+  if (tab === 'market') renderMarketTab();
+  if (tab === 'news') renderNewsTab();
+  if (tab === 'fund') renderFundTab();
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'clients') renderClientsTab();
+  if (tab === 'ai') renderAiTab();
+  // 滚动到顶部
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ============================================================
+// 市场速览 + 资讯渲染
+// ============================================================
+
+function renderMarketTab() {
+  const container = document.getElementById('marketContent');
+  // 首次渲染后标记，新闻异步加载完成后会强制刷新
+  const isRefresh = container.dataset.rendered === 'true';
+  
+  const market = MARKET || {};
+  const sr = market.sector_rotation || {};
+  const ap = market.asset_prices || {};
+  const dep = market.deposit_rate || {};
+  const mc = market.macro || {};
+  
+  // 市场偏向判断
+  const bias = judgeBias(market);
+
+  let html = '';
+
+  // ===== 实时行情（股票软件风格）=====
+  const live = window._livePrices || {};
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+  const isLive = !!live._ts;
+  
+  html += '<div class="card"><div class="card-title">📊 实时行情<span style="font-size:0.65rem;color:'+(isLive?'#059669':'#6b7280')+';font-weight:400;margin-left:6px;">'+(isLive?'🟢 实时 '+timeStr:'📡 缓存')+'</span></div>';
+  
+  // 小方块指标
+  function miniCard(label, price, chgVal, chgPct) {
+    const isUp = chgPct > 0, isDown = chgPct < 0;
+    const color = isUp ? '#c41230' : (isDown ? '#059669' : '#6b7280');
+    const arrow = isUp ? '▲' : (isDown ? '▼' : '');
+    const chgStr = (chgVal!=null&&chgVal!=='') ? (arrow+(chgVal>0?'+':'')+chgVal+(chgPct!=null?'  '+(chgPct>0?'+':'')+chgPct.toFixed(2)+'%':'')) : '';
+    const bg = isUp ? '#fef2f2' : (isDown ? '#ecfdf5' : '#f9fafb');
+    const hasPrice = price!=='—' && price!=='';
+    return '<div style="background:'+bg+';border-radius:8px;padding:8px 7px;text-align:center;border:1px solid '+(isUp?'#fecaca':isDown?'#d1fae5':'#e5e7eb')+';">' +
+      '<div style="font-size:0.65rem;color:var(--gray);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+label+'</div>' +
+      '<div style="font-size:0.95rem;font-weight:700;color:var(--dark);line-height:1.2;margin-bottom:2px;">'+(hasPrice?price:'—')+'</div>' +
+      '<div style="font-size:0.7rem;font-weight:600;color:'+color+';line-height:1.2;">'+(chgStr||'—')+'</div>' +
+    '</div>';
+  }
+  
+  // 指数网格 3列
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">';
+  html += miniCard('上证指数', live.ss_price||'—', live.ss_chg_val, live.ss_chg_pct);
+  html += miniCard('深证成指', live.sz_price||'—', live.sz_chg_val, live.sz_chg_pct);
+  html += miniCard('创业板指', live.cy_price||'—', live.cy_chg_val, live.cy_chg_pct);
+  html += miniCard('科创50', live.kc_price||'—', live.kc_chg_val, live.kc_chg_pct);
+  html += miniCard('北证50', live.bj_price||'—', live.bj_chg_val, live.bj_chg_pct);
+  html += miniCard('黄金XAU', live.gold?('$'+live.gold):'—', live.gold_chg_val, live.gold_chg_pct);
+  html += miniCard('USD/CNY', live.fx||'—', live.fx_chg_val, live.fx_chg_pct);
+  html += miniCard('美元指数', live.dxy||'—', live.dxy_chg_val, live.dxy_chg_pct);
+  html += miniCard('10年国债', (ap.bond||{}).cn_10y||'—', null, null);
+  html += '</div>';
+  html += '<div style="font-size:0.6rem;color:#9ca3af;margin-top:4px;text-align:right;">数据来源：东方财富 · 黄金API · open.er-api</div>';
+  
+  // 行业板块涨幅前六
+  const sectors = live.sectors || [];
+  if (sectors.length > 0) {
+    html += '<div style="margin-top:10px;font-size:0.75rem;font-weight:600;color:var(--dark);">📈 行业涨幅榜</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;">';
+    for (const s of sectors) {
+      const sUp = (s.chg||0) >= 0, sColor = sUp ? '#c41230' : '#059669';
+      html += '<div style="background:'+(sUp?'#fef2f2':'#ecfdf5')+';border-radius:8px;padding:6px 7px;text-align:center;border:1px solid '+(sUp?'#fecaca':'#d1fae5')+';">' +
+        '<div style="font-size:0.62rem;color:var(--gray);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+s.name+'</div>' +
+        '<div style="font-size:0.78rem;font-weight:700;color:'+sColor+';">'+(sUp?'+':'')+(s.chg||0).toFixed(2)+'%</div>' +
+      '</div>';
+    }
+    html += '</div>';
+    html += '<div style="font-size:0.6rem;color:#9ca3af;margin-top:4px;text-align:right;">数据来源：东方财富行情</div>';
+  }
+  
+  html += '</div>'; // end card
+
+  // ===== 市场环境速览（5维度卡片，动态计算）=====
+  const dynBias = calcLiveBias(live, ap);
+  const biasLabels = {equity:'权益', bond:'债券', gold:'黄金', deposit:'利率', fx:'汇率'};
+  html += '<div class="card"><div class="card-title">🌐 市场环境速览<span style="font-size:0.65rem;color:#6b7280;font-weight:400;margin-left:8px;">'+(isLive?'实时计算':'基于缓存')+'</span></div>';
+  html += '<div class="bias-grid">';
+  for (const [key, label] of Object.entries(biasLabels)) {
+    const v = dynBias[key] || bias[key] || '—';
+    const cls = v.includes('偏多') ? 'bull' : (v.includes('偏空') ? 'bear' : 'neutral');
+    html += '<div class="bias-card"><div class="bias-label">'+label+'</div><div class="bias-value '+cls+'">'+v+'</div></div>';
+  }
+  html += '</div>';
+
+  // 投资主线
+  const hotspots = sr.current_hotspots || [];
+  if (hotspots.length > 0) {
+    html += '<div style="margin-top:12px;"><strong style="font-size:0.9rem;">当前投资主线</strong></div>';
+    html += '<div style="margin-top:6px;">';
+    for (const h of hotspots) {
+      html += '<span class="hotspot-tag">' + h.sector + ' <strong>' + (h.momentum||'—') + '</strong></span>';
+    }
+    html += '</div>';
+    html += '<div style="font-size:0.75rem;color:var(--gray);margin-top:6px;">';
+    for (const h of hotspots) {
+      html += '• <strong>' + h.sector + '</strong>：' + (h.driver||'') + '<br>';
+    }
+    html += '</div>';
+  }
+  
+  // 风险提示
+  const risks = sr.risk_factors || [];
+  if (risks.length > 0) {
+    html += '<div class="reminder-box"><div class="reminder-title">⚠ 风险因素</div><ul>';
+    for (const r of risks) {
+      html += '<li>' + r + '</li>';
+    }
+    html += '</ul></div>';
+  }
+  
+  html += '</div>'; // end card
+
+  // ===== 每日展望 =====
+  const outlook = (window._dailyOutlook) || {};
+  if (Object.keys(outlook).length > 0) {
+    html += '<div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">📋 每日展望<span><button onclick="copyOutlook()" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:var(--gray);cursor:pointer;">📋 复制</button></span></div>';
+    const icons = {债券:'🟢', 股票:'🔴', 黄金:'🟡', 汇率:'🔵'};
+    for (const [asset, info] of Object.entries(outlook)) {
+      html += '<div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;">';
+      html += '<div style="font-size:0.95rem;font-weight:700;margin-bottom:4px;">' + (icons[asset]||'') + ' ' + asset + '：<span style="color:var(--red);">' + (info.label||'') + '</span></div>';
+      html += '<div style="font-size:0.82rem;color:var(--gray);line-height:1.7;">' + (info.analysis||'') + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+
+  // 市场Tab不再渲染资讯，改为独立Tab
+  html += '<div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center;">📰 今日资讯速览<span><button onclick="switchTab(\'news\')" style="font-size:0.75rem;color:var(--red);background:none;border:none;cursor:pointer;font-weight:600;">查看全部 →</button></span></div>';
+  html += '<p style="font-size:0.82rem;color:var(--gray);">点击上方按钮或底部导航切换到「📰 资讯」标签查看完整新闻列表。</p>';
+  html += '</div>';
+
+  container.innerHTML = html;
+  container.dataset.rendered = 'true';
+}
+
+// ===== 复制每日展望 ====
+function copyOutlook() {
+  const outlook = (window._dailyOutlook) || {};
+  if (Object.keys(outlook).length === 0) { toast('暂无展望数据'); return; }
+  const icons = {债券:'🟢', 股票:'🔴', 黄金:'🟡', 汇率:'🔵'};
+  let text = '📋 每日市场展望\n\n';
+  for (const [asset, info] of Object.entries(outlook)) {
+    text += (icons[asset]||'') + ' ' + asset + '：' + (info.label||'') + '\n';
+    text += (info.analysis||'') + '\n\n';
+  }
+  text += '—— 智能投顾系统';
+  navigator.clipboard.writeText(text).then(() => {
+    toast('✅ 每日展望已复制，可直接粘贴发送');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✅ 已复制到剪贴板');
+  });
+}
+
+// ============================================================
+// 资讯Tab渲染（独立Tab）
+// ============================================================
+function renderNewsTab() {
+  const container = document.getElementById('newsContent');
+  const dailyNews = (window._dailyNews) || [];
+  
+  let html = '';
+  if (dailyNews.length === 0) {
+    html += '<div class="card"><div class="card-title">📰 今日资讯</div>';
+    html += '<p style="font-size:0.82rem;color:var(--gray);">暂无实时资讯，等待数据管道更新后显示。</p>';
+    html += '<p style="font-size:0.75rem;color:var(--gray);">每天早晨数据管道会自动爬取最新财经要闻。</p>';
+    html += '</div>';
+  } else {
+    // 去重显示
+    const seen = window._renderedNewsIds || new Set();
+    const fresh = dailyNews.filter(n => !seen.has(n.title));
+    
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+    html += '<div style="font-weight:700;">📰 今日资讯（' + fresh.length + '条）</div>';
+    html += '<button onclick="refreshNewsTab()" id="btnRefreshNews" style="font-size:0.8rem;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">🔄 刷新资讯</button>';
+    html += '</div>';
+    
+    for (const n of fresh) {
+      const catCls = {宏观经济:'macro', 行业动态:'industry', 上市公司:'company', 国际地缘:'geopolitics'}[n.category] || 'macro';
+      html += '<div class="news-card">';
+      html += '<span class="news-cat ' + catCls + '">' + (n.category||'资讯') + '</span>';
+      html += '<div class="news-title">' + (n.title||'') + '</div>';
+      if (n.summary) html += '<div class="news-summary">' + n.summary + '</div>';
+      if (n.capital_view) html += '<div class="news-capital">💰 资本视角：' + n.capital_view + '</div>';
+      if (n.plain_text) html += '<div class="news-plain">💬 人话版：' + n.plain_text + '</div>';
+      html += '</div>';
+    }
+    
+    // 标记已显示
+    dailyNews.forEach(n => seen.add(n.title));
+    window._renderedNewsIds = seen;
+  }
+  
+  container.innerHTML = html;
+}
+
+async function refreshNewsTab() {
+  const btn = document.getElementById('btnRefreshNews');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 刷新中...'; }
+  
+  try {
+    // 优先从新浪API实时抓取
+    const liveNews = await fetchLiveNews();
+    if (liveNews && liveNews.length > 3) {
+      window._dailyNews = liveNews;
+      window._renderedNewsIds = new Set();
+      renderNewsTab();
+      if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新资讯'; }
+      toast('✅ 已更新 ' + liveNews.length + ' 条实时资讯');
+      return;
+    }
+  } catch(e) { console.warn('实时新闻抓取失败:', e.message); }
+  
+  // 兜底：从 daily.json 读取
+  try {
+    const resp = await fetch('data/daily.json?' + Date.now());
+    if (resp.ok) {
+      const daily = await resp.json();
+      if (daily.news) {
+        window._dailyNews = daily.news;
+        window._renderedNewsIds = new Set();
+      }
+    }
+  } catch(e) {}
+  
+  renderNewsTab();
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新资讯'; }
+  toast('📡 已刷新');
+}
+
+// 从新浪财经API实时抓取最新新闻
+async function fetchLiveNews() {
+  const url = 'https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2509&k=&num=20&page=1';
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const items = data?.result?.data;
+    if (!items || !items.length) return null;
+    
+    const news = [];
+    for (const item of items) {
+      const title = (item.title || '').trim();
+      if (!title || title.length < 5) continue;
+      const summary = (item.intro || item.ctime || '').trim();
+      news.push({
+        title: title.slice(0, 80),
+        summary: summary.slice(0, 150),
+        category: classifyLiveNews(title)
+      });
+      if (news.length >= 15) break;
+    }
+    return news;
+  } catch(e) { return null; }
+}
+
+function classifyLiveNews(title) {
+  const t = title;
+  if (anyKw(t, '美联储 央行 LPR 利率 CPI 通胀 GDP PMI 降息 降准 宏观 经济 财政'.split(' '))) return '宏观经济';
+  if (anyKw(t, 'A股 上证 深证 创业板 科创板 涨停 跌停 板块 行情 指数 反弹 调整 震荡 牛市 熊市 北向 外资'.split(' '))) return '行业动态';
+  if (anyKw(t, '公司 股份 回购 分红 业绩 财报 IPO 上市 融资 收购 减持 利润'.split(' '))) return '上市公司';
+  if (anyKw(t, '美国 欧洲 日本 俄 乌 中东 地缘 贸易 关税 制裁 冲突'.split(' '))) return '国际地缘';
+  if (anyKw(t, 'AI 芯片 半导体 机器人 新能源 光伏 锂电 算力 大模型 人工智能 5G 自动驾驶'.split(' '))) return '行业动态';
+  if (anyKw(t, '黄金 原油 期货 汇率 比特币 美股 港股 恒生 纳指 道指'.split(' '))) return '国际地缘';
+  return '行业动态';
+}
+
+function anyKw(text, keywords) {
+  return keywords.some(w => text.includes(w));
+}
+
+// ============================================================
+// 基金估值Tab（JSONP方案，顺序加载）
+// ============================================================
+let _compareMode = false, _compareList = [];
+
+async function renderFundTab() {
+  const container = document.getElementById('fundContent');
+  if (!container) return;
+  
+  const allProds = typeof PRODUCTS !== 'undefined' ? PRODUCTS : [];
+  const funds = allProds.filter(p => p.product_category === '基金');
+  
+  if (funds.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:40px;">未找到基金产品</p>';
+    return;
+  }
+
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+  html += '<div style="font-weight:700;">📈 基金估值（'+funds.length+'只）</div>';
+  html += '<div style="display:flex;gap:6px;">';
+  html += '<button onclick="toggleCompare()" id="btnCompare" style="font-size:0.75rem;padding:6px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;">📊 对比</button>';
+  html += '<button onclick="fetchFundEstimates()" id="btnEstimate" style="font-size:0.8rem;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">🔄 估值</button>';
+  html += '</div></div>';
+  
+  html += '<input id="fundSearch" oninput="filterFunds()" placeholder="🔍 搜索基金名称/代码..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;margin-bottom:10px;">';
+  
+  // 对比模式：渲染对比表
+  if (_compareMode && _compareList.length > 1) {
+    html += '<div style="overflow-x:auto;margin-bottom:12px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;">';
+    html += '<div style="font-weight:600;font-size:0.8rem;margin-bottom:6px;">📊 对比 ('+_compareList.length+'只)</div>';
+    html += '<div style="display:flex;gap:8px;font-size:0.7rem;border-bottom:1px solid #fde68a;padding-bottom:4px;">';
+    html += '<div style="min-width:70px;font-weight:600;">指标</div>';
+    for (const c of _compareList) {
+      const f = funds.find(x=>x.product_id===c);
+      html += '<div style="min-width:90px;font-weight:600;">'+(f?f.product_name.slice(0,8):c)+'</div>';
+    }
+    html += '</div>';
+    const rows = [['近1月','1m'],['近3月','3m'],['近半年','6m'],['近1年','1y']];
+    for (const [label,key] of rows) {
+      html += '<div style="display:flex;gap:8px;font-size:0.7rem;margin-top:3px;">';
+      html += '<div style="min-width:70px;color:var(--gray);">'+label+'</div>';
+      for (const c of _compareList) {
+        const perf = (window._fundHistory||{})[c];
+        let val = '—';
+        if (perf && perf[key] != null) val = (perf[key]>=0?'+':'')+perf[key]+'%';
+        const cl = val.startsWith('+') ? '#c41230' : (val.startsWith('-') ? '#059669' : 'var(--gray)');
+        html += '<div style="min-width:90px;color:'+cl+';">'+val+'</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  
+  // 基金卡片列表（竖排，每只基金独立）
+  for (const f of funds) {
+    const code = f.product_id || '';
+    const industry = f.sub_category || f.issuer || '';
+    const isSel = _compareList.includes(code);
+    html += '<div class="fund-card" data-code="'+code+'" style="background:'+(isSel?'#fef3c7':'#fff')+';border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid '+(isSel?'#f59e0b':'#e5e7eb')+';cursor:'+(_compareMode?'pointer':'default')+';" onclick="'+(_compareMode?'toggleCompareFund(\''+code+'\')':'')+'">';
+    // 第一行：名称 + 估值 + 涨跌
+    html += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
+    html += '<div style="flex:1;min-width:0;">';
+    html += '<div style="font-size:0.85rem;font-weight:600;color:var(--dark);">'+(f.product_name||'')+'</div>';
+    html += '<div style="font-size:0.65rem;color:var(--gray);">'+code+' · '+(industry.slice(0,10))+'</div>';
+    html += '</div>';
+    html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">点击获取</span>';
+    html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:60px;text-align:right;color:var(--gray);">—</span>';
+    html += '</div>';
+    // 第二行：净值+更新+历史业绩（可左右滑动）
+    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">';
+    html += '<div style="display:flex;gap:10px;font-size:0.7rem;min-width:340px;">';
+    html += '<span class="fund-nav" style="color:var(--gray);white-space:nowrap;">净值 —</span>';
+    html += '<span class="fund-1m" style="color:var(--gray);white-space:nowrap;">近1月 —</span>';
+    html += '<span class="fund-3m" style="color:var(--gray);white-space:nowrap;">近3月 —</span>';
+    html += '<span class="fund-6m" style="color:var(--gray);white-space:nowrap;">近半年 —</span>';
+    html += '<span class="fund-1y" style="color:var(--gray);white-space:nowrap;">近1年 —</span>';
+    html += '</div></div>';
+    html += '</div>';
+  }
+  html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:right;margin-top:8px;">数据来源：天天基金 · 东方财富 | 估值仅供参考</div>';
+  container.innerHTML = html;
+
+function toggleCompare() {
+  _compareMode = !_compareMode; _compareList = [];
+  const btn = document.getElementById('btnCompare');
+  if (btn) { btn.style.background = _compareMode ? 'var(--red)' : '#fff'; btn.style.color = _compareMode ? '#fff' : 'var(--dark)'; }
+  if (_compareMode) toast('点击基金卡片加入对比（最多5只）');
+  renderFundTab();
+}
+
+function toggleCompareFund(code) {
+  if (!_compareMode) return;
+  const idx = _compareList.indexOf(code);
+  if (idx >= 0) _compareList.splice(idx, 1);
+  else if (_compareList.length < 5) _compareList.push(code);
+  renderFundTab();
+}
+
+  // 异步加载历史业绩（从 fund_history.json）
+  loadFundHistory().then(hist => {
+    for (const card of document.querySelectorAll('.fund-card')) {
+      const code = card.dataset.code;
+      if (hist[code]) updateHistRow(code, hist[code]);
+    }
+  });
+}
+
+async function fetchFundEstimates() {
+  const btn = document.getElementById('btnEstimate');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 获取中...'; }
+  
+  const allProds = typeof PRODUCTS !== 'undefined' ? PRODUCTS : [];
+  const funds = allProds.filter(p => p.product_category === '基金');
+  const codes = funds.map(f => String(f.product_id)).filter(c => c.length >= 6);
+  
+  function updateProgress(done) {
+    if (btn) btn.innerHTML = '<span class="spinner"></span> ' + done + '/' + codes.length;
+  }
+  
+  for (let i = 0; i < codes.length; i++) {
+    const code = codes[i];
+    updateProgress(i + 1);
+    
+    // 获取实时估值 (JSONP)
+    try {
+      const data = await new Promise((resolve) => {
+        const timeout = setTimeout(() => resolve(null), 4000);
+        const prev = window.jsonpgz;
+        window.jsonpgz = function(d) { 
+          clearTimeout(timeout); 
+          window.jsonpgz = prev; 
+          try { resolve(d); } catch(e) { resolve(null); }
+        };
+        const s = document.createElement('script');
+        s.src = 'https://fundgz.1234567.com.cn/js/' + code + '.js?rt=' + Date.now();
+        s.onerror = () => { clearTimeout(timeout); window.jsonpgz = prev; resolve(null); };
+        document.head.appendChild(s);
+        s.onload = () => { if (s.parentNode) s.parentNode.removeChild(s); };
+      });
+      
+      if (data && data.fundcode) {
+        try {
+          updateRow(code, data);
+        } catch(e2) {
+          // 单只基金更新失败不影响其他
+          console.warn('更新基金失败:', code, e2.message);
+        }
+      }
+    } catch(e) {
+      console.warn('基金JSONP失败:', codes[i], e.message);
+    }
+    
+    if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 200));
+  }
+  
+  delete window.jsonpgz;
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新估值'; }
+}
+
+function updateRow(code, data) {
+  const card = document.querySelector('.fund-card[data-code="'+code+'"]');
+  if (!card) return;
+  
+  const gz = data.gz ? parseFloat(data.gz).toFixed(4) : '—';
+  const gszzl = parseFloat(data.gszzl || 0);
+  const clr = gszzl >= 0 ? '#c41230' : '#059669';
+  const arr = gszzl >= 0 ? '▲' : (gszzl < 0 ? '▼' : '');
+  const dwjz = data.dwjz ? parseFloat(data.dwjz).toFixed(4) : '—';
+  
+  card.querySelector('.fund-gz').innerHTML = gz+'<div style="font-size:0.55rem;color:#9ca3af;font-weight:400;">'+(data.gztime||'').slice(-8)+'</div>';
+  card.querySelector('.fund-chg').innerHTML = '<span style="color:'+clr+';">'+arr+(gszzl>0?'+':'')+gszzl.toFixed(2)+'%</span>';
+  card.querySelector('.fund-nav').innerHTML = '净值 <span style="font-weight:600;color:var(--dark);">'+dwjz+'</span>';
+  card.style.background = '#f9fafb';
+}
+
+function filterFunds() {
+  const q = (document.getElementById('fundSearch')?.value||'').toLowerCase();
+  document.querySelectorAll('.fund-card').forEach(c => {
+    c.style.display = q ? ((c.textContent||'').toLowerCase().includes(q) ? '' : 'none') : '';
+  });
+}
+
+async function loadFundHistory() {
+  try {
+    const resp = await fetch('data/fund_history.json?' + Date.now());
+    if (resp.ok) return await resp.json();
+  } catch(e) {}
+  return {};
+}
+
+function updateHistRow(code, hist) {
+  const card = document.querySelector('.fund-card[data-code="'+code+'"]');
+  if (!card) return;
+  const setVal = (cls, label, val) => {
+    const el = card.querySelector('.'+cls);
+    if (!el || val == null) return;
+    const isUp = val >= 0, clr = isUp ? '#c41230' : '#059669';
+    el.innerHTML = label+' <span style="font-weight:600;color:'+clr+';">'+(isUp?'+':'')+val.toFixed(2)+'%</span>';
+  };
+  setVal('fund-1m', '近1月', hist['1m']);
+  setVal('fund-3m', '近3月', hist['3m']);
+  setVal('fund-6m', '近半年', hist['6m']);
+  setVal('fund-1y', '近1年', hist['1y']);
+  if (hist.streak >= 3) {
+    const tag = hist.streak_up ? '🔥连'+hist.streak+'涨' : '❄连'+hist.streak+'跌';
+    const nd = card.querySelector('div div:last-child');
+    if (nd) nd.innerHTML += ' <span style="font-size:0.6rem;color:'+(hist.streak_up?'#c41230':'#059669')+';">'+tag+'</span>';
+  }
+}
+
+function judgeBias(market) {
+  const dep = market.deposit_rate || {};
+  const ap = market.asset_prices || {};
+  const aTrend = ((ap.a_share||{}).trend||'');
+  const bTrend = ((ap.bond||{}).trend||'');
+  const gTrend = ((ap.gold||{}).trend||'');
+  const fTrend = ((ap.fx||{}).trend||'');
+  
+  const bull = v => /强|偏强|上涨|走强|反弹|上行/.test(v||'');
+  const bear = v => /弱|偏弱|下跌|走弱|回落|承压|倒挂/.test(v||'');
+  
+  return {
+    equity: bull(aTrend) ? '偏多' : (bear(aTrend) ? '偏空' : '中性'),
+    bond: bear(bTrend) ? '偏多' : (bull(bTrend) ? '偏空' : '中性'),
+    gold: bull(gTrend) ? '偏多' : (bear(gTrend) ? '偏空' : '中性'),
+    deposit: (dep.trend||'').includes('下行') ? '偏空（利率下行中）' : '中性',
+    fx: bull(fTrend) ? '偏多（人民币走强）' : (bear(fTrend) ? '偏空' : '中性'),
+  };
+}
+
+// 尝试从 daily.json 加载新闻
+
+
+// ============================================================
+// 实时行情（浏览器直连免费API，60秒刷新）
+// ============================================================
+async function fetchLivePrices() {
+  try {
+    const idxUrl = (secid) => 'https://push2.eastmoney.com/api/qt/stock/get?secid='+secid+'&fields=f43,f169,f170&_='+Date.now();
+    const [s1,s2,s3,s4,s5,g1,f1,sec1] = await Promise.allSettled([
+      fetch(idxUrl('1.000001'),{cache:'no-cache'}),  // 上证
+      fetch(idxUrl('0.399001'),{cache:'no-cache'}),  // 深证
+      fetch(idxUrl('0.399006'),{cache:'no-cache'}),  // 创业板
+      fetch(idxUrl('1.000688'),{cache:'no-cache'}),  // 科创50
+      fetch(idxUrl('0.899050'),{cache:'no-cache'}),  // 北证50
+      fetch('https://api.gold-api.com/price/XAU',{cache:'no-cache'}),
+      fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-cache'}),
+      // 行业板块涨幅前6
+      fetch('https://push2.eastmoney.com/api/qt/clist/get?pn=1&pz=6&po=1&np=1&fltt=2&invt=2&fid=f3&fs=m:90+t:2&fields=f12,f14,f3&_='+Date.now(),{cache:'no-cache'}),
+    ]);
+    const live = {};
+    const parseIdx = async (r) => { if(r.status!=='fulfilled'||!r.value.ok) return null; try{const d=await r.value.json();return d?.data||null;}catch(e){return null;} };
+    
+    const dSS=await parseIdx(s1); if(dSS){live.ss_price=Math.round(dSS.f43/100);live.ss_chg_val=Math.round(dSS.f169/100);live.ss_chg_pct=+(dSS.f170/100).toFixed(2);live._ts=Date.now();}
+    const dSZ=await parseIdx(s2); if(dSZ){live.sz_price=Math.round(dSZ.f43/100);live.sz_chg_val=Math.round(dSZ.f169/100);live.sz_chg_pct=+(dSZ.f170/100).toFixed(2);live._ts=Date.now();}
+    const dCY=await parseIdx(s3); if(dCY){live.cy_price=Math.round(dCY.f43/100);live.cy_chg_val=Math.round(dCY.f169/100);live.cy_chg_pct=+(dCY.f170/100).toFixed(2);live._ts=Date.now();}
+    const dKC=await parseIdx(s4); if(dKC){live.kc_price=Math.round(dKC.f43/100);live.kc_chg_val=Math.round(dKC.f169/100);live.kc_chg_pct=+(dKC.f170/100).toFixed(2);live._ts=Date.now();}
+    const dBJ=await parseIdx(s5); if(dBJ){live.bj_price=Math.round(dBJ.f43/100);live.bj_chg_val=Math.round(dBJ.f169/100);live.bj_chg_pct=+(dBJ.f170/100).toFixed(2);live._ts=Date.now();}
+    
+    if(g1.status==='fulfilled'&&g1.value.ok){try{const d=await g1.value.json();if(d?.price){const p=window._livePrices?.gold;live.gold=Math.round(d.price);if(p){live.gold_chg_val=live.gold-p;live.gold_chg_pct=+((live.gold-p)/p*100).toFixed(2);}live._ts=Date.now();}}catch(e){}}
+    if(f1.status==='fulfilled'&&f1.value.ok){try{const d=await f1.value.json();if(d?.rates?.CNY){const p=window._livePrices?.fx;live.fx=d.rates.CNY.toFixed(3);if(p){live.fx_chg_val=+(live.fx-p).toFixed(4);live.fx_chg_pct=+((live.fx-p)/p*100).toFixed(3);}
+      // 从汇率数据计算美元指数 DXY
+      const r=d.rates; if(r.EUR&&r.JPY&&r.GBP&&r.CAD&&r.SEK&&r.CHF){
+        const eurusd=1/r.EUR, usdjpy=r.JPY, gbpusd=1/r.GBP, usdcad=r.CAD, usdsek=r.SEK, usdchf=r.CHF;
+        live.dxy=+(50.14348112*Math.pow(eurusd,-0.576)*Math.pow(usdjpy,0.136)*Math.pow(gbpusd,-0.119)*Math.pow(usdcad,0.091)*Math.pow(usdsek,0.042)*Math.pow(usdchf,0.036)).toFixed(2);
+        const pdx=window._livePrices?.dxy; if(pdx){live.dxy_chg_val=+(live.dxy-pdx).toFixed(2);live.dxy_chg_pct=+((live.dxy-pdx)/pdx*100).toFixed(2);}
+      }
+      live._ts=Date.now();}}catch(e){}}
+    
+    if(sec1.status==='fulfilled'&&sec1.value.ok){try{const d=await sec1.value.json();if(d?.data?.diff){live.sectors=d.data.diff.map(x=>({name:x.f14||'',chg:+(x.f3||0)}));}}catch(e){}}
+    
+    if(live.ss_price||live.gold||live.fx){
+      window._livePrices=live;
+      console.log('[实时]',live.ss_price,live.sz_price,live.cy_price,live.kc_price,live.bj_price,live.gold,live.fx);
+      const mc=document.getElementById('marketContent');
+      if(mc&&mc.dataset.rendered==='true'){mc.dataset.rendered='';renderMarketTab();}
+    }
+  }catch(e){console.warn('[实时]',e.message);}
+}
+
+// 动态计算市场偏向（基于实时数据）
+function calcLiveBias(live, ap) {
+  const bias = {};
+  // 权益：基于三大指数涨跌
+  const eqAvg = [(live.ss_chg_pct||0),(live.sz_chg_pct||0),(live.cy_chg_pct||0)];
+  const eqUp = eqAvg.filter(v=>v>0).length;
+  bias.equity = eqUp >= 2 ? '偏多' : (eqUp === 0 ? '偏空' : '中性');
+  // 债券：低位利率=偏多
+  const bondY = parseFloat((ap.bond||{}).cn_10y||'1.6');
+  bias.bond = bondY < 1.8 ? '偏多（债牛）' : (bondY > 2.5 ? '偏空' : '中性');
+  // 黄金：基于日内涨跌
+  bias.gold = (live.gold_chg_pct||0) > 0.3 ? '偏多' : ((live.gold_chg_pct||0) < -0.3 ? '偏空' : '中性');
+  // 利率：持续下行
+  bias.deposit = '偏空（利率下行中）';
+  // 汇率：基于日内涨跌
+  bias.fx = (live.fx_chg_pct||0) < 0 ? '偏多（人民币走强）' : ((live.fx_chg_pct||0) > 0.1 ? '偏空' : '中性');
+  return bias;
+}
+(function startLivePoll(){ fetchLivePrices(); setInterval(fetchLivePrices, 60000); })();
+
+// ============================================================
+
+function toggleProduct(pid, checked, event) {
+  if (checked) sids.add(pid); else sids.delete(pid);
+  document.getElementById('resultCount').textContent = sids.size;
+  // 更新对应卡片的视觉状态
+  if (event && event.target) {
+    const card = event.target.closest('.prod-card');
+    if (card) card.style.opacity = checked ? '1' : '0.55';
+  }
+}
+
+function toggleCatAll(cat) {
+  const prods = (lastResult && lastResult.by_category && lastResult.by_category[cat]) || [];
+  if (!prods.length) return;
+  const allChecked = prods.every(p => sids.has(p.product_id));
+  prods.forEach(p => {
+    if (allChecked) sids.delete(p.product_id); else sids.add(p.product_id);
+  });
+  // 重新渲染
+  if (lastResult && lastProfile) {
+    runMatchRender();
+  }
+}
+
+function runMatchRender() {
+  if (!lastResult) return;
+  let html = '';
+  for (const [cat, prods] of Object.entries(lastResult.by_category)) {
+    if (!prods || prods.length === 0) continue;
+    html += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:0.9rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;">'+
+      '<span class="cat-badge '+(CAT_BADGE_CLASS[cat]||'')+'">'+(CAT_LABELS[cat]||cat)+'</span>'+
+      '<span style="color:var(--gray);font-size:0.75rem;">精选'+prods.length+'款</span>'+
+      '<span style="flex:1;"></span>'+
+      '<button onclick="toggleCatAll(\''+cat+'\')" style="font-size:0.7rem;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:#fff;color:var(--gray);cursor:pointer;">全选/取消</button>'+
+      '</div>';
+    prods.forEach(p => {
+      const pid = p.product_id || '';
+      const checked = sids.has(pid) ? 'checked' : '';
+      const name = p.product_name || '';
+      const risk = p.risk_level || '';
+      const issuer = p.issuer || '';
+      const retHi = p.expected_return_high || '';
+      const retLo = p.expected_return_low || '';
+      const retStr = retLo && retHi ? retLo+'%~'+retHi+'%' : (retLo||'详见说明');
+      const term = p.term_days || '';
+      const termStr = term === 0 ? '活期' : (term > 0 ? term+'天' : '无固定期限');
+      const minInv = p.min_investment || '';
+      const minStr = minInv ? minInv+'万' : '-';
+      const score = p.match_score || 0;
+      const reason = p.recommendation_reason || '';
+      html += '<div class="prod-card" style="display:flex;align-items:flex-start;gap:10px;'+(checked?'':'opacity:0.55;')+'">'+
+        '<input type="checkbox" '+checked+' onchange="toggleProduct(\''+pid+'\',this.checked,event)" style="margin-top:3px;accent-color:#c41230;width:16px;height:16px;flex-shrink:0;">'+
+        '<div style="flex:1;">'+
+        '<div class="name">'+name+(pid?' <span class="code-tag">'+pid+'</span>':'')+'</div>'+
+        '<div class="meta">'+issuer+' | '+risk+' | '+termStr+' | 起购'+minStr+' | 匹配度 '+score+'分</div>'+
+        '<div class="ret">'+retStr+'</div>'+
+        '<div class="reason">💡 '+reason+'</div>'+
+        '</div></div>';
+    });
+    html += '</div>';
+  }
+  // 自定义产品
+  if (customProducts && Object.keys(customProducts).length > 0) {
+    html += '<div style="margin-bottom:16px;"><div style="font-weight:700;font-size:0.9rem;margin-bottom:8px;">📌 自定义产品</div>';
+    for (const [cat, cps] of Object.entries(customProducts)) {
+      cps.forEach((cp,i) => {
+        const cid = 'custom_'+cat+'_'+i;
+        const checked = sids.has(cid) ? 'checked' : '';
+        html += '<div class="prod-card custom-prod" style="display:flex;align-items:flex-start;gap:10px;'+(checked?'':'opacity:0.55;')+'">'+
+          '<input type="checkbox" '+checked+' onchange="toggleProduct(\''+cid+'\',this.checked,event)" style="margin-top:3px;accent-color:#c41230;width:16px;height:16px;flex-shrink:0;">'+
+          '<div style="flex:1;"><div class="name">'+cp.name+'</div>'+
+          '<div class="meta">'+(cp.code?'代码:'+cp.code+' | ':'')+(cp.issuer||'')+' | '+(cp.risk||'')+' | '+(cp.term||'')+'</div>'+
+          '<div class="ret">'+(cp.ret||'')+'</div>'+
+          '<div class="reason">💡 '+(cp.reason||'智能投顾根据客户需求个性化推荐')+'</div></div></div>';
+      });
+    }
+    html += '</div>';
+  }
+  document.getElementById('resultArea').innerHTML = html || '<p style="color:var(--gray);text-align:center;padding:40px;">未找到匹配产品，请调整客户画像</p>';
+  document.getElementById('resultTotal').textContent = lastResult ? lastResult.total : 0;
+  document.getElementById('resultCount').textContent = sids.size;
+}
+
+function addCustomProduct() {
+  const id = ++customIdCounter;
+  const div = document.createElement('div');
+  div.className = 'custom-prod';
+  div.id = 'custom-'+id;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <span style="font-weight:600;font-size:0.8rem;">自定义产品 #${id}</span>
+      <button onclick="document.getElementById('custom-${id}').remove()" style="background:none;border:none;color:var(--gray);cursor:pointer;font-size:1.1rem;">×</button>
+    </div>
+    <div class="grid-3">
+      <div><label>品类</label><select class="cp-cat"><option>基金</option><option>保险</option><option>理财</option><option>存款</option><option>结构性存款</option><option>外币存款</option></select></div>
+      <div><label>产品名称</label><input class="cp-name" placeholder="如：XX基金"></div>
+      <div><label>产品代码</label><input class="cp-code" placeholder="如：000979（回车亦可搜索补齐）"></div>
+      <div><label>发行方</label><input class="cp-issuer" placeholder="如：工银瑞信"></div>
+      <div><label>预期收益</label><input class="cp-ret" placeholder="如：3%-5%"></div>
+      <div><label>期限</label><input class="cp-term" placeholder="如：365天"></div>
+      <div><label>风险等级</label><select class="cp-risk"><option>PR1</option><option>PR2</option><option selected>PR3</option><option>PR4</option><option>PR5</option></select></div>
+      <div><label>推荐理由</label><input class="cp-reason" placeholder="核心推荐理由"></div>
+    </div>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:6px;">
+      <input class="cp-search" placeholder="输入产品代码/名称智能补齐..." style="flex:1;font-size:0.75rem;padding:6px 8px;border:1px dashed #f59e0b;border-radius:6px;background:#fff;">
+      <button class="cp-search-btn" style="font-size:0.7rem;padding:6px 10px;background:#f59e0b;color:#fff;border:none;border-radius:6px;cursor:pointer;white-space:nowrap;">查询补齐</button>
+    </div>
+  `;
+  // bind search button（优先读搜索框，空则读产品代码框）
+  div.querySelector('.cp-search-btn').addEventListener('click', function() {
+    let query = div.querySelector('.cp-search').value.trim();
+    if (!query) query = div.querySelector('.cp-code').value.trim();
+    searchInProducts(query, div);
+  });
+  // 搜索框回车
+  div.querySelector('.cp-search').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') { 
+      const query = e.target.value.trim();
+      if (query) searchInProducts(query, div);
+    }
+  });
+  // 产品代码框回车也可触发搜索
+  div.querySelector('.cp-code').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const query = e.target.value.trim();
+      if (query) searchInProducts(query, div);
+    }
+  });
+  document.getElementById('customProducts').appendChild(div);
+}
+
+// 从产品库搜索并自动补齐自定义表单
+function searchInProducts(query, formDiv) {
+  if (!query || query.length < 1) { toast('请输入产品代码或名称'); return; }
+  const q = query.toLowerCase();
+  let best = null;
+  // 精确匹配代码
+  for (const p of PRODUCTS) {
+    if (String(p.product_id) === query) { best = p; break; }
+  }
+  // 模糊匹配（代码开头匹配优先，再名称匹配）
+  if (!best) {
+    for (const p of PRODUCTS) {
+      const id = String(p.product_id || '');
+      if (id.startsWith(query)) { best = p; break; }
+    }
+  }
+  if (!best) {
+    for (const p of PRODUCTS) {
+      const name = (p.product_name || '').toLowerCase();
+      const id = String(p.product_id || '').toLowerCase();
+      if (name.includes(q) || id.includes(q)) { best = p; break; }
+    }
+  }
+  if (!best) { toast('未找到匹配产品，请核实代码/名称'); return; }
+  // 自动填充
+  const cat = best.product_category || '';
+  const catSelect = formDiv.querySelector('.cp-cat');
+  if (catSelect && cat) catSelect.value = cat;
+  const nameEl = formDiv.querySelector('.cp-name');
+  if (nameEl) nameEl.value = best.product_name || '';
+  const codeEl = formDiv.querySelector('.cp-code');
+  if (codeEl) codeEl.value = best.product_id || '';
+  const issuerEl = formDiv.querySelector('.cp-issuer');
+  if (issuerEl) issuerEl.value = best.issuer || '';
+  const retEl = formDiv.querySelector('.cp-ret');
+  if (retEl) {
+    const lo = best.expected_return_low || '';
+    const hi = best.expected_return_high || '';
+    retEl.value = (lo && hi) ? lo+'%~'+hi+'%' : (lo||hi||'');
+  }
+  const termEl = formDiv.querySelector('.cp-term');
+  if (termEl && best.term_days !== undefined) {
+    termEl.value = best.term_days === 0 ? '活期' : (best.term_days > 0 ? best.term_days+'天' : '无固定');
+  }
+  const riskEl = formDiv.querySelector('.cp-risk');
+  if (riskEl && best.risk_level) riskEl.value = best.risk_level;
+  const reasonEl = formDiv.querySelector('.cp-reason');
+  if (reasonEl && best.highlights) reasonEl.value = best.highlights;
+  formDiv.querySelector('.cp-search').value = '';
+  toast('已自动补齐「'+(best.product_name||'')+'」的信息');
+}
+
+function getCustomProducts() {
+  const result = {};
+  document.querySelectorAll('.custom-prod').forEach(el => {
+    const cat = el.querySelector('.cp-cat')?.value || '基金';
+    const name = el.querySelector('.cp-name')?.value?.trim();
+    if (!name) return;
+    if (!result[cat]) result[cat] = [];
+    result[cat].push({
+      name: name,
+      code: el.querySelector('.cp-code')?.value?.trim() || '',
+      issuer: el.querySelector('.cp-issuer')?.value?.trim() || '',
+      ret: el.querySelector('.cp-ret')?.value?.trim() || '',
+      term: el.querySelector('.cp-term')?.value?.trim() || '',
+      risk: el.querySelector('.cp-risk')?.value || 'PR3',
+      reason: el.querySelector('.cp-reason')?.value?.trim() || '',
+    });
+  });
+  return result;
+}
+
+function toggleCat(cat) {
+  if (prefCats.has(cat)) {
+    if (prefCats.size > 1) prefCats.delete(cat);
+    else { toast('至少需保留一个产品品类'); return; }
+  } else {
+    prefCats.add(cat);
+  }
+  renderCatPicker();
+}
+
+function renderCatPicker() {
+  const el = document.getElementById('catPicker');
+  if (!el) return;
+  el.innerHTML = ALL_CATS.map(c => {
+    const sel = prefCats.has(c);
+    const style = sel ? `background:${CAT_COLORS[c]};color:#fff;` : 'background:#e5e7eb;color:#9ca3af;';
+    return '<button onclick="toggleCat(\''+c+'\')" style="padding:6px 14px;border-radius:6px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;'+style+'">'+(sel?'✓ ':'')+c+'</button>';
+  }).join('');
+}
+
+// ============================================================
+// 产品匹配引擎（JS 版）
+// ============================================================
+function calculateScore(product, riskLevel, horizonDays, liquidityNeed) {
+  let score = 50;
+  const riskOrder = RISK_ORDER;
+  try {
+    const idxP = riskOrder.indexOf(product.risk_level);
+    const idxC = riskOrder.indexOf(riskLevel);
+    const diff = Math.abs(idxC - idxP);
+    if (diff === 0) score += 25;
+    else if (diff === 1) score += 15;
+    else score += 5;
+  } catch(e) {}
+
+  const term = product.term_days || 0;
+  if (term > 0) {
+    if (horizonDays >= term * 1.2) score += 10;
+    else if (horizonDays >= term) score += 5;
+    else score -= 5;
+  } else {
+    score += 5;
+  }
+
+  const liq = product.liquidity_type || '';
+  if (liquidityNeed === '高') {
+    if (liq === 'T+0' || liq === 'T+1') score += 10;
+    else if (liq === 'T+2') score += 5;
+  } else if (liquidityNeed === '中') {
+    if (liq === 'T+0' || liq === 'T+1' || liq === 'T+2') score += 10;
+    else score += 5;
+  }
+
+  const er = product.expected_return_high || product.expected_return_low || 0;
+  if (er > 5) score += 10;
+  else if (er > 3) score += 5;
+
+  return Math.min(score, 100);
+}
+
+function genBaseReason(product, market, cat) {
+  const highlights = product.highlights || '';
+  const fundName = product.product_name || '';
+  const tags = (typeof product.tags === 'string' ? JSON.parse(product.tags||'[]') : (product.tags || []));
+
+  if (cat === '保险') {
+    if (highlights.includes('收益率') || highlights.includes('利率')) {
+      return '存款利率持续下行，锁定当前'+(product.expected_return_high||'')+'%的保证收益，对抗利率下行风险';
+    }
+    return '在降息周期中提前锁定收益，'+(highlights || '稳健增值');
+  }
+
+  if (cat === '基金') {
+    const kw = fundName + highlights;
+    if (/AI|科技|半导体|算力|机器人/.test(kw))
+      return '契合当前AI算力/科技主线的结构性行情，政策与产业双轮驱动';
+    if (/新能源|新材料|绿色/.test(kw))
+      return '新能源技术突破+出口竞争力提升，行业景气度持续';
+    if (/红利|高股息|价值/.test(kw))
+      return '低利率环境下高股息策略性价比较高，提供稳定现金流';
+    if (/消费|内需/.test(kw))
+      return '消费复苏预期升温，政策刺激下内需板块有修复空间';
+    if (/指数|500|300|1000|增强/.test(kw))
+      return '指数估值处于历史中低位，跟随市场整体回暖获取Beta收益';
+    if (/债|固收|稳健/.test(kw))
+      return '债市收益率低位运行，债券型基金在波动市场中提供稳健压舱石';
+    return '市场结构性机会丰富，'+(highlights || '匹配当前市场风格');
+  }
+
+  if (cat === '理财') {
+    const ret = product.expected_return_high || '';
+    if (ret) return '固收类稳健配置，'+ret+'%业绩比较基准，在当前低利率环境中收益可观';
+    return '银行理财稳健之选，'+(highlights || '兼具流动性与收益');
+  }
+
+  if (cat === '存款' || cat === '结构性存款') {
+    if (cat.includes('结构性')) return '保本基础上获取浮动收益，低利率环境下的存款替代方案';
+    return '保障流动性安全垫，'+(highlights || '基础配置必备');
+  }
+
+  if (cat === '外币存款') return '美元仍处相对高位，适度配置外币分散汇率风险';
+
+  return highlights || '与客户风险偏好及市场环境相匹配';
+}
+
+function genReason(product, market) {
+  const cat = product.product_category || '';
+  const extra = (typeof product.extra_fields === 'string' ? JSON.parse(product.extra_fields||'{}') : (product.extra_fields || {}));
+  let base = genBaseReason(product, market, cat);
+
+  if (cat === '基金' && extra && Object.keys(extra).length > 0) {
+    let parts = [base.replace(/[。；]$/, '')];
+    let addedPerf = false;
+
+    const ret1y = extra.return_1y;
+    if (ret1y != null) {
+      const rv = parseFloat(ret1y);
+      if (!isNaN(rv)) { parts.push('近1年回报'+rv.toFixed(2)+'%'); addedPerf = true; }
+    }
+
+    const ret3m = extra.return_3m;
+    if (ret3m != null && addedPerf) {
+      const rv = parseFloat(ret3m);
+      if (!isNaN(rv)) parts.push('近3月'+rv.toFixed(2)+'%');
+    }
+
+    if (!addedPerf) {
+      const ret6m = extra.return_6m;
+      if (ret6m != null) {
+        const rv = parseFloat(ret6m);
+        if (!isNaN(rv)) { parts.push('近6个月回报'+rv.toFixed(2)+'%'); addedPerf = true; }
+      }
+    }
+
+    const focus = extra.investment_focus;
+    if (focus && String(focus).toLowerCase() !== 'none' && String(focus) !== 'null' && focus !== '')
+      parts.push('主要投资'+focus);
+
+    const style = extra.style_label;
+    if (style && String(style).toLowerCase() !== 'none' && String(style) !== 'null' && style !== '')
+      parts.push(style+'风格');
+
+    const md = extra.max_drawdown_1y;
+    if (md != null) {
+      const mdv = parseFloat(md);
+      if (!isNaN(mdv) && mdv > -5.0) parts.push('近1年最大回撤仅'+mdv.toFixed(2)+'%');
+    }
+
+    const fm = extra.fund_manager;
+    if (fm && String(fm).toLowerCase() !== 'none' && String(fm) !== 'null' && fm !== '')
+      parts.push('基金经理：'+fm);
+
+    if (parts.length > 1) return parts.join('，') + '。';
+    return base;
+  }
+
+  if (cat === '理财') {
+    base = genBaseReason(product, market, cat);
+    const extraAsset = (extra||{}).asset_allocation || '';
+    if (extraAsset && String(extraAsset).toLowerCase() !== 'none' && extraAsset !== 'null' && extraAsset !== '') {
+      const allocStr = String(extraAsset).substring(0, 30);
+      return base.replace(/[。；]$/, '') + '，' + allocStr + '。';
+    }
+    return base;
+  }
+
+  return genBaseReason(product, market, cat);
+}
+
+function matchProducts(riskLevel, assets, horizonDays, liquidityNeed, isPrivateBank, perCatLimits) {
+  // perCatLimits: {保险:5, 基金:3, ...}  或 number（兼容旧调用：5）
+  const limits = typeof perCatLimits === 'number' ? {
+    保险: perCatLimits, 基金: perCatLimits, 理财: perCatLimits,
+    存款: perCatLimits, 结构性存款: perCatLimits, 外币存款: perCatLimits,
+  } : (perCatLimits || {});
+  const defaultLimit = 1;
+  const idx = RISK_ORDER.indexOf(riskLevel);
+  const allowedRisks = RISK_ORDER.slice(0, idx + 1);
+
+  // 过滤
+  let filtered = PRODUCTS.filter(p => {
+    if (!allowedRisks.includes(p.risk_level)) return false;
+    if (p.min_investment != null && p.min_investment > assets) return false;
+    if (!isPrivateBank && p.private_bank_only) return false;
+
+    const term = p.term_days || 0;
+    if (liquidityNeed === '高') {
+      if (p.liquidity_type !== 'T+0' && p.liquidity_type !== 'T+1' && (term <= 0 || term > 90)) return false;
+    } else if (liquidityNeed === '中') {
+      if (p.liquidity_type !== 'T+0' && p.liquidity_type !== 'T+1' && p.liquidity_type !== 'T+2' && term > 365 && term > 0) return false;
+    }
+
+    if (term > 0 && term > Math.max(horizonDays, 365)) return false;
+
+    // 品类偏好过滤
+    if (!prefCats.has(p.product_category)) return false;
+
+    return true;
+  });
+
+  // 打分
+  filtered.forEach(p => {
+    p._score = calculateScore(p, riskLevel, horizonDays, liquidityNeed);
+  });
+
+  // 排序
+  filtered.sort((a,b) => b._score - a._score);
+
+  // 分组
+  const grouped = {};
+  filtered.forEach(p => {
+    const cat = p.product_category;
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(p);
+  });
+
+  // 保险优先公司筛选
+  if (grouped['保险']) {
+    const priority = grouped['保险'].filter(p => PRIORITY_INSURERS.includes(p.issuer||''));
+    if (priority.length > 0) grouped['保险'] = priority;
+  }
+
+  // 每类按各自限制取
+  const topGrouped = {};
+  for (const [cat, prods] of Object.entries(grouped)) {
+    const limit = limits[cat] || defaultLimit;
+    topGrouped[cat] = prods.slice(0, limit);
+    topGrouped[cat].forEach(p => {
+      p.match_score = p._score;
+      p.recommendation_reason = genReason(p, MARKET);
+      // 确保 extra_fields 和 tags 已解析
+      if (typeof p.extra_fields === 'string') {
+        try { p.extra_fields = JSON.parse(p.extra_fields||'{}'); } catch(e) { p.extra_fields = {}; }
+      }
+      if (typeof p.tags === 'string') {
+        try { p.tags = JSON.parse(p.tags||'[]'); } catch(e) { p.tags = []; }
+      }
+      delete p._score;
+    });
+  }
+
+  return {
+    total: Object.values(topGrouped).reduce((s,arr) => s + arr.length, 0),
+    by_category: topGrouped,
+    all: Object.values(topGrouped).flat(),
+    market_context: MARKET,
+  };
+}
+
+// ============================================================
+// 报告生成
+// ============================================================
+function buildReport(clientProfile, matchedProducts, customProds) {
+  const riskLevel = clientProfile.risk_level;
+  const assets = clientProfile.assets;
+  const horizonDays = clientProfile.horizon_days;
+  const liquidity = clientProfile.liquidity;
+  const isPb = clientProfile.is_private_bank;
+  const customerType = isPb ? '私银客户' : '个人客户';
+
+  let horizonText;
+  if (horizonDays <= 90) horizonText = '短期（3个月内）';
+  else if (horizonDays <= 365) horizonText = '中期（1年内）';
+  else if (horizonDays <= 1095) horizonText = '中长期（1-3年）';
+  else horizonText = '长期（3年以上）';
+
+  const now = new Date();
+  const dateStr = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日';
+
+  const alloc = ALLOCATION[riskLevel] || ALLOCATION['PR3'];
+
+  // 市场数据
+  const ap = (MARKET.asset_prices || {});
+  const mc = (MARKET.macro || {});
+
+  // 产品详析
+  let productDetail = '';
+  for (const [cat, prods] of Object.entries(matchedProducts.by_category || {})) {
+    if (!prods || prods.length === 0) continue;
+    productDetail += '\n### '+cat+'产品推荐（精选'+prods.length+'款）\n\n';
+    prods.slice(0,5).forEach((p,i) => {
+      const name = p.product_name || '';
+      const pid = p.product_id || '';
+      const issuer = p.issuer || '';
+      const risk = p.risk_level || '';
+      const retLo = p.expected_return_low || '';
+      const retHi = p.expected_return_high || '';
+      const retStr = retLo && retHi ? retLo+'%~'+retHi+'%' : (retLo || '详见产品说明');
+      const term = p.term_days || '';
+      const termStr = term === 0 ? '活期/每日开放' : (term > 0 ? term+'天' : '无固定期限');
+      const minInv = p.min_investment || '';
+      const minStr = minInv ? minInv+'万' : '-';
+      const score = p.match_score || 0;
+      const reason = p.recommendation_reason || '';
+      const liq = p.liquidity_type || '';
+      const pidLine = pid ? '\n- 产品代码：`'+pid+'`' : '';
+
+      productDetail += '**推荐'+(i+1)+'：'+name+'**'+pidLine+'\n';
+      productDetail += '- 发行方：'+issuer+' | 风险等级：'+risk+' | 匹配度：'+score+'分\n';
+      productDetail += '- 预期收益：'+retStr+' | 期限：'+termStr+' | 流动性：'+liq+'\n';
+      productDetail += '- 起购金额：'+minStr+'\n';
+      productDetail += '- 💡 推荐理由：'+reason+'\n\n';
+    });
+  }
+
+  // 自定义产品
+  if (customProds && Object.keys(customProds).length > 0) {
+    productDetail += '\n### 自定义添加产品（智能投顾补充推荐）\n\n';
+    for (const [cat, cps] of Object.entries(customProds)) {
+      if (!cps || cps.length === 0) continue;
+      productDetail += '**'+cat+'类自定义产品：**\n\n';
+      cps.forEach((cp,i) => {
+        const parts = [];
+        if (cp.code) parts.push('产品代码：'+cp.code);
+        if (cp.issuer) parts.push('发行方：'+cp.issuer);
+        if (cp.risk) parts.push('风险等级：'+cp.risk);
+        if (cp.ret) parts.push('预期收益：'+cp.ret);
+        if (cp.term) parts.push('期限：'+cp.term);
+        const meta = parts.length > 0 ? parts.join(' | ') : '详情请咨询智能投顾';
+        productDetail += '**自定义'+(i+1)+'：'+cp.name+'**\n';
+        productDetail += '- '+meta+'\n';
+        productDetail += '- 💡 推荐理由：'+(cp.reason || '智能投顾根据客户需求个性化推荐')+'\n\n';
+      });
+    }
+  }
+
+  // 市场分析洞察
+  const insights = getInvestorInsights(clientProfile);
+
+  // 配置金额计算
+  const calcAmt = (range, assets) => {
+    const parts = range.split('-');
+    const hi = parseFloat(parts[parts.length-1]) || 0;
+    return Math.round(hi * assets / 100);
+  };
+
+  return '# 个人客户资产配置建议书\n\n' +
+    '**生成日期**：'+dateStr+' | **客户类型**：'+customerType+' | **风险等级**：'+riskLevel+'\n\n' +
+    '---\n\n' +
+    '## 一、宏观市场环境速览\n\n' +
+    '> '+(mc.trend || '')+'\n\n' +
+    '### 大类资产表现\n\n' +
+    '| 资产类别 | 当前水平 | 趋势 |\n' +
+    '|----------|---------|------|\n' +
+    '| A股（上证） | '+((ap.a_share||{}).level||'-')+' | '+((ap.a_share||{}).trend||'-')+' |\n' +
+    '| 中国10年国债 | '+((ap.bond||{}).cn_10y||'-')+' | '+((ap.bond||{}).trend||'-')+' |\n' +
+    '| 黄金 | '+((ap.gold||{}).price||'-')+' | '+((ap.gold||{}).trend||'-')+' |\n' +
+    '| 人民币汇率 | '+((ap.fx||{}).usd_cny||'-')+' | '+((ap.fx||{}).trend||'-')+' |\n' +
+    '| LPR（1年/5年） | '+(mc.lpr_1y||'-')+'/'+(mc.lpr_5y||'-')+' | 持续下行 |\n\n' +
+    '### 存款利率趋势\n\n' +
+    '> '+((MARKET.deposit_rate||{}).current||'1年期定存基准约1.1%，3年期约1.5%')+'，趋势：'+((MARKET.deposit_rate||{}).trend||'持续下行')+'\n\n' +
+    '### 当前投资主线\n\n' +
+    '| 板块 | 核心驱动 | 动量 |\n' +
+    '|------|---------|:----:|\n' +
+    ((MARKET.sector_rotation||{}).current_hotspots||[]).map(h => '| '+h.sector+' | '+h.driver+' | '+h.momentum+' |').join('\n') + '\n\n' +
+    '> ⚠️ 风险因素：'+((MARKET.sector_rotation||{}).risk_factors||[]).join('、')+'\n\n' +
+    '---\n\n' +
+    '## 二、投资者视角：为什么现在这样配置？\n\n' +
+    (insights.insurance_rationale || '') + '\n\n---\n\n' +
+    (insights.fund_rationale || '') + '\n\n---\n\n' +
+    (insights.wealth_rationale || '') + '\n\n---\n\n' +
+    (insights.deposit_rationale || '') + '\n\n---\n\n' +
+    '## 三、客户风险画像总结\n\n' +
+    '- 风险等级：**'+riskLevel+'**\n' +
+    '- 可投资资产：**'+assets+'万元**\n' +
+    '- 投资期限：**'+horizonText+'**\n' +
+    '- 流动性需求：**'+liquidity+'**\n\n' +
+    '基于以上画像和当前市场环境，建议采取适配'+riskLevel+'的资产配置策略。\n\n' +
+    '---\n\n' +
+    '## 四、大类资产配置建议\n\n' +
+    '| 资产类别 | 建议配置比例 | 配置金额（万元） | 配置理由 |\n' +
+    '|----------|:----------:|:-------------:|----------|\n' +
+    '| 存款/货币类 | '+alloc['存款/货币']+' | '+calcAmt(alloc['存款/货币'], assets)+' | 保障流动性，满足日常资金需求 |\n' +
+    '| 保险类 | '+alloc['保险']+' | '+calcAmt(alloc['保险'], assets)+' | 锁定利率，对抗下行周期 |\n' +
+    '| 银行理财类 | '+alloc['理财']+' | '+calcAmt(alloc['理财'], assets)+' | 稳健核心配置，中等收益 |\n' +
+    '| 公募基金类 | '+alloc['基金']+' | '+calcAmt(alloc['基金'], assets)+' | 分享资本市场成长红利 |\n\n' +
+    '---\n\n' +
+    '## 五、推荐产品详析\n' +
+    (productDetail || '（暂无匹配产品）') + '\n' +
+    '---\n\n' +
+    '## 六、流动性管理建议\n\n' +
+    '- 建议保留 **'+Math.round(assets*0.1)+'万元** 左右高流动性资产用于应急\n' +
+    '- T+0/T+1 产品配置不低于流动资产的 50%\n' +
+    '- 定期到期产品分批配置，确保资金有序到账\n\n' +
+    '---\n\n' +
+    '## 七、风险提示\n\n' +
+    '1. **投资有风险，入市需谨慎。** 本报告中的预期收益仅供参考，不构成收益承诺。\n' +
+    '2. 产品过往业绩不代表未来表现，市场波动可能导致实际收益低于预期。\n' +
+    '3. 理财产品不等同于存款，保本类产品以外存在本金损失风险。\n' +
+    '4. 基金投资面临净值波动风险，请根据自身风险承受能力审慎决策。\n' +
+    '5. 保险产品侧重风险保障功能，退保可能产生损失，请仔细阅读条款。\n\n' +
+    '---\n\n' +
+    '*本报告由智能投顾系统 v2.0 云端版自动生成，仅供参考。*';
+}
+
+// ============================================================
+// PPT 导出（pptxgenjs - WPS 兼容版）
+// ============================================================
+function exportPPT() {
+  if (!lastResult || !lastProfile) { toast('请先完成产品匹配'); return; }
+
+  const btn = document.getElementById('btnExportPPT');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 生成中...';
+
+  setTimeout(() => {
+    try {
+      const PptxGenJS = window.PptxGenJS;
+      const pptx = new PptxGenJS();
+
+      // WPS兼容：使用标准尺寸，不自定义layout
+      pptx.defineLayout({ name:'CUSTOM', width:10, height:5.625 });
+      pptx.layout = 'CUSTOM';
+
+      const DARK = '1a1a2e';
+      const RED = 'c41230';
+      const WHITE = 'FFFFFF';
+      const GRAY = '6b7280';
+      const LIGHT = 'f3f4f6';
+
+      // 过滤选中产品
+      const selResult = filterSelectedProducts();
+      const d = new Date();
+      const dateStr = d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+
+      // ===== 封面 =====
+      const slide1 = pptx.addSlide();
+      slide1.background = { color: DARK };
+      slide1.addText('个人客户资产配置建议书', { x:0.5, y:1.5, w:9, h:1.2, fontSize:28, bold:true, color:WHITE, align:'center' });
+      slide1.addText('智能投顾系统 - 客户资产配置与产品推荐 v2.0', { x:0.5, y:2.8, w:9, h:0.6, fontSize:12, color:RED, align:'center' });
+      slide1.addText(dateStr, { x:0.5, y:3.6, w:9, h:0.4, fontSize:11, color:GRAY, align:'center' });
+
+      // ===== 客户画像 =====
+      const slide2 = pptx.addSlide();
+      slide2.addText('客户风险画像', { x:0.4, y:0.2, w:9, h:0.6, fontSize:18, bold:true, color:DARK });
+      // 用纯色矩形做分割线（不用 roundRect）
+      slide2.addShape(pptx.ShapeType.rect, { x:0.4, y:0.75, w:9.2, h:0.02, fill:RED });
+
+      const profile = lastProfile;
+      const horizonDays = profile.horizon_days || 365;
+      const horizonText = horizonDays <= 90 ? '短期（3个月内）' : horizonDays <= 365 ? '中期（1年内）' : horizonDays <= 1095 ? '中长期（1-3年）' : '长期（3年以上）';
+      const rows = [
+        [{ text:'指标', options:{ bold:true, color:WHITE, fill:DARK, fontSize:10 } }, { text:'内容', options:{ bold:true, color:WHITE, fill:DARK, fontSize:10 } }],
+        ['风险等级', profile.risk_level || 'PR3'],
+        ['可投资资产', profile.assets+'万元'],
+        ['投资期限', horizonText],
+        ['流动性需求', profile.liquidity || '中'],
+        ['客户类型', profile.is_private_bank ? '私银客户' : '个人客户'],
+      ];
+      slide2.addTable(rows, { x:0.4, y:1.0, w:4.5, border:{ type:'solid', pt:0.5, color:GRAY }, colW:[1.8,2.7], rowH:[0.4,0.35,0.35,0.35,0.35,0.35], fontSize:10 });
+
+      // 配置建议
+      const alloc = ALLOCATION[profile.risk_level] || ALLOCATION['PR3'];
+      const calcAmt = (range, assets) => { const parts = range.split('-'); return Math.round(parseFloat(parts[parts.length-1]) * assets / 100); };
+      const arows = [
+        [{ text:'资产类别', options:{ bold:true, color:WHITE, fill:DARK, fontSize:9 } }, { text:'比例', options:{ bold:true, color:WHITE, fill:DARK, fontSize:9 } }, { text:'金额(万)', options:{ bold:true, color:WHITE, fill:DARK, fontSize:9 } }, { text:'配置理由', options:{ bold:true, color:WHITE, fill:DARK, fontSize:9 } }],
+        ['存款/货币类', alloc['存款/货币'], calcAmt(alloc['存款/货币'], profile.assets)+'', '保障流动性'],
+        ['保险类', alloc['保险'], calcAmt(alloc['保险'], profile.assets)+'', '锁定利率'],
+        ['银行理财类', alloc['理财'], calcAmt(alloc['理财'], profile.assets)+'', '稳健核心'],
+        ['公募基金类', alloc['基金'], calcAmt(alloc['基金'], profile.assets)+'', '分享成长红利'],
+      ];
+      slide2.addText('大类资产配置建议', { x:0.4, y:3.3, w:9, h:0.5, fontSize:14, bold:true, color:DARK });
+      slide2.addTable(arows, { x:0.4, y:3.8, w:9.2, border:{ type:'solid', pt:0.5, color:GRAY }, colW:[2.0,1.4,1.4,4.4], rowH:[0.35,0.3,0.3,0.3,0.3], fontSize:9 });
+
+      // ===== 一、宏观市场环境速览（上）：大类资产表现 + 宏观政策面 =====
+      try {
+      const slide3a = pptx.addSlide();
+      slide3a.addText('一、宏观市场环境速览（上）', { x:0.5, y:0.12, w:9, h:0.40, fontSize:16, bold:true, color:DARK });
+      slide3a.addShape(pptx.ShapeType.rect, { x:0.5, y:0.54, w:9.0, h:0.025, fill:RED });
+
+      const ap3 = (MARKET.asset_prices || {});
+      const mc3 = (MARKET.macro || {});
+      const cp = (MARKET.capital_market || {});
+      const HDR = { bold:true, color:WHITE, fill:DARK, fontSize:11 };
+
+      // 左栏：大类资产表现表（6行，占据上半部分）
+      slide3a.addText('大类资产表现', { x:0.5, y:0.70, w:4.5, h:0.30, fontSize:13, bold:true, color:DARK });
+      const astRows = [
+        [{ text:'资产类别', options:HDR }, { text:'当前水平', options:HDR }, { text:'趋势', options:HDR }],
+        ['A股（上证）',       ((ap3.a_share||{}).level||'—'),   ((ap3.a_share||{}).trend||'—')],
+        ['中国10年期国债',    ((ap3.bond||{}).cn_10y||'—'),     ((ap3.bond||{}).trend||'—')],
+        ['黄金（美元/盎司）', ((ap3.gold||{}).price||'—'),      ((ap3.gold||{}).trend||'—')],
+        ['人民币汇率(USD/CNY)', ((ap3.fx||{}).usd_cny||'—'),    ((ap3.fx||{}).trend||'—')],
+        ['LPR利率（1年 / 5年）', (mc3.lpr_1y||'—')+' / '+(mc3.lpr_5y||'—'), '持续下行'],
+      ];
+      slide3a.addTable(astRows, { x:0.5, y:1.06, w:4.5, border:{ type:'solid', pt:0.5, color:GRAY },
+        colW:[1.8,1.4,1.3], rowH:[0.34, 0.32,0.32,0.32,0.32,0.32], fontSize:11 });
+
+      // 右栏：宏观政策面（3段独立文本，充足高度）
+      slide3a.addText('宏观政策面', { x:5.4, y:0.70, w:4.2, h:0.30, fontSize:13, bold:true, color:DARK });
+      slide3a.addText(
+        '政策定调：\n' + (cp.policy_stance || '中央经济工作会议明确持续深化资本市场投融资综合改革，推动中长期资金入市。'),
+        { x:5.4, y:1.06, w:4.2, h:0.84, fontSize:11, color:GRAY }
+      );
+      slide3a.addText(
+        '存款利率：\n' + ((MARKET.deposit_rate||{}).current || '1年期定存基准约1.1%\n3年期定存基准约1.5%'),
+        { x:5.4, y:1.98, w:4.2, h:0.64, fontSize:11, color:GRAY }
+      );
+      slide3a.addText(
+        '趋势判断：\n' + ((MARKET.deposit_rate||{}).trend || '持续下行，LPR仍有下调空间，利率下行趋势短期难逆转。存款利率中枢将继续走低。'),
+        { x:5.4, y:2.70, w:4.2, h:0.68, fontSize:11, color:GRAY }
+      );
+
+      console.log('[PPT导出] 宏观市场环境速览（上）完成');
+      } catch(e3a) { console.error('[PPT导出] 宏观市场环境速览（上）失败:', e3a); }
+
+      // ===== 一、宏观市场环境速览（下）：投资主线 + 风险因素 =====
+      try {
+      const slide3b = pptx.addSlide();
+      slide3b.addText('一、宏观市场环境速览（下）', { x:0.5, y:0.12, w:9, h:0.40, fontSize:16, bold:true, color:DARK });
+      slide3b.addShape(pptx.ShapeType.rect, { x:0.5, y:0.54, w:9.0, h:0.025, fill:RED });
+
+      const hotspots3 = ((MARKET.sector_rotation||{}).current_hotspots||[]);
+      const nHot = Math.min(hotspots3.length, 6);
+
+      slide3b.addText('当前投资主线', { x:0.5, y:0.70, w:9.0, h:0.32, fontSize:13, bold:true, color:DARK });
+      const hdr2 = { bold:true, color:WHITE, fill:DARK, fontSize:11 };
+      const hrows = [
+        [{ text:'热点板块', options:hdr2 }, { text:'核心驱动逻辑', options:hdr2 }, { text:'动量预估', options:hdr2 }],
+        ...hotspots3.slice(0, 6).map(h => [h.sector, h.driver, h.momentum || '—']),
+      ];
+      slide3b.addTable(hrows, { x:0.5, y:1.10, w:9.0, border:{ type:'solid', pt:0.5, color:GRAY },
+        colW:[2.2,4.6,2.2], rowH:0.34, fontSize:11 });
+      console.log('[PPT导出] 投资主线表行数='+(nHot+1));
+
+      // 风险因素
+      const rf3 = ((MARKET.sector_rotation||{}).risk_factors||[]);
+      const tblBot = 1.10 + (nHot + 1) * 0.34;
+      slide3b.addText('风险提示', { x:0.5, y:tblBot + 0.18, w:9.0, h:0.30, fontSize:13, bold:true, color:DARK });
+      slide3b.addText(
+        rf3.length > 0 ? rf3.join('；') : '中美利差倒挂；人民币汇率波动；地缘政治不确定性；房地产链复苏节奏偏慢',
+        { x:0.5, y:tblBot + 0.52, w:9.0, h:0.50, fontSize:11, color:RED, bold:true }
+      );
+
+      console.log('[PPT导出] 宏观市场环境速览（下）完成');
+      } catch(e3b) { console.error('[PPT导出] 宏观市场环境速览（下）失败:', e3b); }
+
+      // ===== 二、投资者视角（四象限布局） =====
+      try {
+      const slide4 = pptx.addSlide();
+      slide4.addText('二、投资者视角：为什么现在这样配置？', { x:0.4, y:0.08, w:9, h:0.38, fontSize:15, bold:true, color:DARK });
+      slide4.addShape(pptx.ShapeType.rect, { x:0.4, y:0.46, w:9.2, h:0.02, fill:RED });
+
+      const Q_LEFT = 0.4, Q_RIGHT = 5.2, Q_W = 4.4;
+      const Q1_Y = 0.6, Q1_H = 2.1;   // 上半部高度
+      const Q2_Y = 2.9, Q2_H = 2.2;   // 下半部高度
+      const SEC_HDR = { fontSize:11, bold:true, color:DARK };
+      const SEC_BODY = { fontSize:9, color:GRAY };
+
+      // Q1 左上：保险配置逻辑
+      const insBox = slide4.addShape(pptx.ShapeType.rect, { x:Q_LEFT, y:Q1_Y, w:Q_W, h:Q1_H, fill:LIGHT });
+      slide4.addText('▎ 保险配置逻辑', { x:Q_LEFT+0.15, y:Q1_Y+0.1, w:Q_W-0.3, h:0.28, ...SEC_HDR });
+      slide4.addText(
+        '利率持续下行，锁定长期收益是核心策略。\n'+
+        '• 确定性收益 → 固定收益型年金险、两全险\n'+
+        '• 长期传承   → 增额终身寿险\n'+
+        '• 私银客户   → 分红型 / 万能型产品\n\n'+
+        '当前1年期定存仅约1.1%，保险锁定利率的\n'+
+        '优势在低利率环境下尤为突出。',
+        { x:Q_LEFT+0.15, y:Q1_Y+0.42, w:Q_W-0.3, h:Q1_H-0.52, ...SEC_BODY }
+      );
+
+      // Q1 右上：基金配置逻辑
+      const fundBox = slide4.addShape(pptx.ShapeType.rect, { x:Q_RIGHT, y:Q1_Y, w:Q_W, h:Q1_H, fill:LIGHT });
+      slide4.addText('▎ 基金配置逻辑', { x:Q_RIGHT+0.15, y:Q1_Y+0.1, w:Q_W-0.3, h:0.28, ...SEC_HDR });
+      const hots4 = ((MARKET.sector_rotation||{}).current_hotspots||[]).map(h => '• '+h.sector).join('\n');
+      const fundRisk = {
+        'PR1':'债券/货币基金为主，权益仓位≤10%',
+        'PR2':'债券基金为主(60-70%)，辅以混合/指数型',
+        'PR3':'股债平衡(各50%)，精选行业主题基金',
+        'PR4':'权益基金为主(60-80%)，聚焦高景气赛道',
+        'PR5':'积极配置权益(80%+)，布局高成长板块',
+      }[lastProfile.risk_level]||'股债平衡配置';
+      slide4.addText(
+        '政策支持 + 估值合理 + 结构性机会。\n\n'+
+        '热点主线：\n'+(hots4||'• AI/半导体\n• 高股息\n• 新能源')+'\n\n'+
+        '风险适配（'+lastProfile.risk_level+'）：\n'+fundRisk,
+        { x:Q_RIGHT+0.15, y:Q1_Y+0.42, w:Q_W-0.3, h:Q1_H-0.52, ...SEC_BODY }
+      );
+
+      // Q2 左下：理财配置逻辑
+      const wlBox = slide4.addShape(pptx.ShapeType.rect, { x:Q_LEFT, y:Q2_Y, w:Q_W, h:Q2_H, fill:LIGHT });
+      slide4.addText('▎ 理财配置逻辑', { x:Q_LEFT+0.15, y:Q2_Y+0.1, w:Q_W-0.3, h:0.28, ...SEC_HDR });
+      const wlTips = {
+        'PR1':'固收类理财为主，关注每日开放型和短期定开型',
+        'PR2':'固收类理财为主，关注每日开放型和短期定开型',
+        'PR3':'固收+策略产品性价比之选，稳健基础上提升收益弹性',
+        'PR4':'关注混合类/权益类理财产品，分享资本市场成长红利',
+        'PR5':'关注混合类/权益类理财产品，分享资本市场成长红利',
+      }[lastProfile.risk_level]||'固收+策略产品';
+      slide4.addText(
+        '银行理财凭借稳定收益和低波动，\n'+
+        '仍是利率下行期的稳健核心配置。\n\n'+
+        lastProfile.risk_level+'客户策略：\n'+wlTips,
+        { x:Q_LEFT+0.15, y:Q2_Y+0.42, w:Q_W-0.3, h:Q2_H-0.52, ...SEC_BODY }
+      );
+
+      // Q2 右下：流动性管理
+      const liqBox = slide4.addShape(pptx.ShapeType.rect, { x:Q_RIGHT, y:Q2_Y, w:Q_W, h:Q2_H, fill:LIGHT });
+      slide4.addText('▎ 流动性管理', { x:Q_RIGHT+0.15, y:Q2_Y+0.1, w:Q_W-0.3, h:0.28, ...SEC_HDR });
+      slide4.addText(
+        '• 保留3-6个月生活支出的高流动性资产\n'+
+        '  用于应急和捕捉市场机会\n\n'+
+        '• 大额短期资金关注结构性存款\n\n'+
+        '• 低利率下不宜过多长期存放活期\n\n'+
+        '• 货币基金/同业存单指数基金\n'+
+        '  兼顾流动性与收益',
+        { x:Q_RIGHT+0.15, y:Q2_Y+0.42, w:Q_W-0.3, h:Q2_H-0.52, ...SEC_BODY }
+      );
+      console.log('[PPT导出] 投资者视角 slide 完成');
+      } catch(e4) { console.error('[PPT导出] 投资者视角 slide 生成失败:', e4); }
+
+      // ===== 产品推荐（每品类一页） =====
+      const CAT_NAMES = ['基金','理财','保险','存款','结构性存款','外币存款'];
+      const byCat = selResult.by_category || {};
+
+      for (const cat of CAT_NAMES) {
+        const prods = byCat[cat];
+        if (!prods || prods.length === 0) continue;
+
+        const slide = pptx.addSlide();
+        slide.addText((CAT_LABELS[cat]||cat)+'产品推荐', { x:0.4, y:0.2, w:9, h:0.5, fontSize:16, bold:true, color:DARK });
+        slide.addShape(pptx.ShapeType.rect, { x:0.4, y:0.65, w:9.2, h:0.02, fill:RED });
+
+        let cy = 0.9;
+        prods.slice(0,5).forEach((p,i) => {
+          const name = (p.product_name||'').substring(0, 36);
+          const pid = p.product_id ? ' ['+p.product_id+']' : '';
+          const risk = p.risk_level || '';
+          const retLo = p.expected_return_low || '';
+          const retHi = p.expected_return_high || '';
+          const retStr = retLo && retHi ? retLo+'%~'+retHi+'%' : (retLo||'详见说明');
+          const reason = (p.recommendation_reason||'').substring(0, 100);
+
+          // 产品卡片背景 - 使用普通矩形
+          slide.addShape(pptx.ShapeType.rect, { x:0.4, y:cy, w:9.2, h:1.45, fill:LIGHT, line:{ color:'d1d5db', width:0.5 } });
+          // 序号圆圈 - 使用小矩形
+          slide.addShape(pptx.ShapeType.rect, { x:0.55, y:cy+0.1, w:0.35, h:0.3, fill:RED });
+          slide.addText((i+1)+'', { x:0.55, y:cy+0.1, w:0.35, h:0.3, fontSize:9, bold:true, color:WHITE, align:'center' });
+          // 产品名
+          slide.addText(name, { x:1.1, y:cy+0.08, w:8.3, h:0.35, fontSize:13, bold:true, color:DARK });
+          slide.addText(pid, { x:1.1, y:cy+0.4, w:8.3, h:0.2, fontSize:8, color:GRAY });
+          slide.addText('预期收益: '+retStr+'   风险: '+risk+'   匹配度: '+(p.match_score||0)+'分', { x:1.1, y:cy+0.6, w:8.3, h:0.25, fontSize:9, color:GRAY });
+          slide.addText('推荐理由: '+reason, { x:1.1, y:cy+0.9, w:8.3, h:0.45, fontSize:8, color:GRAY, italic:true });
+
+          cy += 1.55;
+        });
+      }
+
+      // 自定义产品页
+      if (customProducts && Object.keys(customProducts).length > 0) {
+        let hasCustom = false;
+        for (const [cat, cps] of Object.entries(customProducts)) {
+          if (!cps || cps.length === 0) continue;
+          hasCustom = true;
+          const slide = pptx.addSlide();
+          slide.addText('自定义产品推荐', { x:0.4, y:0.2, w:9, h:0.5, fontSize:16, bold:true, color:DARK });
+          slide.addShape(pptx.ShapeType.rect, { x:0.4, y:0.65, w:9.2, h:0.02, fill:RED });
+
+          let cy = 0.9;
+          cps.forEach((cp, i) => {
+            const name = (cp.name||'').substring(0, 36);
+            const reason = (cp.reason||'智能投顾根据客户需求个性化推荐').substring(0, 100);
+
+            slide.addShape(pptx.ShapeType.rect, { x:0.4, y:cy, w:9.2, h:1.2, fill:'fef5f5', line:{ color:RED, width:1.0 } });
+            slide.addShape(pptx.ShapeType.rect, { x:0.55, y:cy+0.1, w:0.35, h:0.3, fill:RED });
+            slide.addText((i+1)+'', { x:0.55, y:cy+0.1, w:0.35, h:0.3, fontSize:9, bold:true, color:WHITE, align:'center' });
+            slide.addText(name, { x:1.1, y:cy+0.08, w:8.3, h:0.35, fontSize:13, bold:true, color:DARK });
+            const metaParts = [];
+            if (cp.code) metaParts.push('代码:'+cp.code);
+            if (cp.issuer) metaParts.push(cp.issuer);
+            if (cp.risk) metaParts.push(cp.risk);
+            if (cp.ret) metaParts.push('收益:'+cp.ret);
+            if (cp.term) metaParts.push(cp.term);
+            slide.addText(metaParts.join(' | '), { x:1.1, y:cy+0.4, w:8.3, h:0.25, fontSize:9, color:GRAY });
+            slide.addText(reason, { x:1.1, y:cy+0.7, w:8.3, h:0.35, fontSize:8, color:GRAY, italic:true });
+
+            cy += 1.3;
+          });
+        }
+      }
+
+      // ===== 风险提示 =====
+      const slideLast = pptx.addSlide();
+      slideLast.addText('风险提示', { x:0.4, y:0.2, w:9, h:0.5, fontSize:18, bold:true, color:DARK });
+      slideLast.addShape(pptx.ShapeType.rect, { x:0.4, y:0.65, w:9.2, h:0.02, fill:RED });
+      const risks = [
+        '1. 投资有风险，入市需谨慎。本报告中的预期收益仅供参考，不构成收益承诺。',
+        '2. 产品过往业绩不代表未来表现，市场波动可能导致实际收益低于预期。',
+        '3. 理财产品不等同于存款，保本类产品以外存在本金损失风险。',
+        '4. 基金投资面临净值波动风险，请根据自身风险承受能力审慎决策。',
+        '5. 保险产品侧重风险保障功能，退保可能产生损失。',
+      ];
+      slideLast.addText(risks.join('\n\n'), { x:0.8, y:1.0, w:8.4, h:3, fontSize:10, color:GRAY });
+      slideLast.addText('本报告由智能投顾系统 - 客户资产配置与产品推荐 v2.0 云端版自动生成，仅供参考。', { x:0.5, y:4.5, w:9, h:0.4, fontSize:8, color:GRAY, align:'center' });
+
+      // 使用 blob 方式导出，WPS 兼容性更好
+      pptx.writeFile({ fileName:'资产配置建议书_'+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2)+'.pptx' }).then(() => {
+        toast('✅ PPT 已下载');
+        btn.disabled = false;
+        btn.innerHTML = '📥 导出PPT';
+      }).catch(e => {
+        console.error(e);
+        toast('❌ PPT 生成失败: '+e.message);
+        btn.disabled = false;
+        btn.innerHTML = '📥 导出PPT';
+      });
+    } catch(e) {
+      console.error(e);
+      toast('❌ PPT 生成失败: '+e.message);
+      btn.disabled = false;
+      btn.innerHTML = '📥 导出PPT';
+    }
+  }, 100);
+}
+
+// ============================================================
+// 客户摘要（微信发送版）
+// ============================================================
+function showClientSummary() {
+  if (!lastResult || !lastProfile) { toast('请先完成产品匹配'); return; }
+  
+  const profile = lastProfile;
+  const selResult = filterSelectedProducts();
+  const market = MARKET || {};
+  const ap = market.asset_prices || {};
+  const sr = market.sector_rotation || {};
+  
+  const riskNames = {PR1:'保守型',PR2:'稳健型',PR3:'平衡型',PR4:'成长型',PR5:'进取型'};
+  const riskName = riskNames[profile.risk_level] || '平衡型';
+  
+  let summary = '';
+  
+  // 称呼+画像
+  summary += '尊敬的客户，您好！\n\n';
+  summary += '根据您的风险偏好和资产状况，我为您制定了一份个性化资产配置方案，供您参考。\n\n';
+  summary += '【您的画像】\n';
+  summary += `风险等级：${riskName}（${profile.risk_level}）\n`;
+  summary += `可投资资产：${profile.assets || 100}万元\n`;
+  summary += `投资期限：${profile.horizon_days <= 90 ? '短期' : profile.horizon_days <= 365 ? '中期' : '长期'}\n\n`;
+  
+  // 市场环境
+  summary += '【当前市场环境】\n';
+  const aShare = ap.a_share || {};
+  const gold = ap.gold || {};
+  const dep = market.deposit_rate || {};
+  summary += `A股：${aShare.level || '震荡'}，${aShare.trend || '结构性行情'}\n`;
+  summary += `黄金：${gold.price || '波动'}，${gold.trend || '震荡'}\n`;
+  summary += `利率：存款利率${dep.trend || '持续下行'}，锁定收益正当时\n\n`;
+  
+  // 产品推荐
+  summary += '【配置建议】\n';
+  let idx = 1;
+  for (const [cat, prods] of Object.entries(selResult.by_category || {})) {
+    if (!prods || prods.length === 0) continue;
+    const top = prods.slice(0, 3);
+    for (const p of top) {
+      const ret = p.expected_return_low && p.expected_return_high 
+        ? `（预期${p.expected_return_low.toFixed(1)}%-${p.expected_return_high.toFixed(1)}%）` : '';
+      const term = p.term_days ? (p.term_days >= 365 ? `${Math.round(p.term_days/365)}年期` : `${p.term_days}天`) : '';
+      summary += `${idx}. 【${cat}】${p.product_name} ${term} ${ret}\n`;
+      if (p.recommendation_reason) summary += `   推荐理由：${p.recommendation_reason}\n`;
+      idx++;
+    }
+  }
+  
+  // 结尾
+  summary += '\n【风险提示】\n';
+  summary += '以上产品建议基于当前市场环境分析，不构成收益承诺。投资有风险，市场波动可能导致实际收益低于预期。建议您根据自身情况审慎决策。\n\n';
+  summary += `—— 智能投顾 · ${new Date().getFullYear()}年${new Date().getMonth()+1}月${new Date().getDate()}日`;
+  
+  document.getElementById('summaryContent').textContent = summary;
+  document.getElementById('summaryModal').style.display = 'flex';
+}
+
+function closeSummary() {
+  document.getElementById('summaryModal').style.display = 'none';
+}
+
+function copySummary() {
+  const text = document.getElementById('summaryContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    toast('✅ 已复制，可直接粘贴到微信发送');
+  }).catch(() => {
+    // 降级方案
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✅ 已复制到剪贴板');
+  });
+  closeSummary();
+}
+
+// ============================================================
+// 主流程
+// ============================================================
+function runMatch() {
+  const btn = document.getElementById('btnMatch');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 匹配中...';
+
+  setTimeout(() => {
+    try {
+      const riskLevel = document.getElementById('riskLevel').value;
+      const assets = parseFloat(document.getElementById('assets').value) || 100;
+      const horizonDays = parseInt(document.getElementById('horizon').value) || 365;
+      const liquidity = document.getElementById('liquidity').value;
+      const isPrivateBank = document.getElementById('isPrivateBank').checked;
+      // 收集每个品类的数量设置
+      const perCatLimits = {};
+      document.querySelectorAll('.per-cat-sel').forEach(sel => {
+        perCatLimits[sel.dataset.cat] = parseInt(sel.value) || 5;
+      });
+      customProducts = getCustomProducts();
+
+      lastProfile = { risk_level: riskLevel, assets, horizon_days: horizonDays, liquidity_need: liquidity, liquidity, is_private_bank: isPrivateBank };
+      lastResult = matchProducts(riskLevel, assets, horizonDays, liquidity, isPrivateBank, perCatLimits);
+
+      // 默认全选所有匹配产品
+      sids.clear();
+      (lastResult.all || []).forEach(p => { if (p.product_id) sids.add(p.product_id); });
+      // 默认全选自定义产品
+      for (const [cat, cps] of Object.entries(customProducts)) {
+        cps.forEach((cp, i) => sids.add('custom_'+cat+'_'+i));
+      }
+
+      runMatchRender();
+      switchTab('result');
+    } catch(e) {
+      console.error(e);
+      toast('❌ 匹配失败: '+e.message);
+    }
+    btn.disabled = false;
+    btn.innerHTML = '🔍 开始智能匹配推荐';
+  }, 50);
+}
+
+function viewReport() {
+  if (!lastResult || !lastProfile) { toast('请先完成产品匹配'); return; }
+  try {
+    // 只包含选中的产品
+    const filteredResult = filterSelectedProducts();
+    // 过滤自定义产品
+    const filteredCustoms = {};
+    for (const [cat, cps] of Object.entries(customProducts || {})) {
+      const sel = cps.filter((cp, i) => sids.has('custom_'+cat+'_'+i));
+      if (sel.length > 0) filteredCustoms[cat] = sel;
+    }
+    const report = buildReport(lastProfile, filteredResult, filteredCustoms);
+    document.getElementById('reportArea').innerHTML = renderMarkdown(report);
+    switchTab('report');
+  } catch(e) {
+    console.error('报告生成失败:', e);
+    toast('报告生成出错: ' + e.message);
+  }
+}
+
+// 根据 sids 过滤匹配结果
+function filterSelectedProducts() {
+  if (!lastResult) return { total: 0, by_category: {}, all: [], market_context: MARKET };
+  const byCat = {};
+  let total = 0;
+  for (const [cat, prods] of Object.entries(lastResult.by_category || {})) {
+    const filtered = prods.filter(p => sids.has(p.product_id));
+    if (filtered.length > 0) { byCat[cat] = filtered; total += filtered.length; }
+  }
+  return { total, by_category: byCat, all: Object.values(byCat).flat(), market_context: MARKET };
+}
+
+// Markdown 渲染器（逐行状态机，处理标题/表格/引用/列表/段落）
+function renderMarkdown(md) {
+  let html = '';
+  let inTable = false, tableRows = [];
+  let inList = false;
+
+  const lines = md.split('\n');
+
+  function closeTable() {
+    if (!inTable || tableRows.length === 0) return;
+    let t = '<table><thead>';
+    t += tableRows[0].replace(/<td>/g, '<th>').replace(/<\/td>/g, '</th>');
+    t += '</thead><tbody>';
+    for (let j = 1; j < tableRows.length; j++) t += tableRows[j];
+    t += '</tbody></table>';
+    html += t;
+    inTable = false; tableRows = [];
+  }
+
+  function closeList() {
+    if (inList) { html += '</ul>'; inList = false; }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // 行内格式化（先做，保证表格/列表里也有加粗效果）
+    line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    line = line.replace(/`(.+?)`/g, '<code>$1</code>');
+
+    const trimmed = line.trim();
+
+    // 表格行检测
+    const isTR = /^\|.+\|$/.test(trimmed);
+    const isSep = /^\|[-:\s|]+\|$/.test(trimmed);
+
+    if (isTR && !isSep) {
+      if (!inTable) { closeList(); inTable = true; tableRows = []; }
+      const cells = trimmed.split('|').filter(c => c !== '');
+      tableRows.push('<tr>' + cells.map(c => '<td>' + c.trim() + '</td>').join('') + '</tr>');
+      continue;
+    }
+    if (isSep) continue; // 跳过分隔行
+
+    // 非表格行 → 关闭表格
+    closeTable();
+
+    // 列表项（不先关闭列表，允许多行连续）
+    if (/^- (.+)/.test(line)) {
+      if (!inList) { inList = true; html += '<ul>'; }
+      html += '<li>' + line.replace(/^- /, '') + '</li>';
+      continue;
+    }
+
+    // 非列表行 → 关闭列表
+    closeList();
+
+    // 标题
+    if (/^### (.+)/.test(line)) { html += '<h3>' + line.replace(/^### /, '') + '</h3>'; continue; }
+    if (/^## (.+)/.test(line)) { html += '<h2>' + line.replace(/^## /, '') + '</h2>'; continue; }
+    if (/^# (.+)/.test(line)) { html += '<h1>' + line.replace(/^# /, '') + '</h1>'; continue; }
+
+    // 水平线
+    if (/^---$/.test(trimmed)) { html += '<hr>'; continue; }
+
+    // 引用
+    if (/^> (.+)/.test(line)) { html += '<blockquote>' + line.replace(/^> /, '') + '</blockquote>'; continue; }
+
+    // 空行
+    if (trimmed === '') { html += '<br>'; continue; }
+
+    // 普通段落
+    html += '<p>' + line + '</p>';
+  }
+
+  // 收尾
+  closeTable();
+  closeList();
+
+  return html;
+}
+
+// 初始化
+addCustomProduct();
+renderCatPicker();
+
+// ============================================================
+// 仪表盘 Tab
+// ============================================================
+function renderDashboard() {
+  const container = document.getElementById('dashboardContent');
+  const ap = (typeof MARKET!=='undefined'&&MARKET.asset_prices)?MARKET.asset_prices:{};
+  const ss=ap.a_share||{}, g=ap.gold||{}, fx=ap.fx||{}, bond=ap.bond||{};
+  const clients = loadClients();
+  const totalPnl = clients.reduce((s,c)=>s+(c.holdings||[]).reduce((ss,h)=>ss+(h.pnl||0),0),0);
+  
+  let html = '';
+  // 市场快照
+  html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;border-radius:12px;padding:14px;margin-bottom:12px;">';
+  html += '<div style="font-size:0.75rem;opacity:0.7;">'+new Date().toLocaleDateString('zh-CN',{weekday:'long',month:'long',day:'numeric'})+'</div>';
+  html += '<div style="display:flex;gap:12px;font-size:0.78rem;margin-top:4px;flex-wrap:wrap;">';
+  html += '<span>上证<b> '+(ss.level||'—')+'</b> <span style="color:#c41230;font-size:0.65rem;">'+(ss.change||'')+'</span></span>';
+  html += '<span>黄金<b> '+(g.level||'—')+'</b></span><span>汇率<b> '+(fx.level||'—')+'</b></span><span>10年国债<b> '+(bond.cn_10y||'—')+'</b></span>';
+  html += '</div></div>';
+  
+  // 统计
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">';
+  html += '<div style="background:#f0fdf4;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.65rem;color:var(--gray);">管理客户</div><div style="font-size:1.3rem;font-weight:700;">'+clients.length+'</div></div>';
+  html += '<div style="background:#fef2f2;border-radius:10px;padding:10px;text-align:center;"><div style="font-size:0.65rem;color:var(--gray);">持仓盈亏</div><div style="font-size:1.3rem;font-weight:700;color:'+(totalPnl>=0?'#c41230':'#059669')+';">'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</div></div>';
+  html += '</div>';
+  
+  // 功能卡片
+  const cards = [
+    {icon:'📰',title:'实时资讯',desc:'最新财经新闻',tab:'news'},
+    {icon:'📡',title:'市场行情',desc:'指数/黄金/汇率',tab:'market'},
+    {icon:'📈',title:'基金估值',desc:'45只+对比器',tab:'fund'},
+    {icon:'👥',title:'客户管理',desc:'档案+持仓',tab:'clients'},
+    {icon:'🤖',title:'AI助手',desc:'DeepSeek+联网',tab:'ai'},
+    {icon:'📋',title:'客户画像',desc:'分析→匹配',tab:'input'},
+    {icon:'📊',title:'推荐结果',desc:'产品匹配',tab:'result'},
+    {icon:'📝',title:'配置报告',desc:'方案+导出',tab:'report'},
+  ];
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+  for (const c of cards) {
+    html += '<div onclick="switchTab(\''+c.tab+'\')" style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px 10px;cursor:pointer;text-align:center;">';
+    html += '<div style="font-size:1.5rem;margin-bottom:4px;">'+c.icon+'</div>';
+    html += '<div style="font-weight:600;font-size:0.82rem;">'+c.title+'</div>';
+    html += '<div style="font-size:0.65rem;color:var(--gray);">'+c.desc+'</div></div>';
+  }
+  html += '</div>';
+  
+  container.innerHTML = html;
+}
+
+function loadClients() { try { return JSON.parse(localStorage.getItem('wm_clients')||'[]'); } catch(e) { return []; } }
+function saveClients(data) { localStorage.setItem('wm_clients', JSON.stringify(data)); }
+function uid() { return 'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
+function huid() { return 'h_'+Date.now()+'_'+Math.random().toString(36).slice(2,6); }
+
+const RISK_OPTIONS = ['PR1','PR2','PR3','PR4','PR5'];
+
+function showBatchImport() {
+  let html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:flex-end;">';
+  html += '<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:85vh;overflow-y:auto;padding:20px;">';
+  html += '<div style="font-weight:700;font-size:1.1rem;margin-bottom:12px;">📥 批量导入持仓</div>';
+  html += '<div style="display:flex;gap:8px;margin-bottom:8px;">';
+  html += '<button id="importTabXls" onclick="switchImportMode(\'xls\')" style="flex:1;padding:8px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:0.82rem;cursor:pointer;">📊 Excel上传</button>';
+  html += '<button id="importTabCsv" onclick="switchImportMode(\'csv\')" style="flex:1;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:0.82rem;cursor:pointer;">📋 粘贴文本</button>';
+  html += '</div>';
+  html += '<div id="importXlsArea"><div style="font-size:0.7rem;color:var(--gray);margin-bottom:8px;">Excel格式：客户名 | 基金代码 | 申购日期 | 买入金额 | 费率</div>';
+  html += '<input type="file" id="xlsFile" accept=".xlsx,.xls,.csv" onchange="previewXls()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.82rem;">';
+  html += '<div id="xlsPreview" style="margin-top:8px;font-size:0.7rem;max-height:200px;overflow-y:auto;"></div></div>';
+  html += '<div id="importCsvArea" style="display:none;"><div style="font-size:0.7rem;color:var(--gray);margin-bottom:8px;line-height:1.5;">每行一条持仓：<br><b>客户名,基金代码,申购日期,买入金额,费率</b></div>';
+  html += '<textarea id="batchData" rows="6" placeholder="张三,000184,2026-01-15,50000,0.15" style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.8rem;font-family:monospace;"></textarea></div>';
+  html += '<div id="batchResult" style="margin-top:8px;font-size:0.7rem;"></div>';
+  html += '<div style="display:flex;gap:8px;margin-top:12px;">';
+  html += '<button onclick="closeModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:0.85rem;cursor:pointer;">取消</button>';
+  html += '<button onclick="doBatchImport()" style="flex:1;padding:10px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:0.85rem;cursor:pointer;">导入</button>';
+  html += '</div></div></div>';
+  document.getElementById('modalHost').innerHTML = html;
+}
+
+function switchImportMode(mode) {
+  document.getElementById('importXlsArea').style.display = mode==='xls'?'block':'none';
+  document.getElementById('importCsvArea').style.display = mode==='csv'?'block':'none';
+  document.getElementById('importTabXls').style.background = mode==='xls'?'var(--red)':'#fff';
+  document.getElementById('importTabXls').style.color = mode==='xls'?'#fff':'var(--dark)';
+  document.getElementById('importTabCsv').style.background = mode==='csv'?'var(--red)':'#fff';
+  document.getElementById('importTabCsv').style.color = mode==='csv'?'#fff':'var(--dark)';
+  document.getElementById('importTabCsv').style.border = mode==='csv'?'none':'1px solid #e5e7eb';
+  document.getElementById('importTabXls').style.border = mode==='xls'?'none':'1px solid #e5e7eb';
+}
+
+function previewXls() {
+  const file = document.getElementById('xlsFile').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, {header:1});
+      let html = '<div style="font-weight:600;margin-bottom:4px;">预览（'+data.length+'行）</div>';
+      for (let i = 0; i < Math.min(data.length, 8); i++) {
+        html += '<div>' + data[i].join(' | ') + '</div>';
+      }
+      if (data.length > 8) html += '<div style="color:var(--gray);">...还有'+(data.length-8)+'行</div>';
+      document.getElementById('xlsPreview').innerHTML = html;
+    } catch(e) {
+      document.getElementById('xlsPreview').innerHTML = '<div style="color:#c41230;">解析失败：'+e.message+'</div>';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doBatchImport() {
+  const mode = document.getElementById('importXlsArea').style.display !== 'none' ? 'xls' : 'csv';
+  
+  if (mode === 'csv') {
+    doCsvImport();
+  } else {
+    doXlsImport();
+  }
+}
+
+function doXlsImport() {
+  const file = document.getElementById('xlsFile').files[0];
+  if (!file) { toast('请选择文件'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, {header:1});
+      processImportLines(data.slice(1).filter(r => r.length >= 4).map(r => r.join(',')).join('\n'));
+    } catch(e) { toast('解析失败:'+e.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function doCsvImport() {
+  const raw = document.getElementById('batchData').value.trim();
+  if (!raw) { toast('请粘贴数据'); return; }
+  processImportLines(raw);
+}
+
+function processImportLines(raw) {
+  const lines = raw.split('\n').filter(l => l.trim() && !l.startsWith('#'));
+  const clients = loadClients();
+  let imported = 0, skipped = 0;
+  
+  for (const line of lines) {
+    const parts = line.split(/[,，\t]+/).map(s => s.trim());
+    if (parts.length < 4) { skipped++; continue; }
+    
+    const [cname, code, date, amountStr, feeStr] = parts;
+    const amount = parseFloat(amountStr) || 0;
+    const fee = parseFloat(feeStr) || 0.15;
+    if (!cname || !code || !date || amount <= 0) { skipped++; continue; }
+    
+    let ci = clients.findIndex(x => (x.name||'').toLowerCase() === cname.toLowerCase());
+    if (ci < 0) {
+      clients.push({
+        id: uid(), name: cname, phone: '', riskLevel: 'PR3',
+        totalAssets: Math.max(50, Math.ceil(amount/10000)), termMonths: 36, tags: '',
+        holdings: [], createdAt: new Date().toISOString().slice(0,10)
+      });
+      ci = clients.length - 1;
+    }
+    if (!clients[ci].holdings) clients[ci].holdings = [];
+    
+    const navs = window._fundNavHistory || {};
+    let buyNav = (navs[code]||{})[date] || 1.0;
+    const feeAmt = amount * fee / 100;
+    const shares = (amount - feeAmt) / buyNav;
+    const fund = (typeof PRODUCTS!=='undefined'?PRODUCTS:[]).find(p => p.product_id === code);
+    
+    clients[ci].holdings.push({
+      id: huid(), fundCode: code, fundName: fund ? fund.product_name : code,
+      buyDate: date, buyAmount: amount, feeRate: fee,
+      buyNav, netAmount: amount - feeAmt, shares,
+      sellDate: null, sellNav: null, pnl: 0
+    });
+    imported++;
+  }
+  
+  saveClients(clients);
+  closeModal();
+  renderClientsTab();
+  toast('导入'+imported+'条，跳过'+skipped+'条');
+}
+
+function renderClientsTab() {
+  const container = document.getElementById('clientsContent');
+  const clients = loadClients();
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;"><div style="font-weight:700;">👥 客户管理 ('+clients.length+'人)</div><div style="display:flex;gap:6px;"><button onclick="showBatchImport()" style="font-size:0.75rem;padding:5px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;">📥 批量导入</button><button onclick="showAddClient()" style="font-size:0.8rem;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">+ 新增客户</button></div></div>';
+  html += '<input id="clientSearch" oninput="renderClientsTab()" placeholder="🔍 搜索客户姓名/手机..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;margin-bottom:10px;">';
+  const q = (document.getElementById('clientSearch')?.value||'').toLowerCase();
+  const filtered = q ? clients.filter(c => (c.name||'').includes(q) || (c.phone||'').includes(q)) : clients;
+  if (filtered.length === 0) { html += '<p style="text-align:center;color:var(--gray);padding:40px;">'+(clients.length?'没有匹配的客户':'暂无客户，点击上方按钮新增')+'</p>'; }
+  else {
+    for (const c of filtered) {
+      const hd = c.holdings||[]; const profit = hd.reduce((s,h)=>s+(h.pnl||0),0);
+      html += '<div style="background:#fff;border-radius:8px;padding:12px;margin-bottom:8px;border:1px solid #e5e7eb;cursor:pointer;" onclick="viewClient(\''+c.id+'\')">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;"><div><span style="font-weight:600;">'+(c.name||'未命名')+'</span><span style="font-size:0.65rem;color:#fff;background:'+({PR1:'#059669',PR2:'#1D9E75',PR3:'#D85A30',PR4:'#993C1D',PR5:'#E24B4A'}[c.riskLevel]||'#6b7280')+';padding:2px 6px;border-radius:4px;margin-left:6px;">'+(c.riskLevel||'')+'</span></div>';
+      html += '<div style="text-align:right;"><div style="font-weight:700;">'+(c.totalAssets||0)+'万</div>'+ (hd.length>0?'<div style="font-size:0.7rem;color:'+(profit>=0?'#c41230':'#059669')+';">'+(profit>=0?'+':'')+profit.toFixed(0)+'元</div>':'') +'</div></div>';
+      if (c.tags) html += '<div style="font-size:0.65rem;color:var(--gray);margin-top:4px;">🏷 '+(c.tags||'')+'</div>';
+      html += '</div>';
+    }
+  }
+  container.innerHTML = html;
+}
+
+function showAddClient(editId) {
+  const clients = loadClients(); const c = editId ? clients.find(x => x.id === editId) : null;
+  let html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:flex-end;"><div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:20px;"><div style="font-weight:700;font-size:1.1rem;margin-bottom:16px;">'+(c?'编辑':'新增')+'客户</div>';
+  html += fm('姓名','<input id="cName" value="'+(c?c.name:'')+'" placeholder="客户姓名" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('手机','<input id="cPhone" value="'+(c?c.phone:'')+'" placeholder="手机号（选填）" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('风险等级','<div style="display:flex;gap:4px;">'+RISK_OPTIONS.map(r=>'<button onclick="document.getElementById(\'cRisk\').value=\''+r+'\';updateRiskBtns()" class="risk-btn" data-r="'+r+'" style="flex:1;padding:8px 4px;border:1px solid #e5e7eb;border-radius:6px;background:'+(c&&c.riskLevel===r?'var(--red)':'#fff')+';color:'+(c&&c.riskLevel===r?'#fff':'var(--dark)')+';font-size:0.75rem;cursor:pointer;">'+r+'</button>').join('')+'</div><input type="hidden" id="cRisk" value="'+(c?c.riskLevel:'PR3')+'">');
+  html += fm('可投资产（万）','<input id="cAsset" type="number" value="'+(c?c.totalAssets:'50')+'" placeholder="万元" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('投资期限（月）','<input id="cTerm" type="number" value="'+(c?c.termMonths:'36')+'" placeholder="月" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('标签/备注','<input id="cTags" value="'+(c?c.tags:'')+'" placeholder="如：退休规划、稳健、私银" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += '<div style="display:flex;gap:8px;margin-top:16px;"><button onclick="closeModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:0.85rem;cursor:pointer;">取消</button><button onclick="saveClient(\''+(c&&c.id?c.id:'')+'\')" style="flex:1;padding:10px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:0.85rem;cursor:pointer;">保存</button></div></div></div>';
+  document.getElementById('modalHost').innerHTML = html;
+}
+
+function fm(l,i) { return '<div style="margin-bottom:12px;"><div style="font-size:0.75rem;color:var(--gray);margin-bottom:4px;">'+l+'</div>'+i+'</div>'; }
+function updateRiskBtns() {
+  const v = document.getElementById('cRisk').value;
+  document.querySelectorAll('.risk-btn').forEach(b=>{b.style.background=b.dataset.r===v?'var(--red)':'#fff';b.style.color=b.dataset.r===v?'#fff':'var(--dark)';});
+}
+function closeModal() { document.getElementById('modalHost').innerHTML = ''; }
+
+function saveClient(editId) {
+  const clients = loadClients();
+  const data = {id: editId || uid(), name: document.getElementById('cName').value.trim(), phone: document.getElementById('cPhone').value.trim(), riskLevel: document.getElementById('cRisk').value, totalAssets: parseInt(document.getElementById('cAsset').value)||0, termMonths: parseInt(document.getElementById('cTerm').value)||36, tags: document.getElementById('cTags').value.trim(), holdings: editId?(clients.find(x=>x.id===editId)?.holdings||[]):[], createdAt: editId?(clients.find(x=>x.id===editId)?.createdAt||''):new Date().toISOString().slice(0,10)};
+  if (!data.name) { toast('请输入客户姓名'); return; }
+  if (editId) { const idx = clients.findIndex(x=>x.id===editId); if(idx>=0) clients[idx]=data; }
+  else clients.unshift(data);
+  saveClients(clients); closeModal(); renderClientsTab();
+  toast(editId?'客户已更新':'客户已添加');
+}
+
+function deleteClient(id) {
+  if (!confirm('确定删除该客户及全部持仓数据？')) return;
+  saveClients(loadClients().filter(c=>c.id!==id));
+  renderClientsTab(); toast('已删除');
+}
+
+function viewClient(id) {
+  const c = loadClients().find(x=>x.id===id); if(!c) return;
+  const container = document.getElementById('clientsContent');
+  const hds = c.holdings||[];
+  const totalCost = hds.reduce((s,h)=>s+(h.buyAmount||0),0);
+  const totalPnl = hds.reduce((s,h)=>s+(h.pnl||0),0);
+  let html = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;"><button onclick="renderClientsTab()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;padding:4px;">← 返回</button><div style="flex:1;"><div style="font-weight:700;font-size:1.1rem;">'+(c.name||'')+'</div><div style="font-size:0.7rem;color:var(--gray);">'+(c.riskLevel||'')+' · '+c.totalAssets+'万 · '+(c.termMonths||'')+'个月</div></div><button onclick="showAddClient(\''+id+'\')" style="font-size:0.75rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;">编辑</button><button onclick="deleteClient(\''+id+'\')" style="font-size:0.75rem;padding:4px 10px;border:1px solid #fecaca;border-radius:6px;background:#fef2f2;color:#c41230;cursor:pointer;">删除</button></div>';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-weight:600;font-size:0.9rem;">📦 持仓明细 ('+hds.length+'只)</div><button onclick="showAddHolding(\''+id+'\')" style="font-size:0.75rem;padding:4px 12px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">+ 录入持仓</button></div>';
+  if (hds.length>0) {
+    for (const h of hds) { const p=h.pnl||0,cl=p>=0?'#c41230':'#059669',ar=p>=0?'▲':'▼'; html += '<div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:8px;border:1px solid #e5e7eb;'+(h.sellDate?'opacity:0.6;':'')+'"><div style="display:flex;justify-content:space-between;"><div><span style="font-weight:600;">'+(h.fundName||h.fundCode)+'</span><span style="font-size:0.65rem;color:var(--gray);"> '+h.fundCode+'</span>'+(h.sellDate?'<span style="font-size:0.6rem;background:#e5e7eb;padding:1px 6px;border-radius:4px;margin-left:4px;">已赎回</span>':'')+'</div><div style="text-align:right;"><span style="font-weight:700;color:'+cl+';">'+ar+(p>=0?'+':'')+p.toFixed(0)+'元</span><div style="font-size:0.65rem;color:var(--gray);">'+(h.shares||0).toFixed(2)+'份</div></div></div><div style="font-size:0.65rem;color:var(--gray);margin-top:4px;">买入 '+(h.buyDate||'')+' | 净值 '+(h.buyNav||'?')+' | 成本'+(h.buyAmount||0)+'元'+(h.sellDate?' | 赎回 '+(h.sellDate||'')+' 净值'+(h.sellNav||'?'):'')+'</div><button onclick="deleteHolding(\''+id+'\',\''+h.id+'\')" style="margin-top:4px;font-size:0.6rem;padding:2px 8px;border:1px solid #fecaca;border-radius:4px;background:#fef2f2;color:#c41230;cursor:pointer;">删除</button></div>'; }
+    html += '<div style="margin-top:12px;padding:10px;background:#f9fafb;border-radius:8px;display:flex;justify-content:space-between;"><span style="font-size:0.8rem;">总投入</span><span style="font-weight:700;">'+totalCost.toFixed(0)+'元</span><span style="font-size:0.8rem;color:'+(totalPnl>=0?'#c41230':'#059669')+';">总盈亏</span><span style="font-weight:700;color:'+(totalPnl>=0?'#c41230':'#059669')+';">'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'元</span></div>';
+  } else { html += '<p style="text-align:center;color:var(--gray);padding:30px;">暂未录入持仓<br><span style="font-size:0.75rem;">点击上方按钮录入基金/存款/保险等</span></p>'; }
+  container.innerHTML = html;
+  refreshHoldingPnL(id);
+}
+
+function showAddHolding(clientId) {
+  let html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:flex-end;"><div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:20px;"><div style="font-weight:700;font-size:1.1rem;margin-bottom:16px;">录入持仓</div>';
+  html += fm('基金代码','<input id="hCode" placeholder="如 000184" oninput="autoFillFund()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('基金名称','<input id="hName" placeholder="自动补全或手动填" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('申购日期','<input id="hDate" type="date" value="'+new Date().toISOString().slice(0,10)+'" onchange="previewCalc()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('买入金额（含手续费）','<input id="hAmount" type="number" placeholder="元" oninput="previewCalc()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('申购费率（%）','<input id="hFee" type="number" value="0.15" step="0.01" oninput="previewCalc()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += fm('当日净值','<input id="hNav" type="number" step="0.0001" placeholder="自动查询，无数据时手动填" oninput="previewCalc()" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;background:#fefce8;">');
+  html += fm('赎回日期（选填）','<input id="hSellDate" type="date" style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.85rem;">');
+  html += '<div id="hCalcPreview" style="font-size:0.7rem;color:var(--gray);padding:8px;background:#f9fafb;border-radius:6px;margin-bottom:8px;min-height:20px;">输入基金代码和日期后自动计算</div>';
+  html += '<div style="display:flex;gap:8px;"><button onclick="closeModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:0.85rem;cursor:pointer;">取消</button><button onclick="saveHolding(\''+clientId+'\')" style="flex:1;padding:10px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:0.85rem;cursor:pointer;">保存</button></div></div></div>';
+  document.getElementById('modalHost').innerHTML = html;
+}
+
+function autoFillFund() {
+  const code = document.getElementById('hCode').value.trim();
+  const fund = (typeof PRODUCTS!=='undefined'?PRODUCTS:[]).find(p=>p.product_id===code&&p.product_category==='基金');
+  if (fund) document.getElementById('hName').value = fund.product_name||'';
+  previewCalc();
+}
+
+function previewCalc() {
+  const code = document.getElementById('hCode').value.trim(), amount = parseFloat(document.getElementById('hAmount').value)||0, fee = parseFloat(document.getElementById('hFee').value)||0, date = document.getElementById('hDate').value;
+  const preview = document.getElementById('hCalcPreview'), navInput = document.getElementById('hNav');
+  if (!code||!amount||!date) { preview.innerHTML='输入基金代码和日期后自动计算'; return; }
+  
+  // 先尝试从历史净值文件查
+  const nv = (window._fundNavHistory||{})[code];
+  let buyNav = nv ? nv[date] : null;
+  
+  if (buyNav) {
+    navInput.value = buyNav.toFixed(4);
+    navInput.style.background = '#ecfdf5';
+    const fa=amount*fee/100,na=amount-fa,sh=na/buyNav;
+    preview.innerHTML='✅ 找到当日净值 <b>'+buyNav.toFixed(4)+'</b> | 手续费 '+fa.toFixed(2)+'元 | 份额 <b>'+sh.toFixed(2)+'</b>份';
+  } else {
+    navInput.value = '';
+    navInput.style.background = '#fefce8';
+    preview.innerHTML='⚠️ <b>未找到历史净值</b>，请在「当日净值」框手动输入申购日的基金净值';
+  }
+}
+
+async function saveHolding(clientId) {
+  const code = document.getElementById('hCode').value.trim(), name = document.getElementById('hName').value.trim(), date = document.getElementById('hDate').value, amount = parseFloat(document.getElementById('hAmount').value)||0, fee = parseFloat(document.getElementById('hFee').value)||0, sellDate = document.getElementById('hSellDate').value;
+  let buyNav = parseFloat(document.getElementById('hNav').value);
+  if (!code||!amount||!date) { toast('请填写完整'); return; }
+  if (!buyNav || isNaN(buyNav)) { toast('请输入或确认当日净值'); return; }
+  const clients = loadClients(); const ci = clients.findIndex(x=>x.id===clientId); if(ci<0) return;
+  const fa=amount*fee/100,na=amount-fa,sh=na/buyNav;
+  const h={id:huid(),fundCode:code,fundName:name||code,buyDate:date,buyAmount:amount,feeRate:fee,buyNav,netAmount:na,shares:sh,sellDate:sellDate||null,sellNav:null,pnl:0};
+  clients[ci].holdings=(clients[ci].holdings||[]); clients[ci].holdings.push(h);
+  saveClients(clients); closeModal(); viewClient(clientId);
+  toast('持仓已录入 · '+sh.toFixed(2)+'份');
+}
+
+function deleteHolding(clientId, holdingId) {
+  if (!confirm('删除该持仓记录？')) return;
+  const clients = loadClients(); const ci = clients.findIndex(x=>x.id===clientId); if(ci<0) return;
+  clients[ci].holdings = (clients[ci].holdings||[]).filter(h=>h.id!==holdingId);
+  saveClients(clients); viewClient(clientId);
+}
+
+async function refreshHoldingPnL(clientId) {
+  const clients = loadClients(); const ci = clients.findIndex(x=>x.id===clientId); if(ci<0) return;
+  let changed = false;
+  for (const h of (clients[ci].holdings||[])) {
+    if (h.sellDate) continue;
+    try { const d = await fetchFundGz(h.fundCode); if(d&&d.dwjz) { const n=parseFloat(d.gz||d.dwjz); if(n>0) { h.pnl=(n-h.buyNav)*h.shares; changed=true; } } } catch(e) {}
+  }
+  if (changed) { saveClients(clients); viewClient(clientId); }
+}
+
+function fetchFundGz(code) {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(()=>resolve(null),4000), prev = window.jsonpgz;
+    window.jsonpgz = function(d) { clearTimeout(timeout); window.jsonpgz=prev; resolve(d); };
+    const s = document.createElement('script');
+    s.src='https://fundgz.1234567.com.cn/js/'+code+'.js?rt='+Date.now();
+    s.onerror = () => { clearTimeout(timeout); window.jsonpgz=prev; resolve(null); };
+    document.head.appendChild(s);
+    s.onload = () => { if(s.parentNode)s.parentNode.removeChild(s); };
+  });
+}
+
+// ============================================================
+// AI助手 Tab（DeepSeek）
+// ============================================================
+function getAiKey() { return localStorage.getItem('wm_ds_key')||''; }
+function setAiKey(k) { localStorage.setItem('wm_ds_key', k); }
+let _aiHistory = [], _aiSearch = false;
+
+function renderAiTab() {
+  const container = document.getElementById('aiContent');
+  const hasKey = !!getAiKey();
+  let html = '<div style="font-weight:700;margin-bottom:12px;">🤖 AI 助手</div>';
+  if (!hasKey) {
+    html += '<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:12px;">';
+    html += '<div style="font-weight:600;font-size:0.85rem;">🔑 请先配置 DeepSeek API Key</div>';
+    html += '<input id="aiKeyInput" type="password" placeholder="sk-..." style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.82rem;margin:8px 0;">';
+    html += '<div style="font-size:0.65rem;color:var(--gray);">Key 仅保存在浏览器本地，不会上传</div>';
+    html += '<button onclick="saveAiKey()" style="margin-top:8px;padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">保存并开始</button></div>';
+  } else {
+    html += renderChatUI();
+  }
+  container.innerHTML = html;
+}
+
+function saveAiKey() {
+  const k = document.getElementById('aiKeyInput').value.trim();
+  if (!k||!k.startsWith('sk-')) { toast('请输入有效的Key (sk-开头)'); return; }
+  setAiKey(k); _aiHistory=[]; renderAiTab(); toast('Key已保存');
+}
+
+function renderChatUI() {
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:0.75rem;color:var(--gray);">Key: '+getAiKey().slice(0,8)+'***</div><div style="display:flex;align-items:center;gap:8px;"><label style="font-size:0.7rem;color:var(--gray);cursor:pointer;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="aiSearchToggle" '+(_aiSearch?'checked':'')+' onchange="_aiSearch=this.checked" style="width:14px;height:14px;">🌐 联网</label><button onclick="setAiKey(\'\');_aiHistory=[];renderAiTab();" style="font-size:0.7rem;padding:3px 8px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;cursor:pointer;">更换</button></div></div>';
+  html += '<div id="aiMessages" style="max-height:60vh;overflow-y:auto;margin-bottom:10px;">';
+  if (_aiHistory.length===0) {
+    html += '<div style="text-align:center;color:var(--gray);padding:20px;"><div style="font-size:2rem;margin-bottom:8px;">🤖</div><div style="font-size:0.85rem;">我是你的AI投资助手</div><div style="font-size:0.7rem;margin-top:4px;">试试问我：</div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">'+quickBtn('对比000184和000218')+quickBtn('今天市场怎么样')+quickBtn('帮我推荐PR3客户的产品')+quickBtn('客户亏了15%怎么安抚')+'</div></div>';
+  } else {
+    for (const m of _aiHistory) {
+      if (m.role==='user') html += '<div style="text-align:right;margin:8px 0;"><span style="background:var(--red);color:#fff;padding:6px 12px;border-radius:12px;font-size:0.82rem;display:inline-block;max-width:80%;text-align:left;">'+m.content+'</span></div>';
+      else html += '<div style="margin:8px 0;"><span style="background:#f3f4f6;padding:6px 12px;border-radius:12px;font-size:0.82rem;display:inline-block;max-width:90%;white-space:pre-wrap;">'+m.content+'</span></div>';
+    }
+  }
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="输入问题..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
+  return html;
+}
+
+function quickBtn(text) { return '<button onclick="document.getElementById(\'aiInput\').value=\''+text+'\';sendAiMsg()" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;white-space:nowrap;">'+text+'</button>'; }
+
+async function webSearch(query) {
+  try {
+    const resp = await fetch('https://brave-search-proxy.8fjzgjv4nw.workers.dev/search?q='+encodeURIComponent(query)+'&count=5');
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const results = data.results||[];
+    if (!results.length) return null;
+    let text = '【来自Brave搜索引擎】\n';
+    for (const r of results) {
+      text += '- '+(r.title||'')+'\n  '+(r.description||'').slice(0,200)+'\n';
+    }
+    return text;
+  } catch(e) { return null; }
+}
+
+async function sendAiMsg() {
+  const input = document.getElementById('aiInput');
+  const msg = (input?.value||'').trim(); if (!msg) return;
+  if (input) input.value = '';
+  _aiHistory.push({role:'user',content:msg});
+  refreshAiMessages(); // 重建DOM，之后重新获取按钮引用
+  
+  let btn = document.getElementById('aiSendBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '...'; }
+  
+  let searchCtx = '';
+  if (_aiSearch) {
+    btn = document.getElementById('aiSendBtn');
+    if (btn) btn.innerHTML = '🔍';
+    try { const sr=await webSearch(msg); if(sr) searchCtx='\n\n'+sr+'\n请基于以上搜索结果用中文总结回答，简洁专业。'; } catch(e){}
+    if (!searchCtx) { _aiHistory.push({role:'assistant',content:'搜索无结果'}); btn = document.getElementById('aiSendBtn'); if(btn){btn.disabled=false;btn.innerHTML='发送';} refreshAiMessages(); return; }
+  }
+  
+  try {
+    const sysMsg = buildAiContext() + searchCtx;
+    const resp = await fetch('https://api.deepseek.com/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+getAiKey()},
+      body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:sysMsg},..._aiHistory],temperature:0.7,max_tokens:1500})
+    });
+    if (!resp.ok) throw new Error('HTTP '+resp.status+' '+resp.statusText);
+    const data = await resp.json();
+    _aiHistory.push({role:'assistant',content:data.choices[0].message.content});
+  } catch(e) {
+    _aiHistory.push({role:'assistant',content:'⚠️ '+e.message});
+  }
+  
+  btn = document.getElementById('aiSendBtn');
+  if (btn) { btn.disabled = false; btn.innerHTML = '发送'; }
+  refreshAiMessages();
+}
+
+function refreshAiMessages() {
+  const container = document.getElementById('aiContent');
+  container.innerHTML = '<div style="font-weight:700;margin-bottom:12px;">🤖 AI 助手</div>' + renderChatUI();
+  setTimeout(()=>{const m=document.getElementById('aiMessages');if(m)m.scrollTop=99999;},100);
+}
+
+function buildAiContext() {
+  const ap = (typeof MARKET!=='undefined'&&MARKET.asset_prices)?MARKET.asset_prices:{};
+  const ss = ap.a_share?.level||'未知', g=ap.gold?.level||'未知', fx=ap.fx?.level||'未知', b=ap.bond?.cn_10y||'未知';
+  const funds = (typeof PRODUCTS!=='undefined'?PRODUCTS:[]).filter(p=>p.product_category==='基金');
+  const fl = funds.slice(0,8).map(f=>f.product_id+' '+f.product_name).join(', ');
+  let ctx = '你是专业的智能投顾AI助手。帮助用户分析市场、推荐基金产品、撰写投资建议。回答简洁专业，控制在500字内。\n\n';
+  ctx += '【市场】上证'+ss+' | 黄金'+g+' | 汇率'+fx+' | 国债'+b+'\n';
+  ctx += '【产品】重点基金:'+fl+'... 共'+funds.length+'只\n';
+  const clients = loadClients();
+  if (clients.length>0) { ctx += '【客户】'+clients.map(c=>c.name+'('+c.riskLevel+','+c.totalAssets+'万)').join(' ')+'\n'; }
+  ctx += '【日期】'+new Date().toISOString().slice(0,10);
+  return ctx;
+}
+
+(async function loadNavHistory() {
+  try { const r = await fetch('data/fund_nav_history.json?'+Date.now()); if(r.ok) window._fundNavHistory = await r.json(); } catch(e) {}
+})();
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(regs) {
+    regs.forEach(function(r) { r.unregister(); });
+  }).then(function() {
+    navigator.serviceWorker.register('./sw.js?v=2');
+  });
+}
+</script>
+</body>
+</html>
+
+<script>
+// 注册 PWA Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').then(function(reg) {
+    console.log('[PWA] Service Worker 已注册');
+    // 检测是否有更新
+    reg.addEventListener('updatefound', function() {
+      console.log('[PWA] 发现新版本，自动更新中...');
+    });
+  }).catch(function(e) {
+    console.warn('[PWA] Service Worker 注册失败:', e);
+  });
+}
+</script>

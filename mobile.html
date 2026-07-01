@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>智能投顾 · 智能匹配</title>
+<style>
+  :root {
+    --bg: #f5f5f7;
+    --card: #fff;
+    --text: #1a1a2e;
+    --sub: #6b7280;
+    --red: #c41230;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --purple: #7c3aed;
+    --gold: #b45309;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --safe: env(safe-area-inset-bottom, 16px);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-bottom: calc(80px + var(--safe));
+  }
+
+  /* 顶部导航 */
+  .nav {
+    position: sticky; top:0; z-index:100;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+    color:#fff; padding: 12px 16px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-title { font-size: 17px; font-weight:700; letter-spacing:0.5px; }
+  .nav-date { font-size: 12px; opacity:.7; }
+  .nav-badge {
+    background: var(--red); font-size: 10px; padding: 2px 8px;
+    border-radius: 10px; font-weight:600;
+  }
+
+  /* 状态栏 */
+  .status-bar {
+    margin: 8px 12px; padding: 10px 14px;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); display:flex; align-items:center;
+    gap: 8px; font-size: 13px; color: var(--sub);
+  }
+  .status-dot { width:8px; height:8px; border-radius:50%; }
+  .status-dot.live { background:var(--green); animation: pulse 2s infinite; }
+  .status-dot.off { background:#ccc; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* 市场环境卡片 */
+  .section { margin: 12px; }
+  .section-title {
+    font-size: 15px; font-weight:700; margin-bottom:8px;
+    padding-left: 10px; border-left: 3px solid var(--red);
+  }
+  .bias-grid {
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:6px; margin-bottom:8px;
+  }
+  .bias-card {
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:10px 8px; text-align:center;
+  }
+  .bias-card .label { font-size:11px; color:var(--sub); margin-bottom:2px; }
+  .bias-card .value { font-size:15px; font-weight:700; }
+  .bias-card .value.bull { color:var(--red); }
+  .bias-card .value.bear { color:var(--green); }
+  .bias-card .value.neutral { color:var(--sub); }
+
+  .bias-row {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:6px;
+  }
+  .bias-card.wide { grid-column: span 2; text-align:left; }
+  .bias-card.wide .label { font-size:12px; margin-bottom:4px; }
+  .bias-card.wide .value { font-size:13px; font-weight:400; color:var(--text); }
+
+  /* 客户画像 */
+  .profile-card {
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:14px; margin-bottom:8px;
+  }
+  .form-row {
+    display:flex; gap:8px; margin-bottom:10px; align-items:center;
+  }
+  .form-row label {
+    font-size:13px; color:var(--text); font-weight:600;
+    min-width: 56px; flex-shrink:0;
+  }
+  .form-row select, .form-row input {
+    flex:1; padding:10px 12px; border:1px solid #e5e7eb;
+    border-radius:8px; font-size:14px; background:#f9fafb;
+    color:var(--text); -webkit-appearance:none;
+    appearance:none;
+  }
+  .form-row select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236b7280'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center;
+    padding-right:32px;
+  }
+  .btn {
+    width:100%; padding:12px; border:none; border-radius:8px;
+    font-size:15px; font-weight:700; cursor:pointer;
+    transition: all .2s; letter-spacing:.5px;
+  }
+  .btn:active { transform:scale(.98); }
+  .btn-primary { background:var(--red); color:#fff; }
+  .btn-outline { background:#fff; color:var(--blue); border:1.5px solid var(--blue); }
+  .btn-ghost { background:#f3f4f6; color:var(--sub); font-size:13px; }
+
+  /* 产品卡片 */
+  .product-card {
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:12px; margin-bottom:8px;
+    position:relative; overflow:hidden;
+  }
+  .product-card::before {
+    content:''; position:absolute; left:0; top:0; bottom:0;
+    width:4px;
+  }
+  .product-card.cat-insurance::before { background:var(--purple); }
+  .product-card.cat-fund::before { background:var(--blue); }
+  .product-card.cat-finance::before { background:#db2777; }
+  .product-card.cat-deposit::before { background:var(--green); }
+  .product-card.cat-struct::before { background:var(--gold); }
+
+  .prod-header { display:flex; justify-content:space-between; align-items:flex-start; }
+  .prod-name { font-size:14px; font-weight:700; flex:1; margin-right:8px; }
+  .prod-tag {
+    font-size:10px; padding:2px 6px; border-radius:4px; font-weight:600;
+    white-space:nowrap;
+  }
+  .tag-insurance { background:#ede9fe; color:var(--purple); }
+  .tag-fund { background:#dbeafe; color:var(--blue); }
+  .tag-finance { background:#fce7f3; color:#db2777; }
+  .tag-deposit { background:#dcfce7; color:var(--green); }
+  .tag-struct { background:#fef3c7; color:var(--gold); }
+
+  .prod-meta { font-size:12px; color:var(--sub); margin-top:4px; }
+  .prod-meta span { margin-right:10px; }
+  .prod-return { font-size:13px; font-weight:700; color:var(--red); margin-top:4px; }
+
+  .prod-reasons { margin-top:8px; }
+  .prod-reason {
+    display:inline-block; font-size:11px; padding:3px 8px;
+    background:#f3f4f6; border-radius:12px; margin:2px 4px 2px 0;
+    color:var(--sub);
+  }
+  .prod-score {
+    position:absolute; top:8px; right:8px;
+    font-size:11px; font-weight:700; color:var(--sub);
+    background:#f3f4f6; padding:2px 6px; border-radius:8px;
+  }
+
+  /* 新闻卡片 */
+  .news-card {
+    background:var(--card); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:12px; margin-bottom:8px;
+  }
+  .news-cat {
+    font-size:10px; padding:1px 6px; border-radius:4px;
+    display:inline-block; margin-bottom:4px; font-weight:600;
+  }
+  .news-cat.macro { background:#fef3c7; color:#92400e; }
+  .news-cat.industry { background:#dbeafe; color:#1e40af; }
+  .news-cat.company { background:#ede9fe; color:#5b21b6; }
+  .news-cat.geopolitics { background:#fce7f3; color:#9d174d; }
+  .news-title { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .news-summary { font-size:12px; color:var(--sub); margin-bottom:6px; }
+  .news-capital { font-size:11px; color:var(--blue); margin-bottom:4px; padding:6px 8px; background:#eff6ff; border-radius:6px; }
+  .news-plain { font-size:12px; color:var(--text); padding:6px 8px; background:#f9fafb; border-radius:6px; }
+
+  /* 底部 */
+  .footer {
+    text-align:center; padding:16px; font-size:11px; color:var(--sub);
+  }
+
+  /* 空状态 */
+  .empty {
+    text-align:center; padding:40px 20px; color:var(--sub);
+  }
+  .empty-icon { font-size:40px; margin-bottom:8px; }
+
+  /* 加载 */
+  .loading {
+    display:flex; align-items:center; justify-content:center;
+    padding:24px; gap:6px; color:var(--sub); font-size:13px;
+  }
+  .spinner {
+    width:18px; height:18px; border:2px solid #e5e7eb;
+    border-top-color:var(--red); border-radius:50%;
+    animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  /* Tab 切换 */
+  .tabs { display:flex; gap:4px; overflow-x:auto; padding:0 2px; }
+  .tab {
+    flex-shrink:0; padding:8px 14px; border-radius:20px;
+    font-size:12px; font-weight:600; border:1px solid #e5e7eb;
+    background:#fff; color:var(--sub); cursor:pointer;
+    transition: all .2s;
+  }
+  .tab.active { background:var(--red); color:#fff; border-color:var(--red); }
+
+  /* 折叠 */
+  .collapse-header {
+    display:flex; justify-content:space-between; align-items:center;
+    cursor:pointer; user-select:none;
+  }
+  .collapse-arrow {
+    transition: transform .2s; font-size:12px; color:var(--sub);
+  }
+  .collapse-arrow.open { transform:rotate(180deg); }
+  .collapse-body { overflow:hidden; transition: max-height .3s ease; }
+  .collapse-body.closed { max-height:0 !important; }
+
+  /* 大类资产表 */
+  .mini-table { width:100%; border-collapse:collapse; font-size:11px; margin-top:4px; }
+  .mini-table th { background:#f3f4f6; padding:6px 8px; text-align:left; font-weight:600; font-size:10px; color:var(--sub); }
+  .mini-table td { padding:6px 8px; border-bottom:1px solid #f3f4f6; }
+  .mini-table .up { color:var(--red); }
+  .mini-table .down { color:var(--green); }
+
+  /* 响应式调整 */
+  @media (min-width: 500px) {
+    body { max-width: 500px; margin:0 auto; }
+    .bias-grid { grid-template-columns: repeat(5,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- 导航 -->
+<div class="nav">
+  <span class="nav-title">智能投顾 · 智能匹配</span>
+  <span class="nav-date" id="navDate">--</span>
+</div>
+
+<!-- 数据状态 -->
+<div class="status-bar" id="statusBar">
+  <span class="status-dot off" id="statusDot"></span>
+  <span id="statusText">正在加载数据...</span>
+  <span style="flex:1"></span>
+  <span id="statusTime" style="font-size:11px;"></span>
+</div>
+
+<!-- 市场环境速览 -->
+<div class="section" id="marketSection" style="display:none">
+  <div class="section-title">市场环境速览</div>
+  <div class="bias-grid" id="biasGrid"></div>
+  <div class="bias-row" id="biasRow"></div>
+</div>
+
+<!-- 客户画像 -->
+<div class="section">
+  <div class="section-title">客户画像</div>
+  <div class="profile-card">
+    <div class="form-row">
+      <label>风险等级</label>
+      <select id="riskLevel">
+        <option value="PR1">PR1 保守型</option>
+        <option value="PR2">PR2 稳健型</option>
+        <option value="PR3" selected>PR3 平衡型</option>
+        <option value="PR4">PR4 成长型</option>
+        <option value="PR5">PR5 进取型</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>可投资产</label>
+      <input type="number" id="assets" placeholder="万元" value="100" min="1">
+      <span style="font-size:13px;color:var(--sub);">万元</span>
+    </div>
+    <div class="form-row">
+      <label>投资期限</label>
+      <select id="horizon">
+        <option value="180">6个月</option>
+        <option value="365" selected>1年</option>
+        <option value="730">2年</option>
+        <option value="1095">3年</option>
+        <option value="1825">5年</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>私银客户</label>
+      <select id="privateBank">
+        <option value="0" selected>否</option>
+        <option value="1">是</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="runMatch()">智能匹配产品</button>
+  </div>
+</div>
+
+<!-- 配置建议 -->
+<div class="section" id="allocationSection" style="display:none">
+  <div class="section-title" id="allocTitle">配置建议</div>
+  <div class="profile-card" style="font-size:13px;" id="allocContent"></div>
+</div>
+
+<!-- 产品推荐 -->
+<div class="section" id="productSection" style="display:none">
+  <div class="section-title">产品推荐</div>
+  <div style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+    <div class="tabs" id="catTabs"></div>
+    <span style="font-size:12px; color:var(--sub);" id="prodCount"></span>
+  </div>
+  <div id="productList"></div>
+</div>
+
+<!-- 资讯速览 -->
+<div class="section" id="newsSection" style="display:none">
+  <div class="section-title">今日资讯</div>
+  <div id="newsList"></div>
+</div>
+
+<!-- 空状态 -->
+<div class="empty" id="emptyState">
+  <div class="empty-icon">📋</div>
+  <p>请先填写客户画像，然后点击<br>"智能匹配产品"按钮</p>
+</div>
+
+<!-- 底部 -->
+<div class="footer">
+  智能投顾智能匹配系统 v1.0 · 数据每日更新<br>
+  <span style="opacity:.5;">本页面仅供参考，不构成投资建议</span>
+</div>
+
+<script>
+// ============================================================
+// 全局状态
+// ============================================================
+let DAILY = null;
+let currentRisk = 'PR3';
+let currentCat = '全部';
+let matchedProducts = {};
+
+// ============================================================
+// 数据加载
+// ============================================================
+async function loadData() {
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const statusTime = document.getElementById('statusTime');
+  
+  try {
+    const resp = await fetch('data/daily.json?' + Date.now());
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    DAILY = await resp.json();
+    
+    statusDot.className = 'status-dot live';
+    statusText.textContent = '数据已就绪';
+    statusTime.textContent = DAILY.date || '';
+    document.getElementById('navDate').textContent = DAILY.date || '';
+    
+    renderMarket();
+    renderNews();
+  } catch (e) {
+    console.warn('daily.json 加载失败，尝试用内嵌市场数据:', e.message);
+    statusDot.className = 'status-dot off';
+    statusText.textContent = '使用本地数据';
+    
+    // 降级：尝试从 index.html 获取 MARKET 数据
+    try {
+      const idxResp = await fetch('index.html?' + Date.now());
+      const html = await idxResp.text();
+      const m = html.match(/const MARKET\s*=\s*(\{.+?\});/s);
+      if (m) {
+        const MARKET = JSON.parse(m[1]);
+        DAILY = {
+          date: MARKET.date || '2026-06-09',
+          market: MARKET,
+          market_bias: guessBias(MARKET),
+          news: [],
+          product_matches: {},
+          allocation: {},
+          summary: { equity_outlook:'', bond_outlook:'', strategy:'', key_reminder:[] }
+        };
+        statusText.textContent = '使用本地快照数据';
+        statusTime.textContent = DAILY.date;
+        document.getElementById('navDate').textContent = DAILY.date;
+        renderMarket();
+      }
+    } catch (e2) {
+      statusText.textContent = '数据加载失败，请刷新重试';
+      console.error(e2);
+    }
+  }
+}
+
+function guessBias(market) {
+  const ap = market.asset_prices || {};
+  const dep = market.deposit_rate || {};
+  return {
+    equity: '偏多',
+    bond: '偏多',
+    gold: '偏空',
+    deposit: '偏空（利率下行中）',
+    fx: '偏多',
+  };
+}
+
+// ============================================================
+// 市场环境渲染
+// ============================================================
+function renderMarket() {
+  const section = document.getElementById('marketSection');
+  if (!DAILY || !DAILY.market_bias) return;
+  section.style.display = 'block';
+  
+  const bias = DAILY.market_bias;
+  const biasClass = v => v.includes('偏多') ? 'bull' : (v.includes('偏空') ? 'bear' : 'neutral');
+  
+  document.getElementById('biasGrid').innerHTML = [
+    {label:'权益', v:bias.equity},
+    {label:'债券', v:bias.bond},
+    {label:'黄金', v:bias.gold},
+    {label:'利率', v:bias.deposit},
+    {label:'汇率', v:bias.fx},
+  ].map(b => `
+    <div class="bias-card">
+      <div class="label">${b.label}</div>
+      <div class="value ${biasClass(b.v)}">${b.v}</div>
+    </div>
+  `).join('');
+  
+  // 投资主线
+  const ap3 = (DAILY.market || {}).asset_prices || {};
+  const sr = ((DAILY.market || {}).sector_rotation || {});
+  const hotspots = sr.current_hotspots || [];
+  
+  let extraHTML = '';
+  if (hotspots.length > 0) {
+    extraHTML = '<div class="bias-card wide"><div class="label">当前投资主线</div><div class="value">' +
+      hotspots.map(h => h.sector).join(' · ') +
+      '</div></div>';
+  }
+  
+  const reminders = (DAILY.summary || {}).key_reminder || [];
+  if (reminders.length > 0) {
+    extraHTML += '<div class="bias-card wide"><div class="label" style="color:var(--red)">⚠ 核心提醒</div><div class="value">' +
+      reminders.map(r => '• ' + r).join('<br>') +
+      '</div></div>';
+  }
+  
+  document.getElementById('biasRow').innerHTML = extraHTML;
+}
+
+// ============================================================
+// 智能匹配
+// ============================================================
+async function runMatch() {
+  currentRisk = document.getElementById('riskLevel').value;
+  const assets = parseInt(document.getElementById('assets').value) || 100;
+  const horizon = parseInt(document.getElementById('horizon').value);
+  const isPrivate = document.getElementById('privateBank').value === '1';
+  
+  // 从 daily.json 获取匹配数据，或本地生成
+  let products = [];
+  if (DAILY && DAILY.product_matches && DAILY.product_matches[currentRisk]) {
+    products = DAILY.product_matches[currentRisk];
+  } else if (DAILY && DAILY.market) {
+    // 从本地 products.json 降级匹配
+    products = await localMatch(currentRisk, DAILY.market, isPrivate);
+  }
+  
+  if (products.length === 0 && DAILY) {
+    // 尝试所有风险等级的产品
+    for (const lvl of ['PR1','PR2','PR3','PR4','PR5']) {
+      if (DAILY.product_matches && DAILY.product_matches[lvl]) {
+        products = DAILY.product_matches[lvl];
+        break;
+      }
+    }
+  }
+  
+  // 按品类分组
+  matchedProducts = {};
+  for (const p of products) {
+    const cat = p.product_category || '其他';
+    if (!matchedProducts[cat]) matchedProducts[cat] = [];
+    matchedProducts[cat].push(p);
+  }
+  
+  // 筛选私银
+  if (!isPrivate) {
+    for (const cat in matchedProducts) {
+      matchedProducts[cat] = matchedProducts[cat].filter(p => !p.private_bank_only);
+    }
+  }
+  
+  // 按投资期限筛选
+  for (const cat in matchedProducts) {
+    matchedProducts[cat] = matchedProducts[cat].filter(p => {
+      if (!p.term_days) return true;
+      if (p.product_category === '存款' || p.product_category === '结构性存款') {
+        return p.term_days <= horizon;
+      }
+      return true;
+    });
+  }
+  
+  // 移除空品类
+  for (const cat in matchedProducts) {
+    if (matchedProducts[cat].length === 0) delete matchedProducts[cat];
+  }
+  
+  renderAllocation(assets);
+  renderCategories();
+  renderProducts();
+}
+
+let _cachedProducts = null;
+
+async function loadProducts() {
+  if (_cachedProducts) return _cachedProducts;
+  try {
+    const resp = await fetch('data/products.json?' + Date.now());
+    if (resp.ok) {
+      _cachedProducts = await resp.json();
+      return _cachedProducts;
+    }
+  } catch(e) { console.warn('加载本地产品库失败:', e); }
+  return [];
+}
+
+async function localMatch(riskLevel, market, isPrivate) {
+  const result = [];
+  const products = await loadProducts();
+  if (products.length === 0) {
+    console.warn('产品库为空，无法本地匹配');
+    return [];
+  }
+  
+  const rateDown = ((market.deposit_rate || {}).trend || '').includes('下行');
+  
+  for (const p of products) {
+    if (!isPrivate && p.private_bank_only) continue;
+    
+    let score = 60;
+    let reasons = ['产品池推荐'];
+    
+    if (p.product_category === '保险' && rateDown) {
+      score += 10;
+      reasons.push('利率下行期，锁定收益价值凸显');
+    }
+    if (p.product_category === '基金' && p.tags) {
+      const sr = market.sector_rotation || {};
+      const hots = sr.current_hotspots || [];
+      for (const h of hots) {
+        for (const t of p.tags) {
+          if (h.sector.includes(t) || t.includes(h.sector)) {
+            score += 10;
+            reasons.push('覆盖热点「' + h.sector + '」');
+          }
+        }
+      }
+    }
+    
+    result.push({
+      product_id: p.product_id,
+      product_name: p.product_name,
+      product_category: p.product_category,
+      sub_category: p.sub_category || '',
+      issuer: p.issuer || '',
+      risk_level: p.risk_level,
+      expected_return_low: p.expected_return_low || 0,
+      expected_return_high: p.expected_return_high || 0,
+      term_days: p.term_days || 0,
+      min_investment: p.min_investment || 1,
+      score: score,
+      reasons: reasons.slice(0, 3),
+      private_bank_only: p.private_bank_only || 0,
+      liquidity_type: p.liquidity_type || '',
+      tags: p.tags || [],
+    });
+  }
+  
+  result.sort((a, b) => b.score - a.score);
+  return result.slice(0, 30);
+}
+
+// ============================================================
+// 配置建议
+// ============================================================
+function renderAllocation(assets) {
+  const section = document.getElementById('allocationSection');
+  const alloc = (DAILY && DAILY.allocation && DAILY.allocation[currentRisk]) || {};
+  
+  if (Object.keys(alloc).length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  document.getElementById('allocTitle').textContent = currentRisk + ' 配置建议';
+  
+  let html = '<table class="mini-table"><tr><th>资产类别</th><th>建议比例</th><th>建议金额</th></tr>';
+  for (const [key, range] of Object.entries(alloc)) {
+    const parts = range.split('-');
+    const maxPct = parseInt(parts[parts.length-1]) || 0;
+    const amt = Math.round(maxPct * assets / 100);
+    html += `<tr><td>${key}</td><td>${range}</td><td>约 ${amt} 万元</td></tr>`;
+  }
+  html += '</table>';
+  document.getElementById('allocContent').innerHTML = html;
+}
+
+// ============================================================
+// 品类标签 + 产品列表
+// ============================================================
+function renderCategories() {
+  const cats = Object.keys(matchedProducts);
+  if (cats.length === 0) {
+    currentCat = '全部';
+  } else if (!cats.includes(currentCat)) {
+    currentCat = '全部';
+  }
+  
+  const tabs = document.getElementById('catTabs');
+  const allTab = { label: '全部 (' + cats.reduce((s,c) => s + matchedProducts[c].length, 0) + ')', value: '全部' };
+  const catTabs = [allTab, ...cats.map(c => ({ label: c + ' (' + matchedProducts[c].length + ')', value: c }))];
+  
+  tabs.innerHTML = catTabs.map(t => `
+    <span class="tab ${t.value === currentCat ? 'active' : ''}" onclick="switchCat('${t.value}')">${t.label}</span>
+  `).join('');
+}
+
+function switchCat(cat) {
+  currentCat = cat;
+  renderCategories();
+  renderProducts();
+}
+
+function renderProducts() {
+  const section = document.getElementById('productSection');
+  const list = document.getElementById('productList');
+  const empty = document.getElementById('emptyState');
+  
+  let products = [];
+  if (currentCat === '全部') {
+    for (const cat in matchedProducts) {
+      products = products.concat(matchedProducts[cat]);
+    }
+  } else {
+    products = matchedProducts[currentCat] || [];
+  }
+  
+  if (products.length === 0) {
+    section.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  
+  section.style.display = 'block';
+  empty.style.display = 'none';
+  document.getElementById('prodCount').textContent = '共 ' + products.length + ' 只';
+  
+  const catClass = cat => {
+    const m = {保险:'insurance',基金:'fund',理财:'finance',存款:'deposit',结构性存款:'struct'};
+    return m[cat] || 'deposit';
+  };
+  const tagClass = cat => {
+    const m = {保险:'insurance',基金:'fund',理财:'finance',存款:'deposit',结构性存款:'struct'};
+    return m[cat] || 'deposit';
+  };
+  
+  list.innerHTML = products.map(p => {
+    const ret = p.expected_return_low && p.expected_return_high
+      ? p.expected_return_low.toFixed(2) + '% ~ ' + p.expected_return_high.toFixed(2) + '%'
+      : '';
+    return `
+    <div class="product-card cat-${catClass(p.product_category)}">
+      <div class="prod-header">
+        <div class="prod-name">${p.product_name}</div>
+        <span class="prod-tag tag-${tagClass(p.product_category)}">${p.product_category}</span>
+      </div>
+      <div class="prod-meta">
+        ${p.issuer ? '<span>发行方：' + p.issuer + '</span>' : ''}
+        ${p.risk_level ? '<span>风险：' + p.risk_level + '</span>' : ''}
+        ${p.term_days ? '<span>期限：' + (p.term_days >= 365 ? Math.round(p.term_days/365) + '年' : p.term_days + '天') + '</span>' : ''}
+      </div>
+      ${ret ? '<div class="prod-return">' + ret + '</div>' : ''}
+      ${p.reasons && p.reasons.length > 0 ? '<div class="prod-reasons">' + p.reasons.map(r => '<span class="prod-reason">' + r + '</span>').join('') + '</div>' : ''}
+      ${p.private_bank_only ? '<div style="margin-top:6px;font-size:10px;color:var(--purple);">👑 私银专属</div>' : ''}
+    </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// 新闻渲染
+// ============================================================
+function renderNews() {
+  const news = (DAILY && DAILY.news) || [];
+  if (news.length === 0) {
+    document.getElementById('newsSection').style.display = 'none';
+    return;
+  }
+  document.getElementById('newsSection').style.display = 'block';
+  
+  const catClass = cat => {
+    const m = {宏观经济:'macro',行业动态:'industry',上市公司:'company','国际地缘':'geopolitics'};
+    return m[cat] || 'macro';
+  };
+  
+  document.getElementById('newsList').innerHTML = news.map(n => `
+    <div class="news-card">
+      <span class="news-cat ${catClass(n.category)}">${n.category || '资讯'}</span>
+      <div class="news-title">${n.title}</div>
+      <div class="news-summary">${n.summary || ''}</div>
+      ${n.capital_view ? '<div class="news-capital">💰 资本视角：' + n.capital_view + '</div>' : ''}
+      ${n.plain_text ? '<div class="news-plain">💬 人话版：' + n.plain_text + '</div>' : ''}
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// 初始化
+// ============================================================
+loadData();
+</script>
+</body>
+</html>

@@ -15,14 +15,6 @@
     "streak": 13,
     "streak_up": true
   },
-  "017592": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": false
-  },
   "016869": {
     "1m": null,
     "3m": null,
@@ -94,14 +86,6 @@
     "1y": null,
     "streak": 2,
     "streak_up": true
-  },
-  "481012": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": false
   },
   "000218": {
     "1m": null,
@@ -199,28 +183,12 @@
     "streak": 2,
     "streak_up": true
   },
-  "010115": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": true
-  },
   "019829": {
     "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": true
-  },
-  "025328": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 2,
     "streak_up": true
   },
   "720001": {

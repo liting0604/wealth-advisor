@@ -36,15 +36,15 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 3,
-    "streak_up": true
+    "streak": 1,
+    "streak_up": false
   },
   "018448": {
     "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "481009": {
@@ -116,8 +116,8 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 6,
-    "streak_up": true
+    "streak": 1,
+    "streak_up": false
   },
   "007674": {
     "1m": null,
@@ -156,7 +156,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": false
   },
   "019933": {
@@ -168,11 +168,11 @@
     "streak_up": true
   },
   "000989": {
-    "1m": -4.25,
+    "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 3,
+    "streak": 4,
     "streak_up": true
   },
   "001048": {
@@ -183,31 +183,7 @@
     "streak": 2,
     "streak_up": false
   },
-  "002168": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 3,
-    "streak_up": true
-  },
   "003069": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": false
-  },
-  "010115": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": false
-  },
-  "019829": {
     "1m": null,
     "3m": null,
     "6m": null,
@@ -215,7 +191,15 @@
     "streak": 2,
     "streak_up": false
   },
-  "025328": {
+  "010115": {
+    "1m": null,
+    "3m": null,
+    "6m": null,
+    "1y": null,
+    "streak": 2,
+    "streak_up": false
+  },
+  "019829": {
     "1m": null,
     "3m": null,
     "6m": null,
@@ -236,7 +220,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": true
   },
   "000480": {
@@ -248,14 +232,6 @@
     "streak_up": false
   },
   "001990": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 3,
-    "streak_up": true
-  },
-  "002943": {
     "1m": null,
     "3m": null,
     "6m": null,

@@ -44,15 +44,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
-    "streak_up": true
-  },
-  "481009": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 2,
+    "streak": 1,
     "streak_up": false
   },
   "021231": {
@@ -156,7 +148,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": false
   },
   "019933": {
@@ -168,11 +160,11 @@
     "streak_up": false
   },
   "000989": {
-    "1m": -0.15,
+    "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": true
   },
   "001048": {
@@ -182,6 +174,14 @@
     "1y": null,
     "streak": 1,
     "streak_up": true
+  },
+  "002168": {
+    "1m": null,
+    "3m": null,
+    "6m": null,
+    "1y": null,
+    "streak": 4,
+    "streak_up": false
   },
   "003069": {
     "1m": null,
@@ -222,6 +222,14 @@
     "1y": null,
     "streak": 1,
     "streak_up": true
+  },
+  "018112": {
+    "1m": null,
+    "3m": null,
+    "6m": null,
+    "1y": null,
+    "streak": 2,
+    "streak_up": false
   },
   "000480": {
     "1m": null,

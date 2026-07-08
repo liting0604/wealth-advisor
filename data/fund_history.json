@@ -47,6 +47,14 @@
     "streak": 1,
     "streak_up": false
   },
+  "481009": {
+    "1m": null,
+    "3m": null,
+    "6m": null,
+    "1y": null,
+    "streak": 2,
+    "streak_up": false
+  },
   "021231": {
     "1m": null,
     "3m": null,
@@ -160,7 +168,7 @@
     "streak_up": false
   },
   "000989": {
-    "1m": null,
+    "1m": 1.69,
     "3m": null,
     "6m": null,
     "1y": null,

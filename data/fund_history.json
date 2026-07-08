@@ -12,7 +12,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 18,
+    "streak": 19,
     "streak_up": true
   },
   "017592": {
@@ -21,7 +21,7 @@
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": false
+    "streak_up": true
   },
   "016869": {
     "1m": null,
@@ -29,15 +29,7 @@
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": false
-  },
-  "164808": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 1,
-    "streak_up": false
+    "streak_up": true
   },
   "018448": {
     "1m": null,
@@ -84,7 +76,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "011614": {
@@ -103,20 +95,12 @@
     "streak": 1,
     "streak_up": false
   },
-  "000218": {
-    "1m": null,
-    "3m": null,
-    "6m": null,
-    "1y": null,
-    "streak": 2,
-    "streak_up": false
-  },
   "020356": {
     "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": true
   },
   "007674": {
@@ -168,7 +152,7 @@
     "streak_up": false
   },
   "000989": {
-    "1m": 1.69,
+    "1m": 2.53,
     "3m": null,
     "6m": null,
     "1y": null,
@@ -180,7 +164,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": true
   },
   "002168": {
@@ -196,7 +180,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "010115": {
@@ -205,14 +189,14 @@
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": true
+    "streak_up": false
   },
   "019829": {
     "1m": null,
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "025328": {
@@ -221,7 +205,7 @@
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": false
+    "streak_up": true
   },
   "720001": {
     "1m": null,
@@ -229,7 +213,7 @@
     "6m": null,
     "1y": null,
     "streak": 1,
-    "streak_up": true
+    "streak_up": false
   },
   "018112": {
     "1m": null,
@@ -244,7 +228,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "001990": {
@@ -252,7 +236,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 2,
+    "streak": 3,
     "streak_up": false
   },
   "002943": {
@@ -260,7 +244,7 @@
     "3m": null,
     "6m": null,
     "1y": null,
-    "streak": 1,
+    "streak": 2,
     "streak_up": false
   }
 }

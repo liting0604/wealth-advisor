@@ -199,6 +199,8 @@ def main():
             'rd_focus': c.get('rd_focus', ''),
             'supply_chain': c.get('supply_chain', None),
             'financials': c.get('financials', None),
+            'recent_news': c.get('recent_news', ''),
+            'trend': c.get('trend', ''),
             'stock': sd if sd else {
                 'price': None, 'change_pct': None, 'pe': None,
                 'market_cap': '—', 'currency': ''

@@ -3047,7 +3047,15 @@ async function renderTechTab() {
       html += '<div style="background:#fff;border-radius:6px;padding:8px;text-align:center;"><div style="font-size:0.6rem;color:var(--gray);">昨收</div><div style="font-weight:600;font-size:0.78rem;">' + (s.prev_close || '—') + '</div></div>';
       html += '</div>';
 
-      // ===== 第3行：一句话概述 =====
+      // ===== 第3行：最新动态 =====
+      if (c.recent_news) {
+        html += '<div style="background:linear-gradient(135deg,#fef2f2,#fff5f5);border:1px solid #fecaca;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+        html += '<div style="font-weight:700;font-size:0.72rem;margin-bottom:4px;color:#c41230;">🆕 最新动态</div>';
+        html += '<div style="font-size:0.73rem;color:var(--dark);line-height:1.7;">' + c.recent_news + '</div>';
+        html += '</div>';
+      }
+
+      // ===== 第4行：一句话概述 =====
       html += '<div style="font-size:0.78rem;color:var(--dark);line-height:1.7;margin-bottom:12px;background:#fff;border-left:3px solid var(--red);padding:10px 12px;border-radius:0 8px 8px 0;">' + (c.description || '暂无') + '</div>';
 
       // ===== 第4行：主营业务 =====
@@ -3087,7 +3095,15 @@ async function renderTechTab() {
       html += '</div>';
       html += '</div>';
 
-      // ===== 第6行：产业链 =====
+      // ===== 第6行：趋势判断 =====
+      if (c.trend) {
+        html += '<div style="background:linear-gradient(135deg,#faf5ff,#f5f3ff);border:1px solid #ddd6fe;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+        html += '<div style="font-weight:700;font-size:0.72rem;margin-bottom:4px;color:#7c3aed;">🔮 趋势判断</div>';
+        html += '<div style="font-size:0.73rem;color:var(--dark);line-height:1.7;">' + c.trend + '</div>';
+        html += '</div>';
+      }
+
+      // ===== 第7行：产业链 =====
       if (sc.upstream || sc.downstream) {
         html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
         html += '<div style="background:#fff;border-radius:8px;padding:10px;border:1px solid #e5e7eb;">';

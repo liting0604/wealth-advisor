@@ -209,6 +209,7 @@ input:focus, select:focus { border-color: var(--red); }
     <div class="tab" onclick="switchTab('report')">📝 配置报告</div>
     <div class="tab" onclick="switchTab('tech')">🔬 科技行业</div>
     <div class="tab" onclick="switchTab('scripts')">📋 话术库</div>
+    <div class="tab" onclick="switchTab('notes')">📝 学习笔记</div>
   </div>
 
   <!-- Tab 0: 仪表盘 -->
@@ -234,6 +235,11 @@ input:focus, select:focus { border-color: var(--red); }
   <!-- Tab: 话术库 -->
   <div id="tab-scripts" style="display:none;">
     <div id="scriptsContent"></div>
+  </div>
+
+  <!-- Tab: 学习笔记 -->
+  <div id="tab-notes" style="display:none;">
+    <div id="notesContent"></div>
   </div>
 
   <!-- Tab 2: 输入 -->
@@ -356,6 +362,9 @@ input:focus, select:focus { border-color: var(--red); }
   </div>
   <div class="mobile-nav-item" onclick="switchTab('scripts')" data-tab="scripts">
     <span class="nav-icon">📋</span>话术
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('notes')" data-tab="notes">
+    <span class="nav-icon">📝</span>笔记
   </div>
   <div class="mobile-nav-item" onclick="exportPPT()" id="mobileExportBtn">
     <span class="nav-icon">📥</span>导出
@@ -632,11 +641,11 @@ let sids = new Set();
 // UI 逻辑
 // ============================================================
 function switchTab(tab) {
-  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts'].forEach(t => {
+  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts','notes'].forEach(t => {
     document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
   });
   document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts'][i]===tab);
+    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts','notes'][i]===tab);
   });
   // 同步移动端底部导航
   document.querySelectorAll('.mobile-nav-item').forEach(el => {
@@ -651,6 +660,7 @@ function switchTab(tab) {
   if (tab === 'ai') renderAiTab();
   if (tab === 'tech') renderTechTab();
   if (tab === 'scripts') renderScriptsTab();
+  if (tab === 'notes') renderNotesTab();
   // 滚动到顶部
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -2442,6 +2452,7 @@ function renderDashboard() {
     {icon:'📝',title:'配置报告',desc:'方案+导出',tab:'report'},
     {icon:'🔬',title:'科技行业',desc:'30家头部追踪',tab:'tech'},
     {icon:'📋',title:'话术库',desc:'18条实战话术',tab:'scripts'},
+    {icon:'📝',title:'学习笔记',desc:'知识积累+复盘',tab:'notes'},
   ];
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
   for (const c of cards) {
@@ -2755,12 +2766,30 @@ function fetchFundGz(code) {
 // ============================================================
 function getAiKey() { return localStorage.getItem('wm_ds_key')||''; }
 function setAiKey(k) { localStorage.setItem('wm_ds_key', k); }
-let _aiHistory = [], _aiSearch = false;
+let _aiHistory = [], _aiSearch = false, _aiRolePlay = null;
+
+const AI_ROLES = [
+  {id:'conservative',name:'保守型大妈',desc:'风险厌恶，只买过定期存款，对基金很警惕',opening:'小伙子/小姑娘，你说的这个基金不会亏钱吧？我就想比存银行多一点，但千万别亏本啊。'},
+  {id:'aggressive',name:'进取型白领',desc:'炒股但业绩不好，想找专业的人打理',opening:'我自己炒股两年了，总是追涨杀跌没赚到钱。你说你们专业做这个的，能给我推荐什么？'},
+  {id:'hesitant',name:'犹豫型客户',desc:'已经了解产品但迟迟不下单，需要推动',opening:'你说的这个产品我看了，确实还不错。但我还想再观望一下，等市场明朗一点再买。'},
+  {id:'panic',name:'大跌恐慌型',desc:'持仓浮亏15%，想全部赎回',opening:'我上个月买的那只基金已经亏了15%了！我现在就想赎回来，你再劝我也没用！'},
+  {id:'pricey',name:'比价型客户',desc:'在银行和支付宝之间比价，纠结手续费',opening:'你给我推荐的这个基金，我看支付宝上也能买，手续费还比你们便宜。我在你这买有什么好处？'},
+  {id:'vip',name:'大客户',desc:'资产几百万但只买理财，需要引导配置',opening:'我钱都放在理财和存款里，一年也就2%多一点。你说还有其他方式能多赚点？但我不接受亏太多。'},
+];
 
 function renderAiTab() {
   const container = document.getElementById('aiContent');
   const hasKey = !!getAiKey();
-  let html = '<div style="font-weight:700;margin-bottom:12px;">🤖 AI 助手</div>';
+  let html = '';
+
+  // 模式切换
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+  html += '<div style="font-weight:700;">🤖 AI 助手</div>';
+  html += '<div style="display:flex;gap:4px;">';
+  html += '<button onclick="switchAiMode(\'normal\')\" style="padding:4px 12px;border-radius:6px 0 0 6px;border:1px solid #e5e7eb;background:' + (!_aiRolePlay ? '#c41230' : '#fff') + ';color:' + (!_aiRolePlay ? '#fff' : 'var(--gray)') + ';font-size:0.7rem;cursor:pointer;">正常</button>';
+  html += '<button onclick="switchAiMode(\'roleplay\')\" style="padding:4px 12px;border-radius:0 6px 6px 0;border:1px solid #e5e7eb;background:' + (_aiRolePlay ? '#7c3aed' : '#fff') + ';color:' + (_aiRolePlay ? '#fff' : 'var(--gray)') + ';font-size:0.7rem;cursor:pointer;">🎭 模拟客户</button>';
+  html += '</div></div>';
+
   if (!hasKey) {
     html += '<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:12px;">';
     html += '<div style="font-weight:600;font-size:0.85rem;">🔑 请先配置 DeepSeek API Key</div>';
@@ -2780,10 +2809,44 @@ function saveAiKey() {
 }
 
 function renderChatUI() {
-  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:0.75rem;color:var(--gray);">Key: '+getAiKey().slice(0,8)+'***</div><div style="display:flex;align-items:center;gap:8px;"><label style="font-size:0.7rem;color:var(--gray);cursor:pointer;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="aiSearchToggle" '+(_aiSearch?'checked':'')+' onchange="_aiSearch=this.checked" style="width:14px;height:14px;">🌐 联网</label><button onclick="setAiKey(\'\');_aiHistory=[];renderAiTab();" style="font-size:0.7rem;padding:3px 8px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;cursor:pointer;">更换</button></div></div>';
+  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><div style="font-size:0.75rem;color:var(--gray);">Key: '+getAiKey().slice(0,8)+'***</div><div style="display:flex;align-items:center;gap:8px;"><label style="font-size:0.7rem;color:var(--gray);cursor:pointer;display:flex;align-items:center;gap:3px;"><input type="checkbox" id="aiSearchToggle" '+(_aiSearch?'checked':'')+' onchange="_aiSearch=this.checked" style="width:14px;height:14px;">🌐 联网</label><button onclick="setAiKey(\'\');_aiHistory=[];_aiRolePlay=null;renderAiTab();" style="font-size:0.7rem;padding:3px 8px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;cursor:pointer;">更换</button></div></div>';
+
+  // 模拟客户模式 - 角色选择
+  if (_aiRolePlay) {
+    if (!_aiRolePlay.role) {
+      // 还没选角色，显示角色选择面板
+      html += '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:10px;padding:14px;margin-bottom:10px;">';
+      html += '<div style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:#7c3aed;">🎭 选择一个要练习的客户类型：</div>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">';
+      for (const r of AI_ROLES) {
+        html += '<div onclick="selectAiRole(\''+r.id+'\')" style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:10px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor=\'#7c3aed\'" onmouseout="this.style.borderColor=\'#e5e7eb\'">';
+        html += '<div style="font-weight:700;font-size:0.78rem;">'+r.name+'</div>';
+        html += '<div style="font-size:0.65rem;color:var(--gray);margin-top:2px;">'+r.desc+'</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    } else {
+      // 已选角色，显示角色信息+开场白
+      html += '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">';
+      html += '<div><span style="background:#7c3aed;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.65rem;">🎭 模拟客户</span> <b style="font-size:0.78rem;">'+_aiRolePlay.name+'</b> <span style="font-size:0.65rem;color:var(--gray);">'+_aiRolePlay.desc+'</span></div>';
+      html += '<button onclick="switchAiMode(\'normal\')\" style="padding:3px 10px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;font-size:0.65rem;cursor:pointer;">退出演练</button>';
+      html += '</div>';
+      // 自动生成开场白
+      if (_aiHistory.length === 0) {
+        html += '<div style="margin:8px 0;font-size:0.8rem;color:var(--gray);background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;">💡 <b>客户开场了：</b>「'+_aiRolePlay.opening+'」<br><span style="font-size:0.68rem;margin-top:4px;display:inline-block;">你可以开始回复了——运用话术库的技巧，试试怎么应对</span></div>';
+      }
+    }
+  }
+
   html += '<div id="aiMessages" style="max-height:60vh;overflow-y:auto;margin-bottom:10px;">';
   if (_aiHistory.length===0) {
-    html += '<div style="text-align:center;color:var(--gray);padding:20px;"><div style="font-size:2rem;margin-bottom:8px;">🤖</div><div style="font-size:0.85rem;">我是你的AI投资助手</div><div style="font-size:0.7rem;margin-top:4px;">试试问我：</div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">'+quickBtn('对比000184和000218')+quickBtn('今天市场怎么样')+quickBtn('帮我推荐PR3客户的产品')+quickBtn('客户亏了15%怎么安抚')+'</div></div>';
+    if (_aiRolePlay && _aiRolePlay.role) {
+      // 模拟客户模式 - 已选角色，空历史，不显示欢迎语（上面已经显示了开场白）
+      html += '<div style="text-align:center;color:var(--gray);padding:10px;"><div style="font-size:0.75rem;">输入你的回复，开始演练 👆</div></div>';
+    } else if (!_aiRolePlay) {
+      // 正常模式
+      html += '<div style="text-align:center;color:var(--gray);padding:20px;"><div style="font-size:2rem;margin-bottom:8px;">🤖</div><div style="font-size:0.85rem;">我是你的AI投资助手</div><div style="font-size:0.7rem;margin-top:4px;">试试问我：</div><div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px;">'+quickBtn('对比000184和000218')+quickBtn('今天市场怎么样')+quickBtn('帮我推荐PR3客户的产品')+quickBtn('客户亏了15%怎么安抚')+'</div></div>';
+    }
   } else {
     for (const m of _aiHistory) {
       if (m.role==='user') html += '<div style="text-align:right;margin:8px 0;"><span style="background:var(--red);color:#fff;padding:6px 12px;border-radius:12px;font-size:0.82rem;display:inline-block;max-width:80%;text-align:left;">'+m.content+'</span></div>';
@@ -2791,8 +2854,26 @@ function renderChatUI() {
     }
   }
   html += '</div>';
-  html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="输入问题..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
+  if (_aiRolePlay && _aiRolePlay.role) {
+    html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="回复客户..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #c4b5fd;border-radius:8px;font-size:0.85rem;background:#faf5ff;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:#7c3aed;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
+  } else {
+    html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="输入问题..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
+  }
   return html;
+}
+
+function switchAiMode(mode) {
+  if (mode === 'normal') { _aiRolePlay = null; _aiHistory = []; }
+  else { _aiRolePlay = {role: null}; _aiHistory = []; }
+  refreshAiMessages();
+}
+
+function selectAiRole(rid) {
+  const role = AI_ROLES.find(r => r.id === rid);
+  if (!role) return;
+  _aiRolePlay = role;
+  _aiHistory = []; // 清空历史开始新演练
+  refreshAiMessages();
 }
 
 function quickBtn(text) { return '<button onclick="document.getElementById(\'aiInput\').value=\''+text+'\';sendAiMsg()" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;white-space:nowrap;">'+text+'</button>'; }
@@ -2856,6 +2937,15 @@ function refreshAiMessages() {
 }
 
 function buildAiContext() {
+  // 模拟客户模式 - 使用角色扮演系统提示词
+  if (_aiRolePlay && _aiRolePlay.role) {
+    return '你正在扮演一位银行客户，客户经理正在向你推荐理财产品。请严格按照以下角色设定回复，不要跳出角色：\n\n'+
+      '【你的角色】' + _aiRolePlay.name + '，' + _aiRolePlay.desc + '\n'+
+      '【开场】' + _aiRolePlay.opening + '\n'+
+      '【规则】1. 始终保持角色，像一个真实的客户那样说话；2. 语气自然，可以有犹豫、质疑、担心等真实情绪；3. 不要主动同意购买，要让对方努力说服你；4. 可以提出合理的质疑和问题；5. 回复控制在100字以内，像聊天对话。\n'+
+      '【开始】现在客户经理要跟你说话了，请你以这个客户的身份开始对话。如果这是对话的第一轮，请自动说出开场白。';
+  }
+
   const ap = (typeof MARKET!=='undefined'&&MARKET.asset_prices)?MARKET.asset_prices:{};
   const ss = ap.a_share?.level||'未知', g=ap.gold?.level||'未知', fx=ap.fx?.level||'未知', b=ap.bond?.cn_10y||'未知';
   const funds = (typeof PRODUCTS!=='undefined'?PRODUCTS:[]).filter(p=>p.product_category==='基金');
@@ -3316,6 +3406,140 @@ function renderDailyBriefing() {
 
   html += '</div>';
   return html;
+}
+
+// ============================================================
+// 学习笔记（localStorage）
+// ============================================================
+
+let _notesFilterTag = 'all', _notesSearch = '';
+
+function loadNotes() { try { return JSON.parse(localStorage.getItem('wm_notes')||'[]'); } catch(e) { return []; } }
+function saveNotes(data) { localStorage.setItem('wm_notes', JSON.stringify(data)); }
+
+function renderNotesTab() {
+  const ctr = document.getElementById('notesContent');
+  const notes = loadNotes();
+
+  // 收集所有标签
+  const allTags = new Set();
+  for (const n of notes) { for (const t of (n.tags||[])) allTags.add(t); }
+
+  let html = '';
+
+  // 工具栏
+  html += '<div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">';
+  html += '<input id="notesSearch" placeholder="🔍 搜索笔记..." value="'+_notesSearch+'" oninput="onNotesSearch()" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;">';
+  html += '<button onclick="showNoteEditor()" style="padding:8px 14px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;white-space:nowrap;">+ 新建笔记</button>';
+  html += '</div>';
+
+  // 标签筛选
+  html += '<div style="display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;">';
+  const allActive = _notesFilterTag === 'all';
+  html += '<span onclick="setNotesFilter(\'all\')" style="padding:3px 10px;border-radius:12px;border:1px solid '+(allActive?'#c41230':'#e5e7eb')+';background:'+(allActive?'#fef2f2':'#fff')+';color:'+(allActive?'#c41230':'var(--gray)')+';font-size:0.68rem;cursor:pointer;font-weight:'+(allActive?'700':'400')+';">全部('+notes.length+')</span>';
+  for (const t of [...allTags].sort()) {
+    const active = _notesFilterTag === t;
+    html += '<span onclick="setNotesFilter(\''+t+'\')" style="padding:3px 10px;border-radius:12px;border:1px solid '+(active?'#c41230':'#e5e7eb')+';background:'+(active?'#fef2f2':'#fff')+';color:'+(active?'#c41230':'var(--gray)')+';font-size:0.68rem;cursor:pointer;font-weight:'+(active?'700':'400')+';">'+t+'</span>';
+  }
+  html += '</div>';
+
+  // 笔记列表
+  let filtered = notes;
+  if (_notesFilterTag !== 'all') filtered = filtered.filter(n => (n.tags||[]).includes(_notesFilterTag));
+  if (_notesSearch) {
+    const q = _notesSearch.toLowerCase();
+    filtered = filtered.filter(n => n.title.toLowerCase().includes(q) || n.content.toLowerCase().includes(q));
+  }
+  filtered.sort((a,b) => (b.updatedAt||b.createdAt||0) - (a.updatedAt||a.createdAt||0));
+
+  if (filtered.length === 0) {
+    html += '<div class="card" style="text-align:center;padding:40px;color:var(--gray);">';
+    html += '<div style="font-size:2rem;margin-bottom:8px;">📝</div>';
+    html += '<div style="font-size:0.9rem;">还没有笔记</div>';
+    html += '<div style="font-size:0.72rem;margin-top:4px;">点击「+ 新建笔记」开始记录吧<br>比如：今天学到的知识点、客户沟通复盘、产品要点备忘</div>';
+    html += '</div>';
+  } else {
+    for (const n of filtered) {
+      const date = new Date(n.updatedAt||n.createdAt);
+      const dateStr = date.toLocaleDateString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      html += '<div class="card" style="padding:14px;margin-bottom:10px;">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:start;">';
+      html += '<div style="flex:1;cursor:pointer;" onclick="showNoteEditor(\''+n.id+'\')"><div style="font-weight:700;font-size:0.88rem;">'+n.title+'</div></div>';
+      html += '<div style="display:flex;gap:4px;flex-shrink:0;">';
+      html += '<button onclick="showNoteEditor(\''+n.id+'\')" style="padding:3px 8px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;font-size:0.65rem;cursor:pointer;">✏️</button>';
+      html += '<button onclick="deleteNote(\''+n.id+'\')" style="padding:3px 8px;border:1px solid #fee2e2;border-radius:4px;background:#fef2f2;font-size:0.65rem;cursor:pointer;color:#c41230;">🗑</button>';
+      html += '</div></div>';
+      html += '<div style="font-size:0.65rem;color:var(--gray);margin:4px 0;">'+dateStr+'</div>';
+      if (n.content) {
+        html += '<div style="font-size:0.75rem;color:var(--gray);line-height:1.6;margin-top:6px;max-height:60px;overflow:hidden;">'+n.content.substring(0,150)+(n.content.length>150?'...':'')+'</div>';
+      }
+      if (n.tags && n.tags.length) {
+        html += '<div style="margin-top:8px;">'+n.tags.map(t=>'<span style="display:inline-block;font-size:0.62rem;background:#f3f4f6;padding:2px 6px;border-radius:8px;margin:2px 4px 0 0;color:var(--gray);">#'+t+'</span>').join('')+'</div>';
+      }
+      html += '</div>';
+    }
+  }
+
+  ctr.innerHTML = html;
+}
+
+function onNotesSearch() {
+  _notesSearch = document.getElementById('notesSearch')?.value||'';
+  renderNotesTab();
+}
+
+function setNotesFilter(t) { _notesFilterTag = t; _notesSearch = ''; renderNotesTab(); }
+
+function showNoteEditor(noteId) {
+  let note = {id:'',title:'',content:'',tags:[],createdAt:Date.now(),updatedAt:Date.now()};
+  if (noteId) {
+    const notes = loadNotes();
+    const found = notes.find(n => n.id === noteId);
+    if (found) note = found;
+  }
+
+  let html = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;justify-content:center;align-items:flex-end;">';
+  html += '<div style="background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:20px;">';
+  html += '<div style="font-weight:700;font-size:1rem;margin-bottom:12px;">'+(noteId?'✏️ 编辑笔记':'📝 新建笔记')+'</div>';
+
+  html += '<label>标题</label><input id="noteTitle" value="'+note.title.replace(/"/g,'&quot;')+'" placeholder="比如：夏普比率是什么" style="margin-bottom:8px;">';
+  html += '<label>内容</label><textarea id="noteContent" rows="8" placeholder="记录你的学习心得..." style="width:100%;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;font-family:inherit;resize:vertical;margin-bottom:8px;">'+note.content+'</textarea>';
+  html += '<label>标签（逗号分隔）</label><input id="noteTags" value="'+(note.tags||[]).join(',')+'" placeholder="比如：基金知识, 客户沟通, 市场解读" style="margin-bottom:14px;">';
+
+  html += '<div style="display:flex;gap:8px;">';
+  html += '<button onclick="closeModal()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;font-size:0.85rem;cursor:pointer;">取消</button>';
+  html += '<button onclick="saveNote(\''+note.id+'\',\''+(note.createdAt||Date.now())+'\')" style="flex:1;padding:10px;border:none;border-radius:8px;background:var(--red);color:#fff;font-size:0.85rem;cursor:pointer;">保存</button>';
+  html += '</div></div></div>';
+  document.getElementById('modalHost').innerHTML = html;
+}
+
+function saveNote(noteId, createdAt) {
+  const title = (document.getElementById('noteTitle')?.value||'').trim();
+  const content = (document.getElementById('noteContent')?.value||'').trim();
+  const tagsStr = (document.getElementById('noteTags')?.value||'').trim();
+  if (!title) { toast('请输入标题'); return; }
+  const tags = tagsStr ? tagsStr.split(/[,，]/).map(t=>t.trim()).filter(Boolean) : [];
+
+  const notes = loadNotes();
+  if (noteId) {
+    const idx = notes.findIndex(n => n.id === noteId);
+    if (idx >= 0) { notes[idx].title = title; notes[idx].content = content; notes[idx].tags = tags; notes[idx].updatedAt = Date.now(); }
+  } else {
+    notes.push({id:'note_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),title,content,tags,createdAt:parseInt(createdAt)||Date.now(),updatedAt:Date.now()});
+  }
+  saveNotes(notes);
+  closeModal();
+  renderNotesTab();
+  toast(noteId?'笔记已更新':'笔记已保存');
+}
+
+function deleteNote(noteId) {
+  if (!confirm('确定删除这条笔记？')) return;
+  let notes = loadNotes();
+  notes = notes.filter(n => n.id !== noteId);
+  saveNotes(notes);
+  renderNotesTab();
+  toast('笔记已删除');
 }
 
 (async function loadNavHistory() {

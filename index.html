@@ -208,6 +208,7 @@ input:focus, select:focus { border-color: var(--red); }
     <div class="tab" onclick="switchTab('result')">📊 推荐结果</div>
     <div class="tab" onclick="switchTab('report')">📝 配置报告</div>
     <div class="tab" onclick="switchTab('tech')">🔬 科技行业</div>
+    <div class="tab" onclick="switchTab('scripts')">📋 话术库</div>
   </div>
 
   <!-- Tab 0: 仪表盘 -->
@@ -228,6 +229,11 @@ input:focus, select:focus { border-color: var(--red); }
   <!-- Tab: 科技行业 -->
   <div id="tab-tech" style="display:none;">
     <div id="techContent"></div>
+  </div>
+
+  <!-- Tab: 话术库 -->
+  <div id="tab-scripts" style="display:none;">
+    <div id="scriptsContent"></div>
   </div>
 
   <!-- Tab 2: 输入 -->
@@ -347,6 +353,9 @@ input:focus, select:focus { border-color: var(--red); }
   </div>
   <div class="mobile-nav-item" onclick="switchTab('tech')" data-tab="tech">
     <span class="nav-icon">🔬</span>科技
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('scripts')" data-tab="scripts">
+    <span class="nav-icon">📋</span>话术
   </div>
   <div class="mobile-nav-item" onclick="exportPPT()" id="mobileExportBtn">
     <span class="nav-icon">📥</span>导出
@@ -623,11 +632,11 @@ let sids = new Set();
 // UI 逻辑
 // ============================================================
 function switchTab(tab) {
-  ['input','result','report','market','news','fund','clients','ai','dashboard','tech'].forEach(t => {
+  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts'].forEach(t => {
     document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
   });
   document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech'][i]===tab);
+    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts'][i]===tab);
   });
   // 同步移动端底部导航
   document.querySelectorAll('.mobile-nav-item').forEach(el => {
@@ -641,6 +650,7 @@ function switchTab(tab) {
   if (tab === 'clients') renderClientsTab();
   if (tab === 'ai') renderAiTab();
   if (tab === 'tech') renderTechTab();
+  if (tab === 'scripts') renderScriptsTab();
   // 滚动到顶部
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -2404,6 +2414,8 @@ function renderDashboard() {
   const totalPnl = clients.reduce((s,c)=>s+(c.holdings||[]).reduce((ss,h)=>ss+(h.pnl||0),0),0);
   
   let html = '';
+  // 每日简报
+  html += renderDailyBriefing();
   // 市场快照
   html += '<div style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;border-radius:12px;padding:14px;margin-bottom:12px;">';
   html += '<div style="font-size:0.75rem;opacity:0.7;">'+new Date().toLocaleDateString('zh-CN',{weekday:'long',month:'long',day:'numeric'})+'</div>';
@@ -2429,6 +2441,7 @@ function renderDashboard() {
     {icon:'📊',title:'推荐结果',desc:'产品匹配',tab:'result'},
     {icon:'📝',title:'配置报告',desc:'方案+导出',tab:'report'},
     {icon:'🔬',title:'科技行业',desc:'30家头部追踪',tab:'tech'},
+    {icon:'📋',title:'话术库',desc:'18条实战话术',tab:'scripts'},
   ];
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
   for (const c of cards) {
@@ -3148,6 +3161,161 @@ function sortTech(field) {
 function toggleTechDetail(code) {
   _techExpanded = (_techExpanded === code) ? null : code;
   renderTechTab();
+}
+
+// ============================================================
+// 话术库
+// ============================================================
+
+let _scriptsData = null;
+let _scriptsFilter = 'all';
+
+async function loadScriptsData() {
+  if (_scriptsData) return _scriptsData;
+  try {
+    const r = await fetch('data/scripts.json?' + Date.now());
+    if (r.ok) { _scriptsData = await r.json(); return _scriptsData; }
+  } catch (e) {}
+  return [];
+}
+
+async function renderScriptsTab() {
+  const ctr = document.getElementById('scriptsContent');
+  ctr.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);">加载中...</div>';
+  const scripts = await loadScriptsData();
+  if (!scripts.length) {
+    ctr.innerHTML = '<div class="card" style="text-align:center;padding:40px;color:var(--gray);">话术库加载失败，请刷新页面</div>';
+    return;
+  }
+
+  // 分类统计
+  const cats = {};
+  for (const s of scripts) { cats[s.category] = (cats[s.category] || 0) + 1; }
+
+  let html = '';
+
+  // 筛选栏
+  html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">';
+  const allActive = _scriptsFilter === 'all';
+  html += '<button onclick="setScriptsFilter(\'all\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (allActive ? '#c41230' : '#e5e7eb') + ';background:' + (allActive ? '#fef2f2' : '#fff') + ';color:' + (allActive ? '#c41230' : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (allActive ? '700' : '400') + ';">全部(' + scripts.length + ')</button>';
+  for (const [cat, count] of Object.entries(cats)) {
+    const active = _scriptsFilter === cat;
+    html += '<button onclick="setScriptsFilter(\'' + cat + '\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (active ? '#c41230' : '#e5e7eb') + ';background:' + (active ? '#fef2f2' : '#fff') + ';color:' + (active ? '#c41230' : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (active ? '700' : '400') + ';">' + cat + '(' + count + ')</button>';
+  }
+  html += '<span style="margin-left:auto;font-size:0.68rem;color:var(--gray);">💡 点击卡片复制话术</span>';
+  html += '</div>';
+
+  // 话术卡片
+  const filtered = _scriptsFilter === 'all' ? scripts : scripts.filter(s => s.category === _scriptsFilter);
+  const customerEmoji = {'保守型':'🛡️','稳健型':'⚖️','进取型':'🚀','新客户':'🆕','存量客户':'💤','刚买入就跌':'😰','大跌恐慌':'😱','不信任型':'🤨','拖延型':'🐌','比价型':'💰','犹豫型':'🤔','大客户':'💎','已购客户':'⭐','定投客户':'📊','所有客户':'🌐','退休/老年客户':'👴','熟人/朋友':'🤝'};
+
+  for (const s of filtered) {
+    html += '<div class="card" style="padding:16px;margin-bottom:12px;">';
+    // 标题行
+    html += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">';
+    html += '<div><div style="font-weight:700;font-size:0.9rem;">' + s.title + '</div>';
+    html += '<div style="font-size:0.7rem;color:var(--gray);margin-top:2px;">' + s.category + ' · ' + (customerEmoji[s.customer_type]||'') + ' ' + s.customer_type + '</div></div>';
+    html += '<button onclick="copyScript(\'' + s.id + '\')" id="copyBtn-' + s.id + '" style="padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.7rem;cursor:pointer;white-space:nowrap;">📋 复制</button>';
+    html += '</div>';
+
+    // 场景
+    html += '<div style="background:#fef2f2;border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:0.72rem;color:var(--gray);line-height:1.5;">📌 <b>场景：</b>' + s.scenario + '</div>';
+
+    // 话术正文
+    html += '<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:0.8rem;line-height:1.8;color:var(--dark);margin-bottom:10px;" id="scriptText-' + s.id + '">' + s.script + '</div>';
+
+    // 要点
+    html += '<div style="font-size:0.7rem;color:var(--gray);">💡 <b>要点：</b>' + s.key_points.map(p => '<span style="display:inline-block;background:#eff6ff;padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0;color:#1e40af;">' + p + '</span>').join('') + '</div>';
+
+    // 标签
+    html += '<div style="margin-top:8px;">' + s.tags.map(t => '<span style="display:inline-block;font-size:0.62rem;background:#f3f4f6;padding:2px 6px;border-radius:8px;margin:2px 4px 2px 0;color:var(--gray);">#' + t + '</span>').join('') + '</div>';
+
+    html += '</div>';
+  }
+
+  ctr.innerHTML = html;
+}
+
+function setScriptsFilter(f) { _scriptsFilter = f; renderScriptsTab(); }
+
+function copyScript(id) {
+  const el = document.getElementById('scriptText-' + id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+    const btn = document.getElementById('copyBtn-' + id);
+    if (btn) { btn.innerHTML = '✅ 已复制'; btn.style.background = '#f0fdf4'; btn.style.borderColor = '#bbf7d0'; setTimeout(() => { btn.innerHTML = '📋 复制'; btn.style.background = '#fff'; btn.style.borderColor = '#e5e7eb'; }, 2000); }
+    toast('话术已复制到剪贴板');
+  }).catch(() => toast('复制失败，请手动复制'));
+}
+
+// ============================================================
+// 每日行动简报（嵌入仪表盘顶部）
+// ============================================================
+
+function renderDailyBriefing() {
+  const ap = (typeof MARKET !== 'undefined' && MARKET.asset_prices) ? MARKET.asset_prices : {};
+  const ss = ap.a_share || {};
+  const gold = ap.gold || {};
+  const fx = ap.fx || {};
+  const bond = ap.bond || {};
+  const hotspots = (typeof MARKET !== 'undefined' && MARKET.sector_rotation && MARKET.sector_rotation.current_hotspots) ? MARKET.sector_rotation.current_hotspots : [];
+  const news = (typeof NEWS !== 'undefined' && NEWS.length) ? NEWS.slice(0, 3) : [];
+
+  let html = '<div class="card" style="background:linear-gradient(135deg,#fef2f2 0%,#fff8f8 40%,#f0f9ff 100%);border:1px solid #fecaca;">';
+  html += '<div class="card-title" style="border-bottom-color:#c41230;">🎯 今日行动简报</div>';
+
+  // 一句话市场
+  const ssChg = ss.change || '';
+  const mood = ssChg.includes('+') ? '偏暖' : (ssChg.includes('-') ? '偏弱' : '平稳');
+  html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:10px;color:var(--dark);">';
+  html += '📊 今日市场：' + mood + ' | 上证' + (ss.level || '—') + ' ' + (ssChg || '') + ' | 国债' + (bond.cn_10y || '—');
+  html += '</div>';
+
+  // 推荐话题
+  html += '<div style="margin-bottom:10px;">';
+  html += '<div style="font-size:0.75rem;font-weight:700;color:var(--red);margin-bottom:6px;">💬 今天可以和客户聊这些：</div>';
+  html += '<div style="font-size:0.75rem;line-height:1.8;">';
+
+  const topics = [];
+  if (hotspots.length) {
+    const h = hotspots[0];
+    topics.push('🔥 <b>热点板块：</b>' + h.sector + '（' + h.driver + '），可以跟关注科技的客户聊聊');
+  }
+  if (bond.cn_10y && bond.cn_10y.includes('1.')) {
+    topics.push('📉 <b>国债收益率低位：</b>存款利率继续走低，是推荐债基/固收+的好时机');
+  }
+  if (gold.price && gold.price.includes('4060')) {
+    topics.push('🥇 <b>黄金高位震荡：</b>如果有客户问黄金能不能买，提醒注意回调风险');
+  }
+  if (ssChg && ssChg.includes('-') && Math.abs(parseFloat(ssChg.replace('+','').replace('%',''))) > 1) {
+    topics.push('⚠️ <b>市场回调：</b>主动联系持仓客户，做好心理按摩（话术库→市场波动安抚）');
+  }
+  if (ssChg && ssChg.includes('+') && parseFloat(ssChg.replace('+','').replace('%','')) > 0.5) {
+    topics.push('📈 <b>市场回暖：</b>联系观望中的客户，促单好时机（话术库→促成成交）');
+  }
+  if (news.length) {
+    const n = news[0];
+    topics.push('📰 <b>今日资讯：</b>' + (n.title || '').substring(0, 40) + '，可以当聊天话题');
+  }
+  topics.push('💡 <b>别忘了：</b>打开话术库，找今天需要的场景提前练一遍');
+
+  for (const t of topics) {
+    html += '<div style="margin-bottom:3px;">' + t + '</div>';
+  }
+  html += '</div></div>';
+
+  // 行动清单
+  html += '<div style="background:#fff;border-radius:8px;padding:10px 12px;border:1px solid #e5e7eb;">';
+  html += '<div style="font-size:0.75rem;font-weight:700;margin-bottom:6px;">✅ 今日行动清单</div>';
+  html += '<div style="font-size:0.72rem;color:var(--gray);line-height:1.7;">';
+  html += '1️⃣ 查看话术库「市场波动安抚」类，万一客户来问有备无患<br>';
+  html += '2️⃣ 从科技行业面板挑2家热点公司，备好话题素材<br>';
+  html += '3️⃣ 检查有没有沉睡超3个月的客户，发一条唤醒消息<br>';
+  html += '4️⃣ 如果有客户持仓浮动盈亏超5%，主动联系<br>';
+  html += '</div></div>';
+
+  html += '</div>';
+  return html;
 }
 
 (async function loadNavHistory() {

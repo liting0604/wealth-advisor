@@ -2451,7 +2451,7 @@ function renderDashboard() {
     {icon:'📊',title:'推荐结果',desc:'产品匹配',tab:'result'},
     {icon:'📝',title:'配置报告',desc:'方案+导出',tab:'report'},
     {icon:'🔬',title:'科技行业',desc:'30家头部追踪',tab:'tech'},
-    {icon:'📋',title:'话术库',desc:'18条实战话术',tab:'scripts'},
+    {icon:'📋',title:'话术库',desc:'21条实战话术',tab:'scripts'},
     {icon:'📝',title:'学习笔记',desc:'知识积累+复盘',tab:'notes'},
   ];
   html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
@@ -2775,6 +2775,7 @@ const AI_ROLES = [
   {id:'panic',name:'大跌恐慌型',desc:'持仓浮亏15%，想全部赎回',opening:'我上个月买的那只基金已经亏了15%了！我现在就想赎回来，你再劝我也没用！'},
   {id:'pricey',name:'比价型客户',desc:'在银行和支付宝之间比价，纠结手续费',opening:'你给我推荐的这个基金，我看支付宝上也能买，手续费还比你们便宜。我在你这买有什么好处？'},
   {id:'vip',name:'大客户',desc:'资产几百万但只买理财，需要引导配置',opening:'我钱都放在理财和存款里，一年也就2%多一点。你说还有其他方式能多赚点？但我不接受亏太多。'},
+  {id:'idle',name:'活期躺平型',desc:'活期趴着几十万从不打理，对理财完全没概念',opening:'我看我活期里确实有不少钱，但我一直没管过。你说的这些基金啊理财啊，跟存活期有什么区别？会不会亏？'},
 ];
 
 function renderAiTab() {

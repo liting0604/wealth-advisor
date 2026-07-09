@@ -2813,7 +2813,7 @@ function renderChatUI() {
 
   // 模拟客户模式 - 角色选择
   if (_aiRolePlay) {
-    if (!_aiRolePlay.role) {
+    if (!_aiRolePlay.id) {
       // 还没选角色，显示角色选择面板
       html += '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:10px;padding:14px;margin-bottom:10px;">';
       html += '<div style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:#7c3aed;">🎭 选择一个要练习的客户类型：</div>';
@@ -2840,7 +2840,7 @@ function renderChatUI() {
 
   html += '<div id="aiMessages" style="max-height:60vh;overflow-y:auto;margin-bottom:10px;">';
   if (_aiHistory.length===0) {
-    if (_aiRolePlay && _aiRolePlay.role) {
+    if (_aiRolePlay && _aiRolePlay.id) {
       // 模拟客户模式 - 已选角色，空历史，不显示欢迎语（上面已经显示了开场白）
       html += '<div style="text-align:center;color:var(--gray);padding:10px;"><div style="font-size:0.75rem;">输入你的回复，开始演练 👆</div></div>';
     } else if (!_aiRolePlay) {
@@ -2854,7 +2854,7 @@ function renderChatUI() {
     }
   }
   html += '</div>';
-  if (_aiRolePlay && _aiRolePlay.role) {
+  if (_aiRolePlay && _aiRolePlay.id) {
     html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="回复客户..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #c4b5fd;border-radius:8px;font-size:0.85rem;background:#faf5ff;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:#7c3aed;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
   } else {
     html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="输入问题..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
@@ -2864,7 +2864,7 @@ function renderChatUI() {
 
 function switchAiMode(mode) {
   if (mode === 'normal') { _aiRolePlay = null; _aiHistory = []; }
-  else { _aiRolePlay = {role: null}; _aiHistory = []; }
+  else { _aiRolePlay = {}; _aiHistory = []; }
   refreshAiMessages();
 }
 
@@ -2931,14 +2931,13 @@ async function sendAiMsg() {
 }
 
 function refreshAiMessages() {
-  const container = document.getElementById('aiContent');
-  container.innerHTML = '<div style="font-weight:700;margin-bottom:12px;">🤖 AI 助手</div>' + renderChatUI();
+  renderAiTab();
   setTimeout(()=>{const m=document.getElementById('aiMessages');if(m)m.scrollTop=99999;},100);
 }
 
 function buildAiContext() {
   // 模拟客户模式 - 使用角色扮演系统提示词
-  if (_aiRolePlay && _aiRolePlay.role) {
+  if (_aiRolePlay && _aiRolePlay.id) {
     return '你正在扮演一位银行客户，客户经理正在向你推荐理财产品。请严格按照以下角色设定回复，不要跳出角色：\n\n'+
       '【你的角色】' + _aiRolePlay.name + '，' + _aiRolePlay.desc + '\n'+
       '【开场】' + _aiRolePlay.opening + '\n'+

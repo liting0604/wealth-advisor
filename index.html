@@ -2766,7 +2766,7 @@ function fetchFundGz(code) {
 // ============================================================
 function getAiKey() { return localStorage.getItem('wm_ds_key')||''; }
 function setAiKey(k) { localStorage.setItem('wm_ds_key', k); }
-let _aiHistory = [], _aiSearch = false, _aiRolePlay = null;
+let _aiHistory = [], _aiSearch = false, _aiRolePlay = null, _aiFeedback = null, _aiFeedbackLoading = false;
 
 const AI_ROLES = [
   {id:'conservative',name:'保守型大妈',desc:'风险厌恶，只买过定期存款，对基金很警惕',opening:'小伙子/小姑娘，你说的这个基金不会亏钱吧？我就想比存银行多一点，但千万别亏本啊。'},
@@ -2830,8 +2830,12 @@ function renderChatUI() {
       // 已选角色，显示角色信息+开场白
       html += '<div style="background:linear-gradient(135deg,#faf5ff,#ede9fe);border:1px solid #c4b5fd;border-radius:8px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">';
       html += '<div><span style="background:#7c3aed;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.65rem;">🎭 模拟客户</span> <b style="font-size:0.78rem;">'+_aiRolePlay.name+'</b> <span style="font-size:0.65rem;color:var(--gray);">'+_aiRolePlay.desc+'</span></div>';
-      html += '<button onclick="switchAiMode(\'normal\')\" style="padding:3px 10px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;font-size:0.65rem;cursor:pointer;">退出演练</button>';
-      html += '</div>';
+      html += '<div style="display:flex;gap:6px;align-items:center;">';
+      if (_aiHistory.length >= 2) {
+        html += '<button onclick="getRolePlayFeedback()" id="btnFeedback" style="padding:3px 10px;border:1px solid #059669;border-radius:4px;background:#ecfdf5;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;">📝 获取反馈</button>';
+      }
+      html += '<button onclick="switchAiMode(\'normal\')" style="padding:3px 10px;border:1px solid #e5e7eb;border-radius:4px;background:#fff;font-size:0.65rem;cursor:pointer;">退出演练</button>';
+      html += '</div></div>';
       // 自动生成开场白
       if (_aiHistory.length === 0) {
         html += '<div style="margin:8px 0;font-size:0.8rem;color:var(--gray);background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;">💡 <b>客户开场了：</b>「'+_aiRolePlay.opening+'」<br><span style="font-size:0.68rem;margin-top:4px;display:inline-block;">你可以开始回复了——运用话术库的技巧，试试怎么应对</span></div>';
@@ -2855,6 +2859,21 @@ function renderChatUI() {
     }
   }
   html += '</div>';
+  // 演练反馈面板
+  if (_aiFeedback) {
+    html += '<div id="aiFeedbackPanel" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #059669;border-radius:10px;padding:14px;margin-bottom:10px;">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
+    html += '<div style="font-weight:700;color:#059669;font-size:0.85rem;">📝 教练反馈报告</div>';
+    html += '<button onclick="_aiFeedback=null;refreshAiMessages();" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;font-size:0.6rem;cursor:pointer;">✕ 关闭</button>';
+    html += '</div>';
+    html += '<div style="font-size:0.78rem;line-height:1.6;color:#065f46;white-space:pre-wrap;">'+_aiFeedback+'</div>';
+    html += '</div>';
+  }
+  if (_aiFeedbackLoading) {
+    html += '<div id="aiFeedbackPanel" style="background:#f0f9ff;border:2px dashed #3b82f6;border-radius:10px;padding:14px;margin-bottom:10px;text-align:center;">';
+    html += '<span class="spinner"></span> <span style="font-size:0.8rem;color:#3b82f6;">AI 教练正在分析你的对话...</span>';
+    html += '</div>';
+  }
   if (_aiRolePlay && _aiRolePlay.id) {
     html += '<div style="display:flex;gap:8px;"><input id="aiInput" placeholder="回复客户..." onkeydown="if(event.key===\'Enter\')sendAiMsg()" style="flex:1;padding:10px;border:1px solid #c4b5fd;border-radius:8px;font-size:0.85rem;background:#faf5ff;"><button onclick="sendAiMsg()" id="aiSendBtn" style="padding:10px 16px;background:#7c3aed;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;">发送</button></div>';
   } else {
@@ -2866,6 +2885,7 @@ function renderChatUI() {
 function switchAiMode(mode) {
   if (mode === 'normal') { _aiRolePlay = null; _aiHistory = []; }
   else { _aiRolePlay = {}; _aiHistory = []; }
+  _aiFeedback = null;
   refreshAiMessages();
 }
 
@@ -2873,8 +2893,61 @@ function selectAiRole(rid) {
   const role = AI_ROLES.find(r => r.id === rid);
   if (!role) return;
   _aiRolePlay = role;
-  _aiHistory = []; // 清空历史开始新演练
+  _aiHistory = [];
+  _aiFeedback = null;
   refreshAiMessages();
+}
+
+async function getRolePlayFeedback() {
+  if (_aiHistory.length < 2) return;
+  const btn = document.getElementById('btnFeedback');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 分析中...'; }
+  _aiFeedbackLoading = true;
+  refreshAiMessages();
+
+  // 构建对话摘要发给AI教练
+  let dialog = '';
+  for (const m of _aiHistory) {
+    dialog += (m.role === 'user' ? '【客户经理】' : '【' + _aiRolePlay.name + '】') + m.content + '\n';
+  }
+
+  const coachPrompt = '你是一位资深的银行理财销售教练，拥有20年一线客户服务经验。下面是一段客户经理与模拟客户的对话记录，请以教练身份进行分析和指导。\n\n' +
+    '请按以下结构输出反馈（用简洁自然的中文，像一位老前辈在带新人）：\n\n' +
+    '## 🟢 做得好的地方\n列出2-3点，具体引用对话中的原话（用「」标注），说明为什么好\n\n' +
+    '## 🟡 可以改进的地方\n列出2-3点，指出问题并解释为什么这样说效果不好\n\n' +
+    '## 💡 改进话术示范\n针对每一个"可以改进的地方"，给出一段更好的话术示范（用💬标注），可以用「你可以这样说：」开头\n\n' +
+    '## 📋 关键技巧提醒\n提炼2-3条本次演练中最值得记住的沟通技巧\n\n' +
+    '要求：反馈要具体、可操作，不要泛泛而谈。像个老师傅在教徒弟那样说话，亲切但一针见血。控制在400字以内。\n\n' +
+    '===对话记录===\n' + dialog;
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAiKey() },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: coachPrompt }
+        ],
+        temperature: 0.5,
+        max_tokens: 2000
+      })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    _aiFeedback = data.choices[0].message.content;
+  } catch (e) {
+    _aiFeedback = '⚠️ 获取反馈失败：' + e.message + '\n\n请检查 DeepSeek API Key 是否有效，或稍后重试。';
+  }
+
+  _aiFeedbackLoading = false;
+  if (btn) { btn.disabled = false; btn.innerHTML = '📝 获取反馈'; }
+  refreshAiMessages();
+  // 滚动到反馈面板
+  setTimeout(() => {
+    const panel = document.getElementById('aiFeedbackPanel');
+    if (panel) panel.scrollIntoView({ behavior: 'smooth' });
+  }, 200);
 }
 
 function quickBtn(text) { return '<button onclick="document.getElementById(\'aiInput\').value=\''+text+'\';sendAiMsg()" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;white-space:nowrap;">'+text+'</button>'; }

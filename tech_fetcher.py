@@ -195,6 +195,10 @@ def main():
             'ceo': c.get('ceo', ''),
             'founded': c.get('founded'),
             'headquarters': c.get('headquarters', ''),
+            'business': c.get('business', None),
+            'rd_focus': c.get('rd_focus', ''),
+            'supply_chain': c.get('supply_chain', None),
+            'financials': c.get('financials', None),
             'stock': sd if sd else {
                 'price': None, 'change_pct': None, 'pe': None,
                 'market_cap': '—', 'currency': ''

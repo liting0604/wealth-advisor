@@ -1,32 +1,512 @@
 [
-  {"code":"00700","market":"HK","name":"腾讯控股","en_name":"Tencent","sector":"互联网","sub_sector":"社交/游戏/云","description":"中国最大互联网综合服务商，核心业务包括社交(微信/QQ)、游戏、金融科技及云服务","ceo":"马化腾","founded":1998,"headquarters":"深圳"},
-  {"code":"09988","market":"HK","name":"阿里巴巴","en_name":"Alibaba","sector":"互联网","sub_sector":"电商/云/AI","description":"全球最大零售电商平台之一，业务涵盖淘宝天猫、阿里云、菜鸟物流及国际电商","ceo":"吴泳铭","founded":1999,"headquarters":"杭州"},
-  {"code":"03690","market":"HK","name":"美团","en_name":"Meituan","sector":"互联网","sub_sector":"本地生活","description":"中国领先的生活服务电商平台，以外卖、到店、酒旅为核心，布局无人机配送","ceo":"王兴","founded":2010,"headquarters":"北京"},
-  {"code":"09888","market":"HK","name":"百度集团","en_name":"Baidu","sector":"互联网","sub_sector":"搜索/AI","description":"中国最大搜索引擎，全面转型AI，文心大模型及自动驾驶(Apollo)为战略重心","ceo":"李彦宏","founded":2000,"headquarters":"北京"},
-  {"code":"09618","market":"HK","name":"京东集团","en_name":"JD.com","sector":"互联网","sub_sector":"电商/物流","description":"中国领先自营电商及供应链技术公司，自建物流体系为核心壁垒","ceo":"许冉","founded":1998,"headquarters":"北京"},
-  {"code":"09999","market":"HK","name":"网易","en_name":"NetEase","sector":"互联网","sub_sector":"游戏/教育","description":"中国头部游戏公司，《梦幻西游》《蛋仔派对》等长线运营，有道布局AI教育","ceo":"丁磊","founded":1997,"headquarters":"广州"},
-  {"code":"01810","market":"HK","name":"小米集团","en_name":"Xiaomi","sector":"消费电子","sub_sector":"手机/汽车/IoT","description":"全球前三智能手机厂商，跨界智能电动汽车，IoT平台连接设备超8亿台","ceo":"雷军","founded":2010,"headquarters":"北京"},
-  {"code":"002594","market":"SZ","name":"比亚迪","en_name":"BYD","sector":"新能源","sub_sector":"电动车/电池","description":"全球新能源车销量冠军，自研刀片电池+DM混动技术，垂直一体化布局","ceo":"王传福","founded":1995,"headquarters":"深圳"},
-  {"code":"688981","market":"SH","name":"中芯国际","en_name":"SMIC","sector":"半导体","sub_sector":"芯片制造","description":"中国大陆最大晶圆代工厂，14nm量产，7nm瓶颈突破中，国产替代核心标的","ceo":"赵海军","founded":2000,"headquarters":"上海"},
-  {"code":"002415","market":"SZ","name":"海康威视","en_name":"Hikvision","sector":"AI/安防","sub_sector":"智能物联","description":"全球安防龙头，AI视觉技术领先，企业级数字化转型解决方案提供商","ceo":"胡扬忠","founded":2001,"headquarters":"杭州"},
-  {"code":"002230","market":"SZ","name":"科大讯飞","en_name":"iFlytek","sector":"AI","sub_sector":"语音/大模型","description":"中国AI国家队，讯飞星火大模型在教育、医疗、汽车场景领先落地","ceo":"刘庆峰","founded":1999,"headquarters":"合肥"},
-  {"code":"688256","market":"SH","name":"寒武纪","en_name":"Cambricon","sector":"半导体","sub_sector":"AI芯片","description":"中国AI芯片独角兽，思元系列云端智能芯片对标英伟达，国产AI算力核心","ceo":"陈天石","founded":2016,"headquarters":"北京"},
-  {"code":"00020","market":"HK","name":"商汤集团","en_name":"SenseTime","sector":"AI","sub_sector":"计算机视觉","description":"亚洲领先AI软件公司，SenseCore大装置提供算力基础设施，日日新大模型","ceo":"徐立","founded":2014,"headquarters":"香港"},
-  {"code":"300750","market":"SZ","name":"宁德时代","en_name":"CATL","sector":"新能源","sub_sector":"电池/储能","description":"全球最大动力电池制造商，市占率超35%，麒麟电池+钠离子电池技术引领","ceo":"曾毓群","founded":2011,"headquarters":"宁德"},
-  {"code":"688111","market":"SH","name":"金山办公","en_name":"Kingsoft Office","sector":"软件","sub_sector":"办公SaaS","description":"WPS Office国内月活超6亿，AI功能WPS AI重塑办公场景，云协作增长强劲","ceo":"章庆元","founded":1988,"headquarters":"北京"},
-  {"code":"AAPL","market":"US","name":"苹果","en_name":"Apple","sector":"消费电子","sub_sector":"硬件/服务","description":"全球市值最高公司，iPhone+服务生态护城河极深，Vision Pro布局空间计算","ceo":"Tim Cook","founded":1976,"headquarters":"Cupertino"},
-  {"code":"MSFT","market":"US","name":"微软","en_name":"Microsoft","sector":"软件/云","sub_sector":"云/AI/办公","description":"全球第二大市值，Azure云+Office 365+OpenAI投资全面布局AI时代","ceo":"Satya Nadella","founded":1975,"headquarters":"Redmond"},
-  {"code":"NVDA","market":"US","name":"英伟达","en_name":"NVIDIA","sector":"半导体","sub_sector":"GPU/AI芯片","description":"AI算力之王，GPU市占率超80%，Blackwell架构引领下一代AI训练推理","ceo":"Jensen Huang","founded":1993,"headquarters":"Santa Clara"},
-  {"code":"GOOGL","market":"US","name":"Alphabet","en_name":"Alphabet (Google)","sector":"互联网","sub_sector":"搜索/AI/云","description":"全球最大搜索引擎，Gemini大模型全面整合，Waymo自动驾驶+Google Cloud","ceo":"Sundar Pichai","founded":1998,"headquarters":"Mountain View"},
-  {"code":"AMZN","market":"US","name":"亚马逊","en_name":"Amazon","sector":"互联网","sub_sector":"电商/云","description":"全球最大云服务商(AWS市占32%)，电商+物流+AI全产业链布局","ceo":"Andy Jassy","founded":1994,"headquarters":"Seattle"},
-  {"code":"META","market":"US","name":"Meta","en_name":"Meta Platforms","sector":"互联网","sub_sector":"社交/元宇宙","description":"Facebook/Instagram/WhatsApp拥有30亿用户，开源Llama大模型，AR眼镜布局","ceo":"Mark Zuckerberg","founded":2004,"headquarters":"Menlo Park"},
-  {"code":"TSLA","market":"US","name":"特斯拉","en_name":"Tesla","sector":"新能源","sub_sector":"电动车/AI","description":"全球电动车先驱，FSD全自动驾驶+Optimus人形机器人打开第二增长曲线","ceo":"Elon Musk","founded":2003,"headquarters":"Austin"},
-  {"code":"TSM","market":"US","name":"台积电","en_name":"TSMC","sector":"半导体","sub_sector":"芯片代工","description":"全球最大晶圆代工厂，3nm量产2nm在即，NVIDIA/Apple/AMD核心代工伙伴","ceo":"魏哲家","founded":1987,"headquarters":"台湾新竹"},
-  {"code":"AVGO","market":"US","name":"博通","en_name":"Broadcom","sector":"半导体","sub_sector":"网络芯片","description":"AI数据中心网络芯片龙头，VMware虚拟化+定制ASIC为科技巨头供货","ceo":"Hock Tan","founded":1961,"headquarters":"San Jose"},
-  {"code":"AMD","market":"US","name":"超威半导体","en_name":"AMD","sector":"半导体","sub_sector":"CPU/GPU","description":"CPU份额持续蚕食Intel，MI300系列AI加速卡挑战英伟达","ceo":"Lisa Su","founded":1969,"headquarters":"Santa Clara"},
-  {"code":"ASML","market":"US","name":"阿斯麦","en_name":"ASML","sector":"半导体","sub_sector":"光刻机","description":"全球独家高端EUV光刻机制造商，芯片产业卡脖子设备，单台售价超3亿欧元","ceo":"Christophe Fouquet","founded":1984,"headquarters":"Veldhoven"},
-  {"code":"CRM","market":"US","name":"Salesforce","en_name":"Salesforce","sector":"软件","sub_sector":"企业SaaS","description":"全球CRM SaaS龙头，Einstein AI助手+Agentforce智能代理重塑企业软件","ceo":"Marc Benioff","founded":1999,"headquarters":"San Francisco"},
-  {"code":"ORCL","market":"US","name":"甲骨文","en_name":"Oracle","sector":"软件/云","sub_sector":"数据库/云","description":"数据库巨头转型云计算，OCI云基础设施增长强劲，AI训练需求激增","ceo":"Safra Catz","founded":1977,"headquarters":"Austin"},
-  {"code":"PLTR","market":"US","name":"Palantir","en_name":"Palantir","sector":"AI/大数据","sub_sector":"数据分析","description":"AI驱动的数据分析平台，政府+商业双轮驱动，AIP平台推动企业AI落地","ceo":"Alex Karp","founded":2003,"headquarters":"Denver"},
-  {"code":"NOW","market":"US","name":"ServiceNow","en_name":"ServiceNow","sector":"软件","sub_sector":"企业SaaS","description":"企业工作流自动化龙头，Now Platform+AI Agent重塑IT/HR/客服流程","ceo":"Bill McDermott","founded":2004,"headquarters":"Santa Clara"}
+  {
+    "code":"00700","market":"HK","name":"腾讯控股","en_name":"Tencent",
+    "sector":"互联网","sub_sector":"社交/游戏/云/AI",
+    "ceo":"马化腾","founded":1998,"headquarters":"深圳",
+    "description":"中国最大互联网综合服务商，微信月活超13亿，业务横跨社交、游戏、支付、云和企业服务。近年全面转向AI，混元大模型已深度整合进微信、腾讯云、腾讯广告等产品线。海外游戏投资布局深远（Riot、Epic、Supercell等）。",
+    "business":{
+      "summary":"社交+游戏+广告+金融科技+云服务",
+      "main":"社交网络（微信/QQ，月活超13亿）贡献广告和支付基础流量；游戏业务国内+海外双轮驱动，《王者荣耀》《PUBG Mobile》等长线运营；金融科技（微信支付+理财通）日交易笔数超十亿；腾讯云国内前三；企业服务（企业微信、腾讯会议）渗透率持续提升。",
+      "revenue_split":"增值服务45% | 金融科技33% | 广告18% | 其他4%"
+    },
+    "rd_focus":"混元大模型（万亿参数，对标GPT-4o）→已接入微信搜一搜、腾讯广告、云服务；AI视频生成、3D生成；自动驾驶高精地图；量子计算实验室。",
+    "supply_chain":{
+      "upstream":"服务器/芯片（英伟达GPU、华为昇腾）、带宽/CDN、内容IP版权方、游戏开发商",
+      "downstream":"13亿C端用户、千万级B端广告主、企业云客户、政府数字化项目"
+    },
+    "financials":{"revenue":"6,090亿(2025)","profit":"1,680亿","growth":"+12%","next_earnings":"2026-08-14","fiscal_year":"12月"}
+  },
+  {
+    "code":"09988","market":"HK","name":"阿里巴巴","en_name":"Alibaba",
+    "sector":"互联网","sub_sector":"电商/云/AI",
+    "ceo":"吴泳铭","founded":1999,"headquarters":"杭州",
+    "description":"全球最大零售电商平台之一。淘宝天猫GMV超8万亿，阿里云连续多年中国市场份额第一。近年战略重心全面转向「AI驱动」，通义千问大模型开源+商业化并行推进。国际电商(AE、Lazada)高速增长。",
+    "business":{
+      "summary":"电商+云计算+AI+本地生活+物流",
+      "main":"淘天集团（淘宝+天猫+闲鱼）是核心利润来源；阿里云（国内TOP1）提供IaaS/PaaS和大模型服务；国际电商（速卖通、Lazada、Trendyol）增长最快；菜鸟物流全球化网络；本地生活（饿了么、高德地图）补充流量生态。",
+      "revenue_split":"淘天42% | 国际电商22% | 阿里云15% | 菜鸟8% | 本地生活7% | 其他6%"
+    },
+    "rd_focus":"通义千问大模型（Qwen系列已开源，HuggingFace最受欢迎中文模型）；AI电商（智能推荐、AI客服、AI设计工具）；自动驾驶（小蛮驴配送车）；芯片（平头哥倚天710、含光800）。",
+    "supply_chain":{
+      "upstream":"服务器/芯片（英伟达+自研平头哥）、云计算基础设施（数据中心）、物流仓储网络、第三方商家供应链",
+      "downstream":"数亿C端消费者、千万级平台商家、企业云客户、海外跨境电商用户"
+    },
+    "financials":{"revenue":"9,412亿(2025)","profit":"1,280亿","growth":"+15%","next_earnings":"2026-08-15","fiscal_year":"3月"}
+  },
+  {
+    "code":"03690","market":"HK","name":"美团","en_name":"Meituan",
+    "sector":"互联网","sub_sector":"本地生活/即时零售",
+    "ceo":"王兴","founded":2010,"headquarters":"北京",
+    "description":"中国最大本地生活平台。外卖日均订单超7000万单，到店酒旅市占率第一。美团优选下沉市场社区电商+美团闪购即时零售是第二增长曲线。无人机配送已在深圳、上海等城市常态化运营。",
+    "business":{
+      "summary":"外卖+到店酒旅+即时零售+社区电商",
+      "main":"核心本地商业（外卖+到店+酒旅+闪购）占收入80%，外卖日均单量持续创新高；美团闪购（30分钟达）品类从餐饮向日用品扩展；到店业务（大众点评+美团）是利润奶牛；新业务（优选、买菜、充电宝）持续减亏。",
+      "revenue_split":"外卖配送52% | 佣金/广告30% | 闪购10% | 新业务8%"
+    },
+    "rd_focus":"无人机配送（深圳常态化运营，单均成本逼近人力）；自动配送车（北京、上海路测）；AI调度系统（实时匹配百万骑手+千万订单）；无人零售终端；大语言模型用于客服和商户工具。",
+    "supply_chain":{
+      "upstream":"餐饮商户、零售供应商、骑手网络（千万级）、地图/位置服务商、支付通道",
+      "downstream":"C端消费者（外卖/到店/闪购）、B端商户（SaaS工具+广告）、品牌方（即时零售渠道）"
+    },
+    "financials":{"revenue":"2,768亿(2024)","profit":"344亿","growth":"+18%","next_earnings":"2026-08-28","fiscal_year":"12月"}
+  },
+  {
+    "code":"09888","market":"HK","name":"百度集团","en_name":"Baidu",
+    "sector":"互联网","sub_sector":"搜索/AI/自动驾驶",
+    "ceo":"李彦宏","founded":2000,"headquarters":"北京",
+    "description":"中国最大搜索引擎，近年全面转型AI。文心大模型（ERNIE）是中国最早发布的国产大模型之一，已接入百度搜索、百度智能云。Apollo自动驾驶开放平台全球最大，萝卜快跑在武汉实现全无人商业化运营。",
+    "business":{
+      "summary":"搜索广告+AI云+自动驾驶",
+      "main":"百度搜索+信息流广告是收入基本盘（占比约60%）；百度智能云借AI大模型快速增长（文心一言API+MaaS平台）；Apollo自动驾驶+萝卜快跑（robotaxi）是全球最大自动驾驶出行平台；爱奇艺贡献部分收入。",
+      "revenue_split":"广告58% | 百度云25% | 自动驾驶/创新12% | 爱奇艺5%"
+    },
+    "rd_focus":"文心大模型持续迭代（ERNIE 5.0对标GPT-5）；Apollo自动驾驶L4全无人运营；AI芯片（昆仑芯三代7nm）；量子计算；AI原生搜索重构。",
+    "supply_chain":{
+      "upstream":"互联网内容/数据、服务器/GPU、传感器/激光雷达（自动驾驶）、汽车OEM合作方",
+      "downstream":"广告主（中小企业为主）、云服务企业客户、自动驾驶出行用户、智能汽车厂商（Apollo汽车智能化方案）"
+    },
+    "financials":{"revenue":"1,346亿(2025)","profit":"278亿","growth":"+2%","next_earnings":"2026-08-22","fiscal_year":"12月"}
+  },
+  {
+    "code":"09618","market":"HK","name":"京东集团","en_name":"JD.com",
+    "sector":"互联网","sub_sector":"电商/物流/供应链",
+    "ceo":"许冉","founded":1998,"headquarters":"北京",
+    "description":"中国最大自营电商平台，自建仓储物流体系（京东物流）覆盖全国99%区县，211限时达为核心壁垒。京东健康、京东工业分拆上市。百亿补贴+低价战略对抗拼多多，AI供应链优化效率领先。",
+    "business":{
+      "summary":"自营电商+平台+物流+健康+工业品",
+      "main":"京东零售（自营+3P平台）是核心收入来源，3C家电优势品类；京东物流（外部客户收入占比超70%）对外开放供应链能力；京东健康（在线医疗+药品零售）行业领先；京东工业（MRO工业品）分拆后高速增长。",
+      "revenue_split":"零售85% | 物流12% | 健康2% | 其他1%"
+    },
+    "rd_focus":"AI供应链优化（智能补货/仓储机器人/路径规划）；京东言犀大模型（客服、营销、供应链场景）；无人配送车/无人机；云计算（京东云）。",
+    "supply_chain":{
+      "upstream":"品牌商/制造商（直供）、第三方商家、物流仓储设施、自动化设备供应商",
+      "downstream":"C端消费者（品质电商用户）、B端企业（供应链解决方案）、政府/央企采购"
+    },
+    "financials":{"revenue":"1.15万亿(2025)","profit":"340亿","growth":"+6%","next_earnings":"2026-08-15","fiscal_year":"12月"}
+  },
+  {
+    "code":"09999","market":"HK","name":"网易","en_name":"NetEase",
+    "sector":"互联网","sub_sector":"游戏/教育/音乐",
+    "ceo":"丁磊","founded":1997,"headquarters":"广州",
+    "description":"中国顶级游戏公司，自研IP长线运营能力极强。《梦幻西游》运营超20年，《蛋仔派对》DAU破千万。暴雪游戏回归国服贡献增量。网易有道布局AI教育，云音乐盈利能力持续改善。",
+    "business":{
+      "summary":"在线游戏+教育+音乐+电商",
+      "main":"游戏业务占收入75%以上，自研+代理双轮驱动，暴雪全家桶回归大幅提振；网易有道（AI学习机+大模型翻译/作文批改）；网易云音乐（付费用户增长+社交娱乐）；网易严选（品质电商）。",
+      "revenue_split":"游戏78% | 有道5% | 云音乐8% | 严选/创新9%"
+    },
+    "rd_focus":"AI+游戏（NPC智能对话/AIGC美术生成）；网易伏羲大模型（游戏场景专用）；AI教育（有道子曰大模型）；游戏引擎自研。",
+    "supply_chain":{
+      "upstream":"游戏IP版权方（暴雪等）、美术/音效外包、云服务器、应用商店渠道（iOS/Android）",
+      "downstream":"全球游戏玩家、教育用户（学生/家长）、音乐付费用户"
+    },
+    "financials":{"revenue":"1,035亿(2024)","profit":"297亿","growth":"+5%","next_earnings":"2026-08-26","fiscal_year":"12月"}
+  },
+  {
+    "code":"01810","market":"HK","name":"小米集团","en_name":"Xiaomi",
+    "sector":"消费电子","sub_sector":"手机/汽车/IoT",
+    "ceo":"雷军","founded":2010,"headquarters":"北京",
+    "description":"全球前三智能手机厂商。2024年跨界造车，小米SU7预订超预期，北京亦庄工厂产能持续爬坡。IoT平台连接设备超8亿台，全球最大消费级IoT平台。AI大模型已接入小爱同学。",
+    "business":{
+      "summary":"智能手机+智能汽车+IoT生活+互联网服务",
+      "main":"智能手机（全球出货前三，高端化战略初见成效）；智能汽车（SU7系列+规划SUV，2025年交付目标30万辆）；IoT与生活消费品（电视、空调、手环、扫地机器人等）；互联网服务（MIUI广告、游戏分发）。",
+      "revenue_split":"手机55% | IoT消费品25% | 互联网10% | 汽车10%(快速爬坡)"
+    },
+    "rd_focus":"智能汽车全栈自研（电驱/电池/自动驾驶/智能座舱）；澎湃OS（手机×汽车×家居融合）；大模型+小爱同学；自研芯片（澎湃系列充电/影像芯片）；机器人（CyberDog/CyberOne）。",
+    "supply_chain":{
+      "upstream":"芯片（高通骁龙/联发科/自研）、屏幕（三星/华星光电）、电池（比亚迪/宁德时代）、摄像头模组、汽车零部件Tier1",
+      "downstream":"全球C端消费者、IoT生态链企业（小米生态链超300家）、智能汽车车主"
+    },
+    "financials":{"revenue":"3,659亿(2025)","profit":"213亿","growth":"+30%","next_earnings":"2026-08-20","fiscal_year":"12月"}
+  },
+  {
+    "code":"002594","market":"SZ","name":"比亚迪","en_name":"BYD",
+    "sector":"新能源","sub_sector":"电动车/电池/储能",
+    "ceo":"王传福","founded":1995,"headquarters":"深圳",
+    "description":"全球新能源车销量冠军，2025年全球销量超500万辆。自研刀片电池+DM-i超级混动技术构建核心技术壁垒。垂直一体化程度全球最高（电池→芯片→电机→整车全自研），成本控制能力极强。储能业务全球前三。",
+    "business":{
+      "summary":"新能源车+动力电池+电子代工+储能",
+      "main":"新能源汽车（王朝+海洋+腾势+仰望+方程豹五大品牌矩阵，覆盖5-150万全价位）；动力电池（刀片电池外供特斯拉、丰田等）；手机部件及组装（比亚迪电子，代工华为等）；储能（电网级+工商业）；云轨（轨道交通）。",
+      "revenue_split":"汽车80% | 手机代工15% | 电池/储能4% | 其他1%"
+    },
+    "rd_focus":"全固态电池（2027年量产目标）；智能驾驶（天神之眼，自研+Momenta合作）；车载芯片（IGBT/SiC）；钠离子电池；轮边电机/易四方技术。",
+    "supply_chain":{
+      "upstream":"锂矿（非洲/南美自有矿权）、钴镍、稀土永磁体、芯片（部分自研IGBT/SiC）、钢材/铝合金",
+      "downstream":"全球C端车主（国内+出口100+国家）、公交/出租/网约车队、电网储能客户"
+    },
+    "financials":{"revenue":"7,023亿(2025)","profit":"387亿","growth":"+17%","next_earnings":"2026-08-28","fiscal_year":"12月"}
+  },
+  {
+    "code":"688981","market":"SH","name":"中芯国际","en_name":"SMIC",
+    "sector":"半导体","sub_sector":"晶圆代工",
+    "ceo":"赵海军","founded":2000,"headquarters":"上海",
+    "description":"中国大陆最大晶圆代工厂，全球排名第五。14nm FinFET已量产，7nm工艺瓶颈逐步突破。国产替代核心标的，华为昇腾/鲲鹏芯片重要代工方。北京/上海/深圳/天津多地扩产，成熟制程产能持续扩充。",
+    "business":{
+      "summary":"晶圆代工（成熟制程为主+先进制程突破中）",
+      "main":"集成电路晶圆代工是核心业务（占比90%+），制程从0.35μm到14nm全覆盖，7nm研发中。服务客户涵盖华为海思、紫光展锐、兆易创新等国内芯片设计公司。产能从8寸到12寸晶圆线，北京京城+上海临港+深圳坪山三大基地。",
+      "revenue_split":"晶圆代工92% | 光掩模/其他8%"
+    },
+    "rd_focus":"7nm/5nm先进制程突破；FinFET到GAA架构演进；先进封装（Chiplet/3D封装）；特色工艺（BCD/eNVM/IGBT）。",
+    "supply_chain":{
+      "upstream":"设备（ASML光刻机、应用材料、泛林半导体、北方华创等）；材料（硅片、光刻胶、电子特气、靶材）；EDA软件（国产替代）",
+      "downstream":"芯片设计公司（华为海思、紫光展锐、韦尔股份等）；汽车电子/物联网/消费电子终端厂商"
+    },
+    "financials":{"revenue":"503亿(2025)","profit":"-12亿(研发投入大)","growth":"+8%","next_earnings":"2026-08-07","fiscal_year":"12月"}
+  },
+  {
+    "code":"002415","market":"SZ","name":"海康威视","en_name":"Hikvision",
+    "sector":"AI/安防","sub_sector":"智能物联/机器视觉",
+    "ceo":"胡扬忠","founded":2001,"headquarters":"杭州",
+    "description":"全球安防龙头，连续多年视频监控市占率全球第一。从安防向AIoT全面转型，AI开放平台+物信融合数据平台赋能千行百业。工业相机/机器视觉（海康机器人）分拆上市，汽车电子（海康汽车）布局智能驾驶。",
+    "business":{
+      "summary":"智能安防+AIoT解决方案+机器人+汽车电子",
+      "main":"智能安防（前端摄像机+后端NVR/VMS，全球市占率第一）；AIoT解决方案（智慧城市/交通/能源/教育等行业落地）；创新业务：海康机器人（机器视觉+AGV，已分拆）、汽车电子（车载摄像头/毫米波雷达）、热成像、消防。",
+      "revenue_split":"安防主业80% | 创新业务（机器人+汽车电子等）20%"
+    },
+    "rd_focus":"AI大模型（观澜大模型，视觉领域专用）；3D机器视觉+工业检测；AI芯片（自研编解码SoC）；毫米波雷达/激光雷达；多模态感知融合。",
+    "supply_chain":{
+      "upstream":"图像传感器（索尼/安森美/豪威）、AI芯片（海思/地平线/自研）、光学镜头、存储、结构件",
+      "downstream":"政府/公安/交通（智慧城市）、企业/工厂（智能制造）、海外市场（180+国家）"
+    },
+    "financials":{"revenue":"882亿(2025)","profit":"154亿","growth":"+12%","next_earnings":"2026-08-22","fiscal_year":"12月"}
+  },
+  {
+    "code":"002230","market":"SZ","name":"科大讯飞","en_name":"iFlytek",
+    "sector":"AI","sub_sector":"语音/大模型/教育",
+    "ceo":"刘庆峰","founded":1999,"headquarters":"合肥",
+    "description":"中国AI国家队，语音识别技术全球领先。讯飞星火大模型对标GPT-4，在教育（智慧课堂/AI学习机）、医疗（AI辅助诊疗）、汽车（智能座舱语音）等多个场景率先商业落地。承建认知智能全国重点实验室。",
+    "business":{
+      "summary":"AI平台+智慧教育+智慧医疗+智慧城市+智能汽车",
+      "main":"智慧教育（因材施教方案/AI学习机/英语听说考试）是第一大收入来源；讯飞开放平台（AI能力API，开发者超500万）；智慧医疗（智医助理辅助基层诊疗）；智能汽车（语音交互前装超5000万辆车）；智慧城市/政法。",
+      "revenue_split":"教育32% | 开放平台20% | 智慧城市18% | 汽车10% | 医疗8% | 其他12%"
+    },
+    "rd_focus":"星火大模型持续迭代（对标GPT-5）；多模态感知（语音+视觉+文本融合）；认知智能（推理/决策）；脑机接口前沿研究。",
+    "supply_chain":{
+      "upstream":"算力（华为昇腾/英伟达GPU）、语音/文本数据资源、教育内容版权、医疗数据合作医院",
+      "downstream":"学校/教育局、医院、汽车主机厂、开发者生态、C端消费者（学习机/办公本）"
+    },
+    "financials":{"revenue":"233亿(2025)","profit":"7.2亿","growth":"+18%","next_earnings":"2026-08-12","fiscal_year":"12月"}
+  },
+  {
+    "code":"688256","market":"SH","name":"寒武纪","en_name":"Cambricon",
+    "sector":"半导体","sub_sector":"AI芯片",
+    "ceo":"陈天石","founded":2016,"headquarters":"北京",
+    "description":"中国AI芯片独角兽，思元系列云端智能芯片对标英伟达。华为早期AI芯片曾用寒武纪IP，后华为自研。当前主要客户为运营商和政府部门。被美国列入实体清单后加速自主可控，国产AI算力核心标的。",
+    "business":{
+      "summary":"AI训练/推理芯片设计",
+      "main":"云端智能芯片（思元370/590系列，用于AI训练和推理）；边缘智能芯片（思元220系列，用于终端设备）；智能计算集群系统（为数据中心提供AI算力解决方案）。产品对标英伟达A100/H100，但生态和应用规模差距大。",
+      "revenue_split":"云端芯片65% | 智能计算集群30% | 边缘芯片5%"
+    },
+    "rd_focus":"下一代7nm/5nm云端AI芯片（思元690）；Chiplet先进封装技术；大模型训练优化栈（对标CUDA的软件生态）；存算一体芯片。",
+    "supply_chain":{
+      "upstream":"晶圆代工（台积电→国产替代）；先进封装（日月光/长电科技）；EDA工具（国产替代）；IP授权",
+      "downstream":"运营商/政府数据中心、AI企业、云计算厂商（国产替代场景为主）"
+    },
+    "financials":{"revenue":"8.4亿(2025)","profit":"-11亿","growth":"+8%","next_earnings":"2026-08-26","fiscal_year":"12月"}
+  },
+  {
+    "code":"00020","market":"HK","name":"商汤集团","en_name":"SenseTime",
+    "sector":"AI","sub_sector":"计算机视觉/大模型",
+    "ceo":"徐立","founded":2014,"headquarters":"香港",
+    "description":"亚洲领先AI软件公司，计算机视觉起家，建设了亚洲最大AI算力基础设施。日日新大模型对标GPT-4o，在自动驾驶（绝影）、医疗、智慧城市等领域落地。生成式AI业务是转型重点，收入增速最快。",
+    "business":{
+      "summary":"AI算力基础设施+生成式AI+传统AI（视觉/自动驾驶）",
+      "main":"生成式AI（日日新大模型API+MaaS平台）是新增长引擎，收入翻倍增长；传统AI（智慧城市/智慧商业的视觉分析）收入下滑；自动驾驶（绝影品牌，前装量产+车路协同）；AI算力（SenseCore大装置，亚洲最大GPU集群之一）。",
+      "revenue_split":"生成式AI 35% | 传统AI 40% | 自动驾驶/其他 25%"
+    },
+    "rd_focus":"日日新大模型（多模态+长上下文+Agent能力）；自动驾驶（UniAD端到端方案）；AI基础设施（万卡GPU集群）；AI for Science。",
+    "supply_chain":{
+      "upstream":"GPU算力（英伟达H100/H800/B200）、数据中心基础设施、传感器/摄像头",
+      "downstream":"政府/企业AI解决方案客户、汽车OEM、金融/医疗/教育行业客户"
+    },
+    "financials":{"revenue":"48亿(2025)","profit":"-28亿(研发投入大)","growth":"+15%","next_earnings":"2026-08-28","fiscal_year":"12月"}
+  },
+  {
+    "code":"300750","market":"SZ","name":"宁德时代","en_name":"CATL",
+    "sector":"新能源","sub_sector":"动力电池/储能",
+    "ceo":"曾毓群","founded":2011,"headquarters":"宁德",
+    "description":"全球最大动力电池制造商，市占率超35%。麒麟电池（CTP3.0）能量密度领先，钠离子电池量产，凝聚态电池研发中。客户覆盖特斯拉、宝马、奔驰、国内全部主流车企。储能电池全球市占率超40%，第二增长曲线明确。",
+    "business":{
+      "summary":"动力电池+储能电池+电池回收+材料",
+      "main":"动力电池系统（三元锂电池+磷酸铁锂+钠离子电池）占收入70%以上，全球车企全覆盖；储能电池系统（发电侧+电网侧+用户侧）增速最快，全球市占率第一；电池材料回收（邦普循环）；电池矿产资源（锂/镍/钴投资）。",
+      "revenue_split":"动力电池72% | 储能电池18% | 材料回收7% | 其他3%"
+    },
+    "rd_focus":"凝聚态电池（航空级能量密度）；全固态电池；钠离子电池二代；CTC底盘一体化；换电（EVOGO品牌，巧克力换电块）。",
+    "supply_chain":{
+      "upstream":"锂矿（天齐/赣锋/自有矿权）、钴镍（刚果金/印尼）、正极/负极/隔膜/电解液供应商、设备厂商",
+      "downstream":"全球汽车主机厂（特斯拉/宝马/奔驰/蔚小理等）、储能项目开发商、两轮车/工程机械"
+    },
+    "financials":{"revenue":"4,008亿(2025)","profit":"520亿","growth":"+8%","next_earnings":"2026-08-25","fiscal_year":"12月"}
+  },
+  {
+    "code":"688111","market":"SH","name":"金山办公","en_name":"Kingsoft Office",
+    "sector":"软件","sub_sector":"办公SaaS/AI",
+    "ceo":"章庆元","founded":1988,"headquarters":"北京",
+    "description":"WPS Office国内月活超6亿，是Microsoft Office在中国最强劲的竞争对手。政企市场国产替代首选，信创订单持续放量。AI功能WPS AI（基于大模型的智能写作/PPT生成/表格分析）已全面上线，向付费用户推广。",
+    "business":{
+      "summary":"办公软件订阅+AI功能+广告",
+      "main":"个人订阅（WPS会员/超级会员，AI功能带来ARPU提升）；政企授权（信创/国产替代，政府+央企+金融机构）；广告（免费版WPS的广告收入，占比持续下降）。云协作（金山文档）和AI功能是未来增长核心。",
+      "revenue_split":"个人订阅45% | 政企授权40% | 广告/其他15%"
+    },
+    "rd_focus":"WPS AI（文字/表格/演示/PDF全品类AI能力）；云协作+团队文档管理；AI Agent（自动执行办公任务）；跨平台/跨终端的无缝体验。",
+    "supply_chain":{
+      "upstream":"AI大模型（自研+合作伙伴）、云基础设施、字体/模板/插件第三方内容",
+      "downstream":"个人用户（学生/白领/自由职业）、政企客户（政府/央企/金融机构/学校）"
+    },
+    "financials":{"revenue":"74亿(2025)","profit":"18亿","growth":"+19%","next_earnings":"2026-08-20","fiscal_year":"12月"}
+  },
+  {
+    "code":"AAPL","market":"US","name":"苹果","en_name":"Apple Inc.",
+    "sector":"消费电子","sub_sector":"硬件/软件/服务",
+    "ceo":"Tim Cook","founded":1976,"headquarters":"Cupertino, CA",
+    "description":"全球市值最高公司（约4.6万亿美元）。iPhone贡献过半收入，服务业务（App Store/iCloud/Apple Music/Apple Pay）是高利润第二增长极。Vision Pro空间计算开辟新赛道，AI战略（Apple Intelligence）深度整合进全系设备。",
+    "business":{
+      "summary":"iPhone+Mac+iPad+可穿戴+服务+Vision Pro",
+      "main":"iPhone是绝对核心（收入占比50%+），搭载A系列/M系列自研芯片构建生态壁垒；服务业务毛利率超70%，订阅用户超10亿；Mac和iPad受益于M系列芯片换代；可穿戴（Apple Watch/AirPods）持续迭代；Vision Pro开启空间计算新赛道。",
+      "revenue_split":"iPhone 52% | 服务25% | Mac 8% | iPad 7% | 可穿戴/配件8%"
+    },
+    "rd_focus":"Apple Intelligence（设备端AI，隐私优先）；M系列芯片（M4/M5，3nm→2nm）；Vision Pro空间计算+AR眼镜；折叠屏iPhone；microLED显示；自动驾驶（Project Titan已转向AI）。",
+    "supply_chain":{
+      "upstream":"台积电（芯片代工）、富士康/立讯精密（组装）、三星/LG（屏幕）、索尼（摄像头）、全球数百家精密零部件供应商",
+      "downstream":"全球C端消费者（高端市场为主）、企业客户（Mac/iPad企业部署）、App开发者生态（超3000万开发者）"
+    },
+    "financials":{"revenue":"$4,150亿(2025)","profit":"$1,150亿","growth":"+5%","next_earnings":"2026-07-30","fiscal_year":"9月"}
+  },
+  {
+    "code":"MSFT","market":"US","name":"微软","en_name":"Microsoft",
+    "sector":"软件/云","sub_sector":"云/AI/办公/游戏",
+    "ceo":"Satya Nadella","founded":1975,"headquarters":"Redmond, WA",
+    "description":"全球第二大市值公司。Azure云全球第二（市占25%），增长引擎。对OpenAI投资超130亿美元，Copilot AI助手全面整合进Office 365、Windows、GitHub等全线产品。收购动视暴雪后游戏业务规模扩大。",
+    "business":{
+      "summary":"Azure云+Office 365+Windows+Copilot AI+LinkedIn+游戏",
+      "main":"Azure云（含AI服务）是最大增长引擎，AI客户增长迅猛；Office 365/Microsoft 365商业+个人订阅是利润基石；Windows OEM授权+Surface硬件；LinkedIn（招聘/广告/学习）；游戏（Xbox+动视暴雪+Game Pass）；Copilot AI贯穿全部产品线。",
+      "revenue_split":"云/AI 42% | Office 365 24% | Windows 10% | LinkedIn 7% | 游戏 9% | 其他8%"
+    },
+    "rd_focus":"AI（与OpenAI深度合作+自研模型）；Azure AI基础设施（自研Maia AI芯片）；Copilot全产品线AI化；量子计算；网络安全。",
+    "supply_chain":{
+      "upstream":"服务器/GPU（英伟达+自研Maia）、数据中心（全球60+区域）、电力/可再生能源、软件开发生态",
+      "downstream":"全球企业客户（Fortune 500全覆盖）、政府、个人消费者（Windows/Office/Xbox）、开发者（GitHub/VS Code/Azure）"
+    },
+    "financials":{"revenue":"$2,870亿(2026财年)","profit":"$1,110亿","growth":"+18%","next_earnings":"2026-07-28","fiscal_year":"6月"}
+  },
+  {
+    "code":"NVDA","market":"US","name":"英伟达","en_name":"NVIDIA",
+    "sector":"半导体","sub_sector":"GPU/AI芯片",
+    "ceo":"Jensen Huang","founded":1993,"headquarters":"Santa Clara, CA",
+    "description":"AI算力之王，数据中心GPU市占率超80%。Blackwell架构（B200/GB200）是当前最强AI训练推理芯片，下一代Rubin架构2026年发布。CUDA软件生态是最大护城河，全球AI开发者几乎都在CUDA上工作。",
+    "business":{
+      "summary":"数据中心GPU+游戏GPU+专业可视化+汽车",
+      "main":"数据中心GPU（H100/H200/B200/GB200系列，用于AI训练和推理）是绝对核心，收入占比超80%；游戏GPU（GeForce RTX 50系列）为第二收入来源；专业可视化（工作站GPU）；汽车（自动驾驶芯片Orin/Thor，供货特斯拉/比亚迪等）。",
+      "revenue_split":"数据中心85% | 游戏10% | 专业可视化3% | 汽车2%"
+    },
+    "rd_focus":"Rubin架构GPU（2026年，3nm工艺）；NVLink/C2C高速互联；CUDA软件生态持续扩展（cuLitho/cuQuantum等）；Grace CPU+GPU超级芯片；AI网络（Spectrum-X）；机器人（GR00T基础模型）。",
+    "supply_chain":{
+      "upstream":"台积电（所有GPU代工）、SK海力士/三星（HBM3e高带宽内存）、先进封装（台积电CoWoS）、安费诺（连接器），CoWoS产能是最大瓶颈",
+      "downstream":"云服务商（微软/亚马逊/谷歌/Oracle）、AI公司（OpenAI等）、企业数据中心、游戏玩家、汽车OEM"
+    },
+    "financials":{"revenue":"$1,510亿(2026财年)","profit":"$810亿","growth":"+120%","next_earnings":"2026-08-26","fiscal_year":"1月"}
+  },
+  {
+    "code":"GOOGL","market":"US","name":"Alphabet","en_name":"Alphabet (Google)",
+    "sector":"互联网","sub_sector":"搜索/AI/云/视频",
+    "ceo":"Sundar Pichai","founded":1998,"headquarters":"Mountain View, CA",
+    "description":"全球最大搜索引擎+数字广告平台+第三大云服务商。Gemini大模型已深度整合进Google搜索、YouTube、Google Workspace等产品。Waymo自动驾驶全球领先（已在美国多城全无人运营）。YouTube是最大视频平台。",
+    "business":{
+      "summary":"搜索广告+YouTube+Google Cloud+其他创新",
+      "main":"Google搜索+其他广告（搜索/地图/Gmail等）是核心利润来源；YouTube广告+订阅（YouTube Music/Premium/TV）增长稳健；Google Cloud（全球第三，AI服务增长最快）；其他（Waymo自动驾驶、DeepMind AI研究、Google硬件）。",
+      "revenue_split":"搜索广告57% | YouTube 13% | Google Cloud 12% | 其他 18%"
+    },
+    "rd_focus":"Gemini大模型（多模态，对标GPT-5）；Waymo L4全无人自动驾驶规模化；AI搜索（Search Generative Experience）；TPU自研AI芯片（v6）；量子计算（Willow芯片）。",
+    "supply_chain":{
+      "upstream":"数据中心/网络基础设施、服务器/TPU/GPU、电力/可再生能源、内容创作者生态（YouTube）",
+      "downstream":"全球广告主（搜索/展示/视频广告）、云服务企业客户、C端用户（搜索/YouTube/地图/Android）、汽车OEM（Waymo合作）"
+    },
+    "financials":{"revenue":"$3,710亿(2025)","profit":"$1,080亿","growth":"+14%","next_earnings":"2026-07-23","fiscal_year":"12月"}
+  },
+  {
+    "code":"AMZN","market":"US","name":"亚马逊","en_name":"Amazon",
+    "sector":"互联网","sub_sector":"电商/云计算/AI",
+    "ceo":"Andy Jassy","founded":1994,"headquarters":"Seattle, WA",
+    "description":"全球最大电商+最大云服务商。AWS云市场份额约32%，是全球企业数字化转型的核心基础设施。电商业务从自营向第三方平台转型，物流网络全球最大。AI（Amazon Bedrock/Titan模型/Trainium芯片）全面布局。",
+    "business":{
+      "summary":"AWS云计算+电商（自营+第三方）+广告+订阅+AI",
+      "main":"AWS（IaaS+PaaS+AI服务）是利润核心（贡献超60%运营利润）；电商（自营零售+第三方卖家平台+物流FBA）；广告（电商搜索广告增长最快）；订阅（Prime会员+Kindle/Audible/视频）；AI（Bedrock模型平台+自研Titan）。",
+      "revenue_split":"电商60% | AWS 18% | 广告/订阅/其他22%"
+    },
+    "rd_focus":"AI（Trainium2自研AI芯片+Titan大模型+Bedrock平台）；AWS基础设施（自研Graviton ARM芯片）；Kuiper卫星互联网；无人机配送（Prime Air）；Alexa AI升级。",
+    "supply_chain":{
+      "upstream":"全球供应商/制造商、物流（自有+第三方）、云计算基础设施（数据中心/服务器/芯片）、内容版权",
+      "downstream":"全球C端消费者、第三方卖家（超200万）、AWS企业客户（Airbnb/Netflix/各大银行等）、广告主"
+    },
+    "financials":{"revenue":"$6,350亿(2025)","profit":"$620亿","growth":"+12%","next_earnings":"2026-08-01","fiscal_year":"12月"}
+  },
+  {
+    "code":"META","market":"US","name":"Meta","en_name":"Meta Platforms",
+    "sector":"互联网","sub_sector":"社交/广告/AI/元宇宙",
+    "ceo":"Mark Zuckerberg","founded":2004,"headquarters":"Menlo Park, CA",
+    "description":"Facebook+Instagram+WhatsApp+Threads覆盖全球超35亿月活用户。数字广告双寡头之一（与Google）。开源Llama大模型是开发者社区最受欢迎的开源模型，已成为AI开源生态领导者。Meta Quest VR/AR头显全球第一，Ray-Ban Meta智能眼镜热销。",
+    "business":{
+      "summary":"社交广告+AI大模型开源+VR/AR硬件",
+      "main":"广告（Facebook/Instagram/WhatsApp/Threads的精准广告）占收入98%以上；Reality Labs（VR头显Quest+AR眼镜Ray-Ban Meta+元宇宙Horizon）是长期投入但持续亏损；AI（Llama开源大模型生态，已用于广告推荐+内容审核）。",
+      "revenue_split":"广告99% | Reality Labs 1%"
+    },
+    "rd_focus":"Llama大模型（开源路线，Llama 4对标GPT-5）；AR眼镜全息显示；元宇宙/VR（Horizon Worlds）；自研AI训练推理芯片（MTIA）；AI推荐系统。",
+    "supply_chain":{
+      "upstream":"全球内容创作者/媒体、数据中心/GPU（英伟达+自研MTIA）、VR/AR硬件供应链（高通芯片/索尼屏幕等）",
+      "downstream":"全球35亿+社交用户、数百万广告主、VR/AR消费用户"
+    },
+    "financials":{"revenue":"$1,630亿(2025)","profit":"$510亿","growth":"+22%","next_earnings":"2026-07-30","fiscal_year":"12月"}
+  },
+  {
+    "code":"TSLA","market":"US","name":"特斯拉","en_name":"Tesla",
+    "sector":"新能源","sub_sector":"电动车/自动驾驶/能源",
+    "ceo":"Elon Musk","founded":2003,"headquarters":"Austin, TX",
+    "description":"全球电动车先驱，Model Y是全球最畅销车型。FSD全自动驾驶持续迭代（v13端到端AI方案），Robotaxi（Cybercab）计划2026年推出。Optimus人形机器人是长期第二增长曲线的想象空间。能源业务（Megapack储能）高速增长。",
+    "business":{
+      "summary":"电动车+FSD自动驾驶+能源存储+人形机器人",
+      "main":"电动车（Model 3/Y/S/X+Cybertruck+计划中低价车型）是收入主体；FSD（全自动驾驶软件，一次性购买+订阅模式）；能源（Megapack/Powerwall储能+太阳能）；Optimus人形机器人（工厂内部部署起步）；Dojo超算（自研AI训练）。",
+      "revenue_split":"汽车销售78% | 能源14% | 服务/软件8%"
+    },
+    "rd_focus":"FSD全自动驾驶（端到端AI神经网络）；Optimus人形机器人；Dojo超算+D1自研AI芯片；4680电池+干法电极；Robotaxi（Cybercab）；AI推理芯片（HW5.0）。",
+    "supply_chain":{
+      "upstream":"电池（松下/LG/宁德时代/自产4680）、芯片（AMD/自研/英伟达）、铝/钢/稀土、汽车零部件Tier1",
+      "downstream":"全球C端车主、储能项目开发商/电网公司、Robotaxi出行用户（未来）"
+    },
+    "financials":{"revenue":"$1,080亿(2025)","profit":"$94亿","growth":"+5%","next_earnings":"2026-07-22","fiscal_year":"12月"}
+  },
+  {
+    "code":"TSM","market":"US","name":"台积电","en_name":"TSMC",
+    "sector":"半导体","sub_sector":"晶圆代工",
+    "ceo":"魏哲家","founded":1987,"headquarters":"台湾新竹",
+    "description":"全球最大晶圆代工厂，市占率超60%，几乎垄断全球先进制程（7nm及以下）。NVIDIA/Apple/AMD/Qualcomm全部依赖台积电代工。3nm(N3)已量产，2nm(N2)2025年底量产，1.4nm研发中。地缘风险下全球扩产（美国亚利桑那/日本熊本/德国德累斯顿）。",
+    "business":{
+      "summary":"先进制程晶圆代工+先进封装",
+      "main":"晶圆代工（逻辑芯片，3nm/5nm/7nm先进制程贡献超65%营收）；成熟制程（16nm及以上，用于汽车/物联网/IoT芯片）；先进封装（CoWoS/InFO/SoIC，AI芯片封装产能严重供不应求）。",
+      "revenue_split":"3nm 25% | 5nm 32% | 7nm 17% | 16nm+ 26%"
+    },
+    "rd_focus":"2nm(N2)GAA晶体管量产爬坡；1.4nm(A14)研发；硅光子/CPO共封装；先进封装（CoWoS产能翻倍扩张）；High-NA EUV光刻技术。",
+    "supply_chain":{
+      "upstream":"ASML（EUV光刻机独家供应商）、硅片/光刻胶/电子特气等材料供应商、设备（应用材料/泛林等）",
+      "downstream":"NVIDIA（GPU）/Apple（A/M系列）/AMD（CPU+GPU）/Qualcomm（手机SoC）/Intel（部分外包）/全球全部Fabless芯片公司"
+    },
+    "financials":{"revenue":"$820亿(2025)","profit":"$340亿","growth":"+18%","next_earnings":"2026-07-16","fiscal_year":"12月"}
+  },
+  {
+    "code":"AVGO","market":"US","name":"博通","en_name":"Broadcom",
+    "sector":"半导体","sub_sector":"网络芯片/基础设施软件",
+    "ceo":"Hock Tan","founded":1961,"headquarters":"San Jose, CA",
+    "description":"AI数据中心网络芯片隐形冠军。定制ASIC（为Google/字节等定制AI芯片）和网络芯片（Tomahawk/Jericho系列）在AI集群中不可或缺。收购VMware后切入企业软件/虚拟化市场，形成芯片+软件双轮驱动。",
+    "business":{
+      "summary":"AI定制ASIC+网络芯片+企业软件(VMware)",
+      "main":"半导体解决方案（AI定制ASIC为Google TPU/字节等大客户设计；数据中心网络芯片/交换芯片；WiFi/蓝牙芯片）；基础设施软件（VMware虚拟化平台，企业IT基础设施管理；Brocade存储网络；CA大型机软件；Symantec企业安全）。",
+      "revenue_split":"半导体55% | 基础设施软件45%"
+    },
+    "rd_focus":"3nm AI定制ASIC（下一代Google TPU等）；800G/1.6T网络交换芯片；CPO（共封装光学）；VMware Cloud Foundation私有云/混合云平台。",
+    "supply_chain":{
+      "upstream":"台积电（ASIC代工）、先进封装（CoWoS等）、IP核授权、晶圆/基板材料",
+      "downstream":"云服务商（Google/字节等定制AI芯片客户）、数据中心运营商、企业IT部门、手机/宽带设备厂商"
+    },
+    "financials":{"revenue":"$510亿(2025)","profit":"$200亿","growth":"+41%","next_earnings":"2026-09-04","fiscal_year":"10月"}
+  },
+  {
+    "code":"AMD","market":"US","name":"超威半导体","en_name":"AMD",
+    "sector":"半导体","sub_sector":"CPU/GPU/FPGA",
+    "ceo":"Lisa Su","founded":1969,"headquarters":"Santa Clara, CA",
+    "description":"CPU市场持续蚕食Intel份额（服务器市占率超30%），GPU方面MI300系列AI加速卡是英伟达之外最重要的替代选择。收购赛灵思(Xilinx)获得FPGA产品线，在AI推理/嵌入式/通信基站场景有独特优势。",
+    "business":{
+      "summary":"CPU（Ryzen/EPYC）+GPU（Radeon/MI系列）+FPGA（Xilinx）",
+      "main":"数据中心（EPYC服务器CPU+MI300 AI GPU，增长最快）；客户端（Ryzen消费级CPU+GPU，PC/笔记本）；游戏（游戏GPU+游戏主机定制SoC PS5/Xbox）；嵌入式（Xilinx FPGA，通信/工业/汽车/AI推理）。",
+      "revenue_split":"数据中心45% | 客户端25% | 嵌入式18% | 游戏12%"
+    },
+    "rd_focus":"MI400系列AI GPU（对标英伟达Blackwell）；Zen6 CPU架构；3nm/2nm先进制程；Chiplet/UCIe小芯片互联；AI PC（Ryzen AI NPU）。",
+    "supply_chain":{
+      "upstream":"台积电（所有先进CPU/GPU代工）、先进封装、基板/PCB、测试设备",
+      "downstream":"云服务商（微软/亚马逊/谷歌）、OEM（Dell/HP/Lenovo）、企业数据中心、游戏玩家、通信设备商"
+    },
+    "financials":{"revenue":"$285亿(2025)","profit":"$55亿","growth":"+12%","next_earnings":"2026-07-29","fiscal_year":"12月"}
+  },
+  {
+    "code":"ASML","market":"US","name":"阿斯麦","en_name":"ASML",
+    "sector":"半导体","sub_sector":"光刻设备",
+    "ceo":"Christophe Fouquet","founded":1984,"headquarters":"Veldhoven, Netherlands",
+    "description":"全球独家高端EUV光刻机制造商，掌握芯片制造最核心卡脖子设备。单台High-NA EUV光刻机售价超过3.5亿欧元。台积电/三星/Intel是三大核心客户。地缘政治限制对华出口，但中国大陆成熟制程DUV光刻机需求依然强劲。",
+    "business":{
+      "summary":"EUV光刻机+DUV光刻机+计量检测设备+服务",
+      "main":"EUV光刻系统（NXE:3800E，High-NA EXE:5000系列）用于3nm及以下先进制程，垄断全球100%市场份额；DUV光刻系统（NXT:2100i等）用于成熟制程；计量与检测系统（YieldStar等）；已安装设备服务（升级/维护，经常性收入占比25%+）。",
+      "revenue_split":"EUV系统50% | DUV系统25% | 服务/其他25%"
+    },
+    "rd_focus":"Hyper-NA EUV（下一代，数值孔径>0.7，面向1nm以下）；High-NA EUV量产优化；多电子束检测；EUV光源功率提升。",
+    "supply_chain":{
+      "upstream":"蔡司（光学镜片系统，不可替代）、通快（光源）、VDL（精密机械）、全球5000+精密供应商，极度集中的欧洲供应链",
+      "downstream":"台积电/三星/Intel/SK海力士/美光等全球所有先进半导体制造商，中国大陆中芯国际等（仅DUV）"
+    },
+    "financials":{"revenue":"€310亿(2025)","profit":"€79亿","growth":"+8%","next_earnings":"2026-07-16","fiscal_year":"12月"}
+  },
+  {
+    "code":"CRM","market":"US","name":"Salesforce","en_name":"Salesforce",
+    "sector":"软件","sub_sector":"企业SaaS/AI CRM",
+    "ceo":"Marc Benioff","founded":1999,"headquarters":"San Francisco, CA",
+    "description":"全球CRM SaaS龙头，定义企业级云计算。Agentforce AI智能代理平台是当前最重磅产品（让企业用AI Agent自动处理销售/客服/营销任务），被视为企业AI落地的标杆。Einstein AI全面嵌入所有产品线。",
+    "business":{
+      "summary":"CRM SaaS（销售/服务/营销/电商）+AI Agent平台",
+      "main":"Sales Cloud（销售自动化）；Service Cloud（客服工单+AI Agent）；Marketing Cloud（精准营销自动化）；Commerce Cloud（电商平台）；Platform/Data Cloud（低代码开发+数据平台）；Slack（企业协作，2021年收购）；Agentforce（AI Agent平台，企业自主构建AI员工）。",
+      "revenue_split":"订阅收入93%（各大Cloud）+专业服务7%"
+    },
+    "rd_focus":"Agentforce AI Agent平台（自主执行任务的AI数字员工）；Einstein GPT（CRM专用大模型）；Data Cloud（实时数据湖）；AI Trust Layer（安全/合规/隐私）。",
+    "supply_chain":{
+      "upstream":"公有云基础设施（AWS等）、AI大模型（自研+合作伙伴）、SaaS生态AppExchange开发者",
+      "downstream":"全球15万+企业客户（从中小企业到Fortune 500），覆盖金融/医疗/零售/制造等全行业"
+    },
+    "financials":{"revenue":"$390亿(2026财年)","profit":"$76亿","growth":"+10%","next_earnings":"2026-08-27","fiscal_year":"1月"}
+  },
+  {
+    "code":"ORCL","market":"US","name":"甲骨文","en_name":"Oracle",
+    "sector":"软件/云","sub_sector":"数据库/云计算/AI",
+    "ceo":"Safra Catz","founded":1977,"headquarters":"Austin, TX",
+    "description":"数据库巨头转型云计算。Oracle Cloud Infrastructure(OCI)凭借高性能和高性价比吸引AI训练/推理客户（包括NVIDIA/马斯克xAI等）。自治数据库（Autonomous Database）是核心产品，NetSuite/Cerner分别覆盖中小ERP和医疗信息化。",
+    "business":{
+      "summary":"云基础设施(OCI)+数据库+企业应用+医疗IT",
+      "main":"云服务（OCI基础设施+自治数据库SaaS，AI训练客户增长迅猛）；云许可/本地部署（传统数据库+中间件Johnson）；硬件（Exadata一体机）；服务。OCI凭借RDMA网络在AI训练场景有独特优势。",
+      "revenue_split":"云服务39% | 云许可15% | 服务/硬件20% | 其他26%"
+    },
+    "rd_focus":"OCI AI基础设施（大规模GPU集群+RDMA网络）；MySQL HeatWave（云原生数据库AI分析）；自治数据库AI化；AI Agent（嵌入Fusion应用）；与NVIDIA深度合作的AI云。",
+    "supply_chain":{
+      "upstream":"英伟达GPU（大宗采购）、数据中心基础设施、电力/冷却系统、企业软件生态合作伙伴",
+      "downstream":"全球企业客户（大型企业为主，金融/电信/制造/政府）、SaaS厂商（基于Oracle数据库构建应用）"
+    },
+    "financials":{"revenue":"$580亿(2026财年)","profit":"$140亿","growth":"+9%","next_earnings":"2026-09-10","fiscal_year":"5月"}
+  },
+  {
+    "code":"PLTR","market":"US","name":"Palantir","en_name":"Palantir Technologies",
+    "sector":"AI/大数据","sub_sector":"数据分析/AI平台",
+    "ceo":"Alex Karp","founded":2003,"headquarters":"Denver, CO",
+    "description":"AI驱动的数据分析平台，政府情报业务起家（CIA/FBI/美军是早期客户），近年商业客户爆发增长。AIP（Artificial Intelligence Platform）让企业将大模型与实际业务数据打通，被视为企业AI落地的最佳实践之一。",
+    "business":{
+      "summary":"AI数据分析平台（政府+商业）+AI Agent部署",
+      "main":"政府业务（Gotham平台：军事情报/反恐/疫情追踪/移民管理，客户包括美国国防部/盟国政府）；商业业务（Foundry平台+AIP：供应链优化/风险管理/客户分析，企业客户增长超100%）。AIP Bootcamp（AI落地实战营）是独特获客模式。",
+      "revenue_split":"政府55% | 商业45%（商业增速更快）"
+    },
+    "rd_focus":"AIP（AI Platform：LLM+企业私有数据+工作流自动化）；Ontology（本体论数据建模引擎，核心竞争力）；AI Agent自动决策与执行；Warp Speed（制造业AI操作系统）。",
+    "supply_chain":{
+      "upstream":"云计算基础设施（AWS/Azure）、大语言模型（合作/自研）、全球各种数据源/传感器",
+      "downstream":"政府国防/情报部门、大型企业（金融/制造/医疗/能源），商业客户拓展迅猛"
+    },
+    "financials":{"revenue":"$36亿(2025)","profit":"$6.5亿","growth":"+25%","next_earnings":"2026-08-05","fiscal_year":"12月"}
+  },
+  {
+    "code":"NOW","market":"US","name":"ServiceNow","en_name":"ServiceNow",
+    "sector":"软件","sub_sector":"企业工作流/AI自动化",
+    "ceo":"Bill McDermott","founded":2004,"headquarters":"Santa Clara, CA",
+    "description":"企业工作流自动化全球龙头，Now Platform将IT/HR/客服/财务等企业流程全部标准化+自动化。AI Agent（Now Assist）是核心增长引擎，让企业用AI自动处理IT工单、HR入离职、采购审批等日常运营任务。",
+    "business":{
+      "summary":"IT服务管理+HR服务+客服+AI Agent自动化",
+      "main":"ITSM/ITOM（IT服务管理/运维管理）是起家核心产品，市占率第一；HR Service Delivery（员工入离职/福利管理）；Customer Service Management（客服工单自动化）；Creator Workflows（低代码应用开发）；Now Assist AI（全线产品内嵌AI Agent）。",
+      "revenue_split":"IT工作流65% | HR/员工工作流20% | 客服/其他15%"
+    },
+    "rd_focus":"Now Assist AI Agent（自主处理IT工单/HR请求的AI数字员工）；Generative AI Controller（企业级AI安全治理）；低代码/无代码AI应用构建；流程挖掘+自动化。",
+    "supply_chain":{
+      "upstream":"云基础设施、AI大模型（自研+合作）、集成第三方SaaS（SAP/Workday等）、ServiceNow Store生态",
+      "downstream":"全球8,000+大型企业客户（Fortune 500中超过80%）、政府机构、IT服务提供商"
+    },
+    "financials":{"revenue":"$113亿(2025)","profit":"$22亿","growth":"+24%","next_earnings":"2026-07-22","fiscal_year":"12月"}
+  }
 ]

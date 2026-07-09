@@ -2766,7 +2766,7 @@ function fetchFundGz(code) {
 // ============================================================
 function getAiKey() { return localStorage.getItem('wm_ds_key')||''; }
 function setAiKey(k) { localStorage.setItem('wm_ds_key', k); }
-let _aiHistory = [], _aiSearch = false, _aiRolePlay = null, _aiFeedback = null, _aiFeedbackLoading = false;
+let _aiHistory = [], _aiSearch = false, _aiRolePlay = null, _aiFeedback = null, _aiFeedbackLoading = false, _aiSimEnded = false;
 
 const AI_ROLES = [
   {id:'conservative',name:'保守型大妈',desc:'风险厌恶，只买过定期存款，对基金很警惕',opening:'小伙子/小姑娘，你说的这个基金不会亏钱吧？我就想比存银行多一点，但千万别亏本啊。'},
@@ -2859,14 +2859,40 @@ function renderChatUI() {
     }
   }
   html += '</div>';
-  // 演练反馈面板
+  // 演练反馈面板（增强版：含教练示范 + 一键收录）
   if (_aiFeedback) {
+    // 解析反馈内容，找到【💬教练示范：xxx】标记，为每个示范添加收录按钮
+    const fbParts = _aiFeedback.split(/(【💬教练示范[：:][^】]*】)/);
+    let fbHtml = '';
+    let inDemo = false, demoTitles = [];
+    for (let i = 0; i < fbParts.length; i++) {
+      if (fbParts[i].match(/【💬教练示范[：:]/)) {
+        inDemo = true;
+        const title = fbParts[i].replace(/【💬教练示范[：:]\s*/,'').replace(/】/,'');
+        demoTitles.push(title);
+        fbHtml += '<div style="margin-top:10px;background:#fff;border:1px dashed #059669;border-radius:8px;padding:10px;position:relative;">';
+        fbHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+        fbHtml += '<div style="font-weight:700;font-size:0.72rem;color:#059669;">💬 教练示范：'+escapeHtml(title)+'</div>';
+        fbHtml += '<button onclick="event.stopPropagation();saveCoachDemo(''+escapeAttr(title)+'',''+escapeAttr(fbParts[i+1]||'').slice(0,200)+'')" title="收录到话术库" style="padding:3px 10px;border:1px solid #059669;border-radius:6px;background:#ecfdf5;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;white-space:nowrap;">➕ 收录到话术库</button>';
+        fbHtml += '</div>';
+      } else if (inDemo) {
+        inDemo = false;
+        fbHtml += '<div style="font-size:0.8rem;line-height:1.7;color:#1e40af;padding:4px 0;">'+fbParts[i].replace(/
+/g,'<br>')+'</div>';
+        fbHtml += '</div>';
+      } else {
+        fbHtml += '<span style="white-space:pre-wrap;">'+fbParts[i]+'</span>';
+      }
+    }
+    
     html += '<div id="aiFeedbackPanel" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #059669;border-radius:10px;padding:14px;margin-bottom:10px;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
-    html += '<div style="font-weight:700;color:#059669;font-size:0.85rem;">📝 教练反馈报告</div>';
+    html += '<div style="font-weight:700;color:#059669;font-size:0.85rem;">📝 教练复盘报告</div>';
+    html += '<div style="display:flex;gap:6px;">';
+    html += '<button onclick="saveAllCoachDemos()" title="一键收录所有示范" style="padding:2px 8px;border:1px solid #059669;border-radius:4px;background:#059669;color:#fff;font-size:0.6rem;cursor:pointer;">📥 全部收录</button>';
     html += '<button onclick="_aiFeedback=null;refreshAiMessages();" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;font-size:0.6rem;cursor:pointer;">✕ 关闭</button>';
-    html += '</div>';
-    html += '<div style="font-size:0.78rem;line-height:1.6;color:#065f46;white-space:pre-wrap;">'+_aiFeedback+'</div>';
+    html += '</div></div>';
+    html += '<div style="font-size:0.78rem;line-height:1.6;color:#065f46;">'+fbHtml+'</div>';
     html += '</div>';
   }
   if (_aiFeedbackLoading) {
@@ -2885,7 +2911,7 @@ function renderChatUI() {
 function switchAiMode(mode) {
   if (mode === 'normal') { _aiRolePlay = null; _aiHistory = []; }
   else { _aiRolePlay = {}; _aiHistory = []; }
-  _aiFeedback = null;
+  _aiFeedback = null; _aiSimEnded = false;
   refreshAiMessages();
 }
 
@@ -2894,7 +2920,7 @@ function selectAiRole(rid) {
   if (!role) return;
   _aiRolePlay = role;
   _aiHistory = [];
-  _aiFeedback = null;
+  _aiFeedback = null; _aiSimEnded = false;
   refreshAiMessages();
 }
 
@@ -2911,13 +2937,18 @@ async function getRolePlayFeedback() {
     dialog += (m.role === 'user' ? '【客户经理】' : '【' + _aiRolePlay.name + '】') + m.content + '\n';
   }
 
-  const coachPrompt = '你是一位资深的银行理财销售教练，拥有20年一线客户服务经验。下面是一段客户经理与模拟客户的对话记录，请以教练身份进行分析和指导。\n\n' +
-    '请按以下结构输出反馈（用简洁自然的中文，像一位老前辈在带新人）：\n\n' +
-    '## 🟢 做得好的地方\n列出2-3点，具体引用对话中的原话（用「」标注），说明为什么好\n\n' +
-    '## 🟡 可以改进的地方\n列出2-3点，指出问题并解释为什么这样说效果不好\n\n' +
-    '## 💡 改进话术示范\n针对每一个"可以改进的地方"，给出一段更好的话术示范（用💬标注），可以用「你可以这样说：」开头\n\n' +
-    '## 📋 关键技巧提醒\n提炼2-3条本次演练中最值得记住的沟通技巧\n\n' +
-    '要求：反馈要具体、可操作，不要泛泛而谈。像个老师傅在教徒弟那样说话，亲切但一针见血。控制在400字以内。\n\n' +
+  const coachPrompt = '你是一位资深银行理财销售教练，拥有20年一线客户服务经验。下面是一段客户经理与模拟客户的对话记录，请以教练身份进行分析和指导。\n\n' +
+    '请严格按以下结构输出（用简洁自然的中文，像老前辈带新人）：\n\n' +
+    '## 🟢 做得好的地方\n列出2-3点，具体引用原话（用「」标注），说明为什么好\n\n' +
+    '## 🟡 可以改进的地方\n列出2-3点，指出问题并解释为什么效果不好\n\n' +
+    '## 📋 关键技巧提醒\n提炼2-3条最值得记住的沟通技巧\n\n' +
+    '## 💬 教练示范回复\n' +
+    '针对每个"可以改进的地方"，请用以下格式给出你的示范回复（这是最重要的部分，请务必认真写）：\n' +
+    '【💬教练示范：场景描述（如"客户说亏15%想赎回时"）】\n' +
+    '你的示范回复内容（像真实对话那样自然，100-200字）\n\n' +
+    '请至少给出2个示范回复。每个示范必须是一段完整的、可以直接对客户说的话。\n' +
+    '不要只给"建议这样说"，而是直接写出你要说的原话。\n\n' +
+    '总体控制在600字以内。\n\n' +
     '===对话记录===\n' + dialog;
 
   try {
@@ -2930,12 +2961,13 @@ async function getRolePlayFeedback() {
           { role: 'system', content: coachPrompt }
         ],
         temperature: 0.5,
-        max_tokens: 2000
+        max_tokens: 2500
       })
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
     _aiFeedback = data.choices[0].message.content;
+    _aiSimEnded = true;  // 暂停演练，等待用户复盘
   } catch (e) {
     _aiFeedback = '⚠️ 获取反馈失败：' + e.message + '\n\n请检查 DeepSeek API Key 是否有效，或稍后重试。';
   }
@@ -2949,6 +2981,94 @@ async function getRolePlayFeedback() {
     if (panel) panel.scrollIntoView({ behavior: 'smooth' });
   }, 200);
 }
+
+function resumeSimulation() {
+  _aiSimEnded = false;
+  _aiFeedback = null;
+  refreshAiMessages();
+  setTimeout(() => {
+    const inp = document.getElementById('aiInput');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function saveCoachDemo(title, content) {
+  const scripts = getMyScripts();
+  if (scripts.some(s => s.title === title)) {
+    toast('⚠️ 这条已经收录过了');
+    return;
+  }
+  scripts.push({
+    id: 'my_' + Date.now(),
+    title: title.slice(0, 30),
+    category: '我的收藏',
+    customer_type: _aiRolePlay ? _aiRolePlay.name : '模拟客户',
+    scenario: '教练示范 · ' + (_aiRolePlay ? _aiRolePlay.name : '') + '演练',
+    script: content.slice(0, 500),
+    key_points: ['教练推荐'],
+    tags: ['教练示范', '模拟演练'],
+    saved_at: new Date().toISOString()
+  });
+  setMyScripts(scripts);
+  toast('✅ 已收录到话术库「我的收藏」');
+  const panel = document.getElementById('aiFeedbackPanel');
+  if (panel) {
+    const btns = panel.querySelectorAll('button');
+    for (const b of btns) {
+      if (b.textContent.includes('收录到话术库') && b.title === title) {
+        b.innerHTML = '✅ 已收录';
+        b.style.background = '#d1fae5';
+        b.disabled = true;
+      }
+    }
+  }
+}
+
+function saveAllCoachDemos() {
+  if (!_aiFeedback) return;
+  const parts = _aiFeedback.split(/(【💬教练示范[：:][^】]*】)/);
+  const scripts = getMyScripts();
+  let count = 0;
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i].match(/【💬教练示范[：:]/)) {
+      const title = parts[i].replace(/【💬教练示范[：:]\s*/,'').replace(/】/,'');
+      const content = (parts[i+1] || '').trim().slice(0, 500);
+      if (!scripts.some(s => s.title === title) && content) {
+        scripts.push({
+          id: 'my_' + Date.now() + '_' + count,
+          title: title.slice(0, 30),
+          category: '我的收藏',
+          customer_type: _aiRolePlay ? _aiRolePlay.name : '模拟客户',
+          scenario: '教练示范 · ' + (_aiRolePlay ? _aiRolePlay.name : '') + '演练',
+          script: content,
+          key_points: ['教练推荐'],
+          tags: ['教练示范', '模拟演练'],
+          saved_at: new Date().toISOString()
+        });
+        count++;
+      }
+    }
+  }
+  if (count > 0) {
+    setMyScripts(scripts);
+    toast('✅ 已收录 ' + count + ' 条到话术库');
+  } else {
+    toast('所有示范已收录，无新增');
+  }
+}
+
+function getMyScripts() {
+  try { return JSON.parse(localStorage.getItem('wm_my_scripts') || '[]'); } catch(e) { return []; }
+}
+function setMyScripts(s) { localStorage.setItem('wm_my_scripts', JSON.stringify(s)); }
+function deleteMyScript(id) {
+  let scripts = getMyScripts().filter(s => s.id !== id);
+  setMyScripts(scripts);
+  renderScriptsTab();
+  toast('已删除');
+}
+function escapeHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeAttr(str) { return String(str).replace(/&/g,'&amp;').replace(/'/g,'&#39;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function quickBtn(text) { return '<button onclick="document.getElementById(\'aiInput\').value=\''+text+'\';sendAiMsg()" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;cursor:pointer;white-space:nowrap;">'+text+'</button>'; }
 
@@ -3346,54 +3466,91 @@ async function renderScriptsTab() {
   const ctr = document.getElementById('scriptsContent');
   ctr.innerHTML = '<div style="text-align:center;padding:40px;color:var(--gray);">加载中...</div>';
   const scripts = await loadScriptsData();
-  if (!scripts.length) {
+  const myScripts = getMyScripts();
+  if (!scripts.length && !myScripts.length) {
     ctr.innerHTML = '<div class="card" style="text-align:center;padding:40px;color:var(--gray);">话术库加载失败，请刷新页面</div>';
     return;
   }
 
-  // 分类统计
+  // 分类统计（含我的收藏）
   const cats = {};
   for (const s of scripts) { cats[s.category] = (cats[s.category] || 0) + 1; }
+  if (myScripts.length) cats['我的收藏'] = myScripts.length;
 
   let html = '';
 
   // 筛选栏
   html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">';
   const allActive = _scriptsFilter === 'all';
-  html += '<button onclick="setScriptsFilter(\'all\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (allActive ? '#c41230' : '#e5e7eb') + ';background:' + (allActive ? '#fef2f2' : '#fff') + ';color:' + (allActive ? '#c41230' : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (allActive ? '700' : '400') + ';">全部(' + scripts.length + ')</button>';
+  html += '<button onclick="setScriptsFilter(\'all\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (allActive ? '#c41230' : '#e5e7eb') + ';background:' + (allActive ? '#fef2f2' : '#fff') + ';color:' + (allActive ? '#c41230' : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (allActive ? '700' : '400') + ';">全部(' + (scripts.length + myScripts.length) + ')</button>';
   for (const [cat, count] of Object.entries(cats)) {
     const active = _scriptsFilter === cat;
-    html += '<button onclick="setScriptsFilter(\'' + cat + '\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (active ? '#c41230' : '#e5e7eb') + ';background:' + (active ? '#fef2f2' : '#fff') + ';color:' + (active ? '#c41230' : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (active ? '700' : '400') + ';">' + cat + '(' + count + ')</button>';
+    const isMy = cat === '我的收藏';
+    html += '<button onclick="setScriptsFilter(\'' + cat + '\')" style="padding:5px 12px;border-radius:16px;border:1px solid ' + (active ? '#c41230' : '#e5e7eb') + ';background:' + (active ? (isMy ? '#f0fdf4' : '#fef2f2') : '#fff') + ';color:' + (active ? (isMy ? '#059669' : '#c41230') : 'var(--gray)') + ';font-size:0.75rem;cursor:pointer;font-weight:' + (active ? '700' : '400') + ';">' + (isMy ? '⭐ ' : '') + cat + '(' + count + ')</button>';
   }
-  html += '<span style="margin-left:auto;font-size:0.68rem;color:var(--gray);">💡 点击卡片复制话术</span>';
+  html += '<span style="margin-left:auto;font-size:0.68rem;color:var(--gray);">' + (myScripts.length ? '⭐ 我的收藏 ' + myScripts.length + '条 | ' : '') + '💡 点击卡片复制话术</span>';
   html += '</div>';
 
-  // 话术卡片
-  const filtered = _scriptsFilter === 'all' ? scripts : scripts.filter(s => s.category === _scriptsFilter);
+  // 合并数据
   const customerEmoji = {'保守型':'🛡️','稳健型':'⚖️','进取型':'🚀','新客户':'🆕','存量客户':'💤','刚买入就跌':'😰','大跌恐慌':'😱','不信任型':'🤨','拖延型':'🐌','比价型':'💰','犹豫型':'🤔','大客户':'💎','已购客户':'⭐','定投客户':'📊','所有客户':'🌐','退休/老年客户':'👴','熟人/朋友':'🤝'};
 
-  for (const s of filtered) {
-    html += '<div class="card" style="padding:16px;margin-bottom:12px;">';
+  function renderCard(s, isMy) {
+    let card = '<div class="card" style="padding:16px;margin-bottom:12px;' + (isMy ? 'border:2px solid #d1fae5;' : '') + '">';
     // 标题行
-    html += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">';
-    html += '<div><div style="font-weight:700;font-size:0.9rem;">' + s.title + '</div>';
-    html += '<div style="font-size:0.7rem;color:var(--gray);margin-top:2px;">' + s.category + ' · ' + (customerEmoji[s.customer_type]||'') + ' ' + s.customer_type + '</div></div>';
-    html += '<button onclick="copyScript(\'' + s.id + '\')" id="copyBtn-' + s.id + '" style="padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.7rem;cursor:pointer;white-space:nowrap;">📋 复制</button>';
-    html += '</div>';
+    card += '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:10px;">';
+    card += '<div><div style="font-weight:700;font-size:0.9rem;">' + (isMy ? '⭐ ' : '') + s.title + '</div>';
+    card += '<div style="font-size:0.7rem;color:var(--gray);margin-top:2px;">' + (isMy ? '📥 ' : '') + s.category + ' · ' + (customerEmoji[s.customer_type]||'') + ' ' + s.customer_type + '</div></div>';
+    if (isMy) {
+      card += '<div style="display:flex;gap:4px;">';
+      card += '<button onclick="copyMyScript(\'' + s.id + '\')" id="copyBtn-' + s.id + '" style="padding:4px 10px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.65rem;cursor:pointer;white-space:nowrap;">📋 复制</button>';
+      card += '<button onclick="deleteMyScript(\'' + s.id + '\')" style="padding:4px 8px;border-radius:6px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:0.65rem;cursor:pointer;">🗑️</button>';
+      card += '</div>';
+    } else {
+      card += '<button onclick="copyScript(\'' + s.id + '\')" id="copyBtn-' + s.id + '" style="padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:0.7rem;cursor:pointer;white-space:nowrap;">📋 复制</button>';
+    }
+    card += '</div>';
 
     // 场景
-    html += '<div style="background:#fef2f2;border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:0.72rem;color:var(--gray);line-height:1.5;">📌 <b>场景：</b>' + s.scenario + '</div>';
+    card += '<div style="background:#fef2f2;border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:0.72rem;color:var(--gray);line-height:1.5;">📌 <b>场景：</b>' + s.scenario + '</div>';
 
     // 话术正文
-    html += '<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;font-size:0.8rem;line-height:1.8;color:var(--dark);margin-bottom:10px;" id="scriptText-' + s.id + '">' + s.script + '</div>';
+    card += '<div style="background:' + (isMy ? '#f0fdf4' : '#f8fafc') + ';border:1px solid ' + (isMy ? '#bbf7d0' : '#e5e7eb') + ';border-radius:8px;padding:12px;font-size:0.8rem;line-height:1.8;color:var(--dark);margin-bottom:10px;" id="scriptText-' + s.id + '">' + s.script + '</div>';
 
     // 要点
-    html += '<div style="font-size:0.7rem;color:var(--gray);">💡 <b>要点：</b>' + s.key_points.map(p => '<span style="display:inline-block;background:#eff6ff;padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0;color:#1e40af;">' + p + '</span>').join('') + '</div>';
+    card += '<div style="font-size:0.7rem;color:var(--gray);">💡 <b>要点：</b>' + s.key_points.map(p => '<span style="display:inline-block;background:' + (isMy ? '#f0fdf4' : '#eff6ff') + ';padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0;color:' + (isMy ? '#059669' : '#1e40af') + ';">' + p + '</span>').join('') + '</div>';
 
     // 标签
-    html += '<div style="margin-top:8px;">' + s.tags.map(t => '<span style="display:inline-block;font-size:0.62rem;background:#f3f4f6;padding:2px 6px;border-radius:8px;margin:2px 4px 2px 0;color:var(--gray);">#' + t + '</span>').join('') + '</div>';
+    if (s.tags && s.tags.length) {
+      card += '<div style="margin-top:8px;">' + s.tags.map(t => '<span style="display:inline-block;font-size:0.62rem;background:#f3f4f6;padding:2px 6px;border-radius:8px;margin:2px 4px 2px 0;color:var(--gray);">#' + t + '</span>').join('') + '</div>';
+    }
 
-    html += '</div>';
+    card += '</div>';
+    return card;
+  }
+
+  // 我的收藏（置顶）
+  if (_scriptsFilter === 'all' || _scriptsFilter === '我的收藏') {
+    if (myScripts.length && _scriptsFilter === 'all') {
+      html += '<div style="font-size:0.78rem;font-weight:700;color:#059669;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #d1fae5;">⭐ 我的收藏（' + myScripts.length + '条）<span style="font-weight:400;font-size:0.65rem;color:var(--gray);margin-left:8px;">来自教练复盘</span></div>';
+    }
+    for (const s of myScripts) {
+      html += renderCard(s, true);
+    }
+  }
+
+  // 系统话术
+  if (_scriptsFilter !== '我的收藏') {
+    const filtered = _scriptsFilter === 'all' ? scripts : scripts.filter(s => s.category === _scriptsFilter);
+    if (_scriptsFilter === 'all' && myScripts.length) {
+      html += '<div style="font-size:0.78rem;font-weight:700;color:var(--dark);margin:16px 0 8px;padding-bottom:6px;border-bottom:2px solid #e5e7eb;">📚 系统话术库（' + filtered.length + '条）</div>';
+    }
+    for (const s of filtered) {
+      html += renderCard(s, false);
+    }
+  }
+
+  if ((_scriptsFilter === '我的收藏' && !myScripts.length) || (!filtered || !filtered.length && _scriptsFilter !== '我的收藏')) {
+    html += '<div class="card" style="text-align:center;padding:30px;color:var(--gray);font-size:0.85rem;">暂无话术</div>';
   }
 
   ctr.innerHTML = html;
@@ -3407,6 +3564,18 @@ function copyScript(id) {
   navigator.clipboard.writeText(el.textContent.trim()).then(() => {
     const btn = document.getElementById('copyBtn-' + id);
     if (btn) { btn.innerHTML = '✅ 已复制'; btn.style.background = '#f0fdf4'; btn.style.borderColor = '#bbf7d0'; setTimeout(() => { btn.innerHTML = '📋 复制'; btn.style.background = '#fff'; btn.style.borderColor = '#e5e7eb'; }, 2000); }
+    toast('话术已复制到剪贴板');
+  }).catch(() => toast('复制失败，请手动复制'));
+}
+
+function copyMyScript(id) {
+  // Same as copyScript but works for my scripts too
+  const scripts = getMyScripts();
+  const s = scripts.find(x => x.id === id);
+  if (!s) return;
+  navigator.clipboard.writeText(s.script.trim()).then(() => {
+    const btn = document.getElementById('copyBtn-' + id);
+    if (btn) { btn.innerHTML = '✅ 已复制'; btn.style.background = '#d1fae5'; btn.style.borderColor = '#86efac'; setTimeout(() => { btn.innerHTML = '📋 复制'; btn.style.background = '#fff'; btn.style.borderColor = '#e5e7eb'; }, 2000); }
     toast('话术已复制到剪贴板');
   }).catch(() => toast('复制失败，请手动复制'));
 }

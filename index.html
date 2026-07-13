@@ -210,6 +210,7 @@ input:focus, select:focus { border-color: var(--red); }
     <div class="tab" onclick="switchTab('tech')">🔬 科技行业</div>
     <div class="tab" onclick="switchTab('scripts')">📋 话术库</div>
     <div class="tab" onclick="switchTab('notes')">📝 学习笔记</div>
+    <div class="tab" onclick="switchTab('qa')">💬 客户问答</div>
   </div>
 
   <!-- Tab 0: 仪表盘 -->
@@ -240,6 +241,11 @@ input:focus, select:focus { border-color: var(--red); }
   <!-- Tab: 学习笔记 -->
   <div id="tab-notes" style="display:none;">
     <div id="notesContent"></div>
+  </div>
+
+  <!-- Tab: 客户问答助手 -->
+  <div id="tab-qa" style="display:none;">
+    <div id="qaContent"></div>
   </div>
 
   <!-- Tab 2: 输入 -->
@@ -365,6 +371,9 @@ input:focus, select:focus { border-color: var(--red); }
   </div>
   <div class="mobile-nav-item" onclick="switchTab('notes')" data-tab="notes">
     <span class="nav-icon">📝</span>笔记
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('qa')" data-tab="qa">
+    <span class="nav-icon">💬</span>问答
   </div>
   <div class="mobile-nav-item" onclick="exportPPT()" id="mobileExportBtn">
     <span class="nav-icon">📥</span>导出
@@ -641,11 +650,11 @@ let sids = new Set();
 // UI 逻辑
 // ============================================================
 function switchTab(tab) {
-  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts','notes'].forEach(t => {
+  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts','notes','qa'].forEach(t => {
     document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
   });
   document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts','notes'][i]===tab);
+    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts','notes','qa'][i]===tab);
   });
   // 同步移动端底部导航
   document.querySelectorAll('.mobile-nav-item').forEach(el => {
@@ -661,6 +670,7 @@ function switchTab(tab) {
   if (tab === 'tech') renderTechTab();
   if (tab === 'scripts') renderScriptsTab();
   if (tab === 'notes') renderNotesTab();
+  if (tab === 'qa') renderQaTab();
   // 滚动到顶部
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -3598,6 +3608,270 @@ function copyMyScript(id) {
     if (btn) { btn.innerHTML = '✅ 已复制'; btn.style.background = '#d1fae5'; btn.style.borderColor = '#86efac'; setTimeout(() => { btn.innerHTML = '📋 复制'; btn.style.background = '#fff'; btn.style.borderColor = '#e5e7eb'; }, 2000); }
     toast('话术已复制到剪贴板');
   }).catch(() => toast('复制失败，请手动复制'));
+}
+
+// ============================================================
+// 客户问答助手
+// ============================================================
+let _qaHistory = [];
+const QA_EXAMPLES = [
+  '这个基金会不会亏钱？',
+  '我钱放定期挺好的，为什么要买基金？',
+  '你们银行的手续费比支付宝贵，我在你们这买有什么好处？',
+  '现在市场这么差，适合买基金吗？',
+  '我买的基金已经亏了15%了，要不要赎回？',
+  '你们推荐的保险，真的能赔吗？',
+  '资产配置是什么意思？我就想存个定期',
+  '这个基金之前涨了这么多，现在买会不会站岗？',
+];
+
+function renderQaTab() {
+  const ctr = document.getElementById('qaContent');
+  if (!ctr) return;
+  const hasKey = !!getAiKey();
+  let html = '';
+
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+  html += '<div style="font-weight:700;font-size:0.95rem;">💬 客户问答助手</div>';
+  html += '<div style="font-size:0.68rem;color:var(--gray);">客户问 → 你输入 → AI拆解+作答</div>';
+  html += '</div>';
+
+  if (!hasKey) {
+    html += '<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px;margin-bottom:12px;">';
+    html += '<div style="font-weight:600;font-size:0.85rem;">🔑 请先配置 DeepSeek API Key</div>';
+    html += '<div style="font-size:0.7rem;color:var(--gray);margin-top:4px;">与 AI 助手共用同一个 Key，配置后两个功能都能用</div>';
+    html += '<input id="qaKeyInput" type="password" placeholder="sk-..." style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.82rem;margin:8px 0;">';
+    html += '<button onclick="saveQaKey()" style="padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">保存并开始</button></div>';
+    ctr.innerHTML = html;
+    return;
+  }
+
+  // 输入区
+  html += '<div style="background:#fff;border:2px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:12px;">';
+  html += '<div style="font-weight:600;font-size:0.82rem;margin-bottom:8px;">🔍 客户问了什么？</div>';
+  html += '<textarea id="qaInput" placeholder="输入客户的问题，比如：这个基金会不会亏钱？" style="width:100%;min-height:60px;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;resize:vertical;font-family:inherit;"></textarea>';
+  html += '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">';
+  html += '<button onclick="analyzeQuestion()" id="qaAnalyzeBtn" style="padding:8px 20px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;">🔍 分析作答</button>';
+  html += '<span style="font-size:0.68rem;color:var(--gray);">回车也可以提交</span>';
+  html += '</div>';
+  // 快捷示例
+  html += '<div style="margin-top:10px;border-top:1px dashed #e5e7eb;padding-top:8px;">';
+  html += '<div style="font-size:0.68rem;color:var(--gray);margin-bottom:6px;">💡 常见客户问题（点击直接填入）：</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  for (const ex of QA_EXAMPLES) {
+    html += '<button onclick="fillQaExample(this)" data-q="' + ex.replace(/"/g, '&quot;') + '" style="font-size:0.7rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;cursor:pointer;white-space:nowrap;color:var(--gray);">' + ex + '</button>';
+  }
+  html += '</div></div>';
+  html += '</div>';
+
+  // 历史记录
+  if (_qaHistory.length === 0) {
+    html += '<div style="text-align:center;color:var(--gray);padding:30px;">';
+    html += '<div style="font-size:2rem;margin-bottom:8px;">💬</div>';
+    html += '<div style="font-size:0.85rem;">把客户的问题输入上面，AI 帮你分析客户心理 + 给出可以直接说的话</div>';
+    html += '</div>';
+  } else {
+    for (let i = _qaHistory.length - 1; i >= 0; i--) {
+      const item = _qaHistory[i];
+      html += '<div class="card" style="padding:14px;margin-bottom:12px;">';
+      // 客户问题
+      html += '<div style="background:#fef2f2;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:0.68rem;color:var(--gray);margin-bottom:4px;">🙋 客户问：</div>';
+      html += '<div style="font-size:0.85rem;font-weight:600;">' + escapeHtml(item.question) + '</div>';
+      html += '</div>';
+
+      if (item.loading) {
+        html += '<div style="text-align:center;padding:20px;color:var(--gray);"><span class="spinner"></span> AI 正在分析...</div>';
+      } else if (item.error) {
+        html += '<div style="background:#fee2e2;border-radius:8px;padding:10px;font-size:0.8rem;color:#dc2626;">⚠️ ' + escapeHtml(item.error) + '</div>';
+      } else if (item.result) {
+        // 1. 客户心理分析
+        html += '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:10px;">';
+        html += '<div style="font-weight:700;font-size:0.8rem;color:#92400e;margin-bottom:8px;">🧠 客户心理分析</div>';
+        if (item.result.psychology) {
+          html += '<div style="font-size:0.78rem;line-height:1.7;color:#78350f;">' + escapeHtml(item.result.psychology).replace(/\n/g, '<br>') + '</div>';
+        }
+        if (item.result.concerns && item.result.concerns.length) {
+          html += '<div style="margin-top:8px;font-size:0.72rem;">';
+          html += '<b style="color:#92400e;">核心担忧：</b>';
+          for (const c of item.result.concerns) {
+            html += '<span style="display:inline-block;background:#fef3c7;padding:2px 8px;border-radius:10px;margin:2px 4px 2px 0;color:#92400e;">😟 ' + escapeHtml(c) + '</span>';
+          }
+          html += '</div>';
+        }
+        if (item.result.caution) {
+          html += '<div style="margin-top:8px;padding:8px;background:#fef3c7;border-radius:6px;font-size:0.72rem;color:#92400e;line-height:1.6;">⚠️ <b>回答注意：</b>' + escapeHtml(item.result.caution) + '</div>';
+        }
+        html += '</div>';
+
+        // 2. 推荐话术
+        if (item.result.script) {
+          html += '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:10px;">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+          html += '<div style="font-weight:700;font-size:0.8rem;color:#059669;">💬 你可以这样回答（直接对客户说）</div>';
+          html += '<button onclick="copyQaScript(' + i + ')" style="padding:3px 10px;border:1px solid #bbf7d0;border-radius:6px;background:#f0fdf4;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;">📋 复制</button>';
+          html += '</div>';
+          html += '<div style="font-size:0.82rem;line-height:1.8;color:#065f46;white-space:pre-wrap;" id="qaScript-' + i + '">' + escapeHtml(item.result.script) + '</div>';
+          html += '</div>';
+        }
+
+        // 3. 知识补充
+        if (item.result.knowledge) {
+          html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.75rem;color:#1e40af;margin-bottom:4px;">📚 知识补充</div>';
+          html += '<div style="font-size:0.72rem;line-height:1.6;color:#1e3a8a;">' + escapeHtml(item.result.knowledge).replace(/\n/g, '<br>') + '</div>';
+          html += '</div>';
+        }
+
+        // 收录按钮
+        html += '<div style="display:flex;gap:6px;">';
+        html += '<button onclick="saveQaToScripts(' + i + ')" style="padding:5px 12px;border:1px solid #059669;border-radius:6px;background:#ecfdf5;color:#059669;font-size:0.7rem;cursor:pointer;font-weight:600;">➕ 收到话术库</button>';
+        html += '<button onclick="deleteQaItem(' + i + ')" style="padding:5px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:var(--gray);font-size:0.7rem;cursor:pointer;">🗑️ 删除</button>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+  }
+
+  ctr.innerHTML = html;
+
+  // 绑定回车
+  const inp = document.getElementById('qaInput');
+  if (inp) {
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        analyzeQuestion();
+      }
+    });
+  }
+}
+
+function saveQaKey() {
+  const k = document.getElementById('qaKeyInput').value.trim();
+  if (!k || !k.startsWith('sk-')) { toast('请输入有效的Key (sk-开头)'); return; }
+  setAiKey(k);
+  toast('Key已保存');
+  renderQaTab();
+}
+
+function fillQaExample(btn) {
+  const q = btn.getAttribute('data-q');
+  const inp = document.getElementById('qaInput');
+  if (inp) { inp.value = q; inp.focus(); }
+}
+
+async function analyzeQuestion() {
+  const inp = document.getElementById('qaInput');
+  const q = (inp && inp.value || '').trim();
+  if (!q) { toast('请输入客户的问题'); return; }
+  if (inp) inp.value = '';
+
+  const item = { question: q, loading: true };
+  _qaHistory.push(item);
+  renderQaTab();
+
+  const prompt = '你是一位资深银行理财销售教练。一位客户经理遇到客户提问，需要你帮忙分析并给出回答方案。\n\n' +
+    '【客户的问题】' + q + '\n\n' +
+    '请严格按以下JSON格式回复（不要有任何多余文字，不要markdown代码块标记，直接输出JSON）：\n' +
+    '{\n' +
+    '  "psychology": "客户为什么会这样问？分析客户的心理动机、真实意图、潜在需求（2-3句话，像老师傅在带新人那样分析）",\n' +
+    '  "concerns": ["担忧1（5-10字）", "担忧2", "担忧3"],\n' +
+    '  "caution": "回答这个问题的注意事项，哪些话不能说，哪些雷区要避开（1-2句话）",\n' +
+    '  "script": "你可以直接对客户说的话术（像真实对话一样自然，150-250字，用「您」称呼客户，语气专业但不生硬）",\n' +
+    '  "knowledge": "客户经理需要知道的背景知识或专业要点，方便追问时接得住（2-3句话）"\n' +
+    '}\n\n' +
+    '要求：\n' +
+    '1. script 是可以直接照着念给客户听的话，不是建议\n' +
+    '2. 语气要像一个有温度的专业理财经理，不要太官方\n' +
+    '3. concerns 每条不超过10个字\n' +
+    '4. 如果问题涉及具体产品/市场，script中要给出有依据的建议';
+
+  try {
+    const resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAiKey() },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'system', content: prompt }],
+        temperature: 0.6,
+        max_tokens: 1500
+      })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    let content = data.choices[0].message.content.trim();
+    // 清理可能的 markdown 包裹
+    content = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+
+    let result;
+    try {
+      result = JSON.parse(content);
+    } catch(e) {
+      // 如果JSON解析失败，尝试提取
+      const m = content.match(/\{[\s\S]*\}/);
+      if (m) {
+        try { result = JSON.parse(m[0]); } catch(e2) { result = null; }
+      }
+    }
+
+    if (result) {
+      item.loading = false;
+      item.result = result;
+    } else {
+      // JSON 解析失败，把原始内容作为 script 显示
+      item.loading = false;
+      item.result = {
+        psychology: 'AI 返回格式异常，请重试',
+        concerns: [],
+        caution: '',
+        script: content,
+        knowledge: ''
+      };
+    }
+  } catch(e) {
+    item.loading = false;
+    item.error = e.message + '（请检查 API Key 是否有效）';
+  }
+
+  renderQaTab();
+  // 滚动到最新结果
+  setTimeout(() => {
+    const cards = document.querySelectorAll('#qaContent .card');
+    if (cards.length) cards[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function copyQaScript(idx) {
+  const el = document.getElementById('qaScript-' + idx);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(() => {
+    toast('话术已复制到剪贴板');
+  }).catch(() => toast('复制失败，请手动复制'));
+}
+
+function saveQaToScripts(idx) {
+  const item = _qaHistory[idx];
+  if (!item || !item.result || !item.result.script) return;
+  const scripts = getMyScripts();
+  scripts.push({
+    id: 'qa_' + Date.now(),
+    title: item.question.slice(0, 25),
+    category: '我的收藏',
+    customer_type: '提问客户',
+    scenario: '客户原话：' + item.question.slice(0, 50),
+    script: item.result.script,
+    key_points: ['AI问答助手'],
+    tags: ['客户问答', 'AI生成'],
+    saved_at: new Date().toISOString()
+  });
+  setMyScripts(scripts);
+  toast('✅ 已收录到话术库「我的收藏」');
+}
+
+function deleteQaItem(idx) {
+  _qaHistory.splice(idx, 1);
+  renderQaTab();
 }
 
 // ============================================================

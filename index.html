@@ -2861,39 +2861,54 @@ function renderChatUI() {
   html += '</div>';
   // 演练反馈面板（增强版：含教练示范 + 一键收录）
   if (_aiFeedback) {
-    // 解析反馈内容，找到【💬教练示范：xxx】标记，为每个示范添加收录按钮
-    const fbParts = _aiFeedback.split(/(【💬教练示范[：:][^】]*】)/);
-    let fbHtml = '';
-    let inDemo = false, demoTitles = [];
-    for (let i = 0; i < fbParts.length; i++) {
-      if (fbParts[i].match(/【💬教练示范[：:]/)) {
-        inDemo = true;
-        const title = fbParts[i].replace(/【💬教练示范[：:]\s*/,'').replace(/】/,'');
-        demoTitles.push(title);
-        fbHtml += '<div style="margin-top:10px;background:#fff;border:1px dashed #059669;border-radius:8px;padding:10px;position:relative;">';
-        fbHtml += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
-        fbHtml += '<div style="font-weight:700;font-size:0.72rem;color:#059669;">💬 教练示范：'+escapeHtml(title)+'</div>';
-        fbHtml += '<button onclick="event.stopPropagation();saveCoachDemo(''+escapeAttr(title)+'',''+escapeAttr(fbParts[i+1]||'').slice(0,200)+'')" title="收录到话术库" style="padding:3px 10px;border:1px solid #059669;border-radius:6px;background:#ecfdf5;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;white-space:nowrap;">➕ 收录到话术库</button>';
-        fbHtml += '</div>';
-      } else if (inDemo) {
-        inDemo = false;
-        fbHtml += '<div style="font-size:0.8rem;line-height:1.7;color:#1e40af;padding:4px 0;">'+fbParts[i].replace(/
-/g,'<br>')+'</div>';
-        fbHtml += '</div>';
-      } else {
-        fbHtml += '<span style="white-space:pre-wrap;">'+fbParts[i]+'</span>';
-      }
+    var _coachDemos = [];
+    var fbDisplay = _aiFeedback;
+    var demoRegex = /【💬教练示范[：:]([^】]*)】([\s\S]*?)(?=【💬教练示范|$)/g;
+    var match;
+    while ((match = demoRegex.exec(fbDisplay)) !== null) {
+      _coachDemos.push({
+        title: match[1].trim(),
+        content: match[2].trim().slice(0, 500)
+      });
     }
+    var fbText = fbDisplay.replace(/【💬教练示范[：:][^】]*】[\s\S]*?(?=【💬教练示范|$)/g, '').trim();
     
     html += '<div id="aiFeedbackPanel" style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:2px solid #059669;border-radius:10px;padding:14px;margin-bottom:10px;">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">';
     html += '<div style="font-weight:700;color:#059669;font-size:0.85rem;">📝 教练复盘报告</div>';
     html += '<div style="display:flex;gap:6px;">';
-    html += '<button onclick="saveAllCoachDemos()" title="一键收录所有示范" style="padding:2px 8px;border:1px solid #059669;border-radius:4px;background:#059669;color:#fff;font-size:0.6rem;cursor:pointer;">📥 全部收录</button>';
+    if (_coachDemos.length > 1) {
+      html += '<button onclick="saveAllCoachDemos()" title="一键收录所有示范" style="padding:2px 8px;border:1px solid #059669;border-radius:4px;background:#059669;color:#fff;font-size:0.6rem;cursor:pointer;">📥 全部收录</button>';
+    }
     html += '<button onclick="_aiFeedback=null;refreshAiMessages();" style="padding:2px 8px;border:1px solid #d1d5db;border-radius:4px;background:#fff;font-size:0.6rem;cursor:pointer;">✕ 关闭</button>';
     html += '</div></div>';
-    html += '<div style="font-size:0.78rem;line-height:1.6;color:#065f46;">'+fbHtml+'</div>';
+    html += '<div style="font-size:0.78rem;line-height:1.6;color:#065f46;white-space:pre-wrap;margin-bottom:8px;">'+escapeHtml(fbText)+'</div>';
+    for (var di = 0; di < _coachDemos.length; di++) {
+      var demo = _coachDemos[di];
+      html += '<div style="margin-top:8px;background:#fff;border:1px dashed #059669;border-radius:8px;padding:10px;">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+      html += '<div style="font-weight:700;font-size:0.72rem;color:#059669;">💬 教练示范：'+escapeHtml(demo.title)+'</div>';
+      html += '<button id="demoBtn_'+di+'" style="padding:3px 10px;border:1px solid #059669;border-radius:6px;background:#ecfdf5;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;white-space:nowrap;">➕ 收录</button>';
+      html += '</div>';
+      html += '<div style="font-size:0.8rem;line-height:1.7;color:#1e40af;">'+escapeHtml(demo.content)+'</div>';
+      html += '</div>';
+    }
     html += '</div>';
+    window._coachDemosData = _coachDemos;
+    // 绑定收录按钮事件（用事件委托，避免 onclick 引号问题）
+    setTimeout(function() {
+      for (var bi = 0; bi < _coachDemos.length; bi++) {
+        var btn = document.getElementById('demoBtn_'+bi);
+        if (btn) {
+          (function(idx) {
+            btn.onclick = function() {
+              var d = window._coachDemosData[idx];
+              if (d) saveCoachDemo(d.title, d.content);
+            };
+          })(bi);
+        }
+      }
+    }, 50);
   }
   if (_aiFeedbackLoading) {
     html += '<div id="aiFeedbackPanel" style="background:#f0f9ff;border:2px dashed #3b82f6;border-radius:10px;padding:14px;margin-bottom:10px;text-align:center;">';
@@ -3032,28 +3047,26 @@ function saveCoachDemo(title, content) {
 }
 
 function saveAllCoachDemos() {
-  if (!_aiFeedback) return;
-  const parts = _aiFeedback.split(/(【💬教练示范[：:][^】]*】)/);
-  const scripts = getMyScripts();
-  let count = 0;
-  for (let i = 0; i < parts.length; i++) {
-    if (parts[i].match(/【💬教练示范[：:]/)) {
-      const title = parts[i].replace(/【💬教练示范[：:]\s*/,'').replace(/】/,'');
-      const content = (parts[i+1] || '').trim().slice(0, 500);
-      if (!scripts.some(s => s.title === title) && content) {
-        scripts.push({
-          id: 'my_' + Date.now() + '_' + count,
-          title: title.slice(0, 30),
-          category: '我的收藏',
-          customer_type: _aiRolePlay ? _aiRolePlay.name : '模拟客户',
-          scenario: '教练示范 · ' + (_aiRolePlay ? _aiRolePlay.name : '') + '演练',
-          script: content,
-          key_points: ['教练推荐'],
-          tags: ['教练示范', '模拟演练'],
-          saved_at: new Date().toISOString()
-        });
-        count++;
-      }
+  var demos = window._coachDemosData || [];
+  if (!demos.length) return;
+  var scripts = getMyScripts();
+  var count = 0;
+  for (var i = 0; i < demos.length; i++) {
+    var title = demos[i].title;
+    var content = demos[i].content;
+    if (!scripts.some(function(s){return s.title === title}) && content) {
+      scripts.push({
+        id: 'my_' + Date.now() + '_' + count,
+        title: title.slice(0, 30),
+        category: '我的收藏',
+        customer_type: _aiRolePlay ? _aiRolePlay.name : '模拟客户',
+        scenario: '教练示范 · ' + (_aiRolePlay ? _aiRolePlay.name : '') + '演练',
+        script: content,
+        key_points: ['教练推荐'],
+        tags: ['教练示范', '模拟演练'],
+        saved_at: new Date().toISOString()
+      });
+      count++;
     }
   }
   if (count > 0) {

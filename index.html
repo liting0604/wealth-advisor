@@ -3715,6 +3715,14 @@ function renderQaTab() {
           html += '</div>';
         }
 
+        // 2.5 通俗类比
+        if (item.result.example) {
+          html += '<div style="background:linear-gradient(135deg,#fef9c3,#fef08a);border:1px solid #facc15;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.75rem;color:#a16207;margin-bottom:4px;">💡 打个比方（让客户秒懂）</div>';
+          html += '<div style="font-size:0.78rem;line-height:1.7;color:#854d0e;font-style:italic;">' + escapeHtml(item.result.example) + '</div>';
+          html += '</div>';
+        }
+
         // 3. 知识补充
         if (item.result.knowledge) {
           html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
@@ -3779,13 +3787,16 @@ async function analyzeQuestion() {
     '  "concerns": ["担忧1（5-10字）", "担忧2", "担忧3"],\n' +
     '  "caution": "回答这个问题的注意事项，哪些话不能说，哪些雷区要避开（1-2句话）",\n' +
     '  "script": "你可以直接对客户说的话术（像真实对话一样自然，150-250字，用「您」称呼客户，语气专业但不生硬）",\n' +
+    '  "example": "一个通俗易懂的生活化类比，帮客户秒懂核心概念（比如把定投比作每月固定买菜、把资产配置比作吃饭荤素搭配、把基金比作请专业司机开车等等，30-80字）",\n' +
     '  "knowledge": "客户经理需要知道的背景知识或专业要点，方便追问时接得住（2-3句话）"\n' +
     '}\n\n' +
     '要求：\n' +
     '1. script 是可以直接照着念给客户听的话，不是建议\n' +
     '2. 语气要像一个有温度的专业理财经理，不要太官方\n' +
-    '3. concerns 每条不超过10个字\n' +
-    '4. 如果问题涉及具体产品/市场，script中要给出有依据的建议';
+    '3. script 中必须包含 example 里的那个通俗类比，用「打个比方...」「就像...」这类开头\n' +
+    '4. example 必须是生活中常见的场景，比如买菜、做饭、开车、装修、健身、旅游等，让大爷大妈也能听懂\n' +
+    '5. concerns 每条不超过10个字\n' +
+    '6. 如果问题涉及具体产品/市场，script中要给出有依据的建议';
 
   try {
     const resp = await fetch('https://api.deepseek.com/chat/completions', {

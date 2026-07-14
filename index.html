@@ -211,6 +211,7 @@ input:focus, select:focus { border-color: var(--red); }
     <div class="tab" onclick="switchTab('scripts')">📋 话术库</div>
     <div class="tab" onclick="switchTab('notes')">📝 学习笔记</div>
     <div class="tab" onclick="switchTab('qa')">💬 客户问答</div>
+    <div class="tab" onclick="switchTab('strategy')">🎯 销售策略</div>
   </div>
 
   <!-- Tab 0: 仪表盘 -->
@@ -246,6 +247,11 @@ input:focus, select:focus { border-color: var(--red); }
   <!-- Tab: 客户问答助手 -->
   <div id="tab-qa" style="display:none;">
     <div id="qaContent"></div>
+  </div>
+
+  <!-- Tab: 销售策略助手 -->
+  <div id="tab-strategy" style="display:none;">
+    <div id="strategyContent"></div>
   </div>
 
   <!-- Tab 2: 输入 -->
@@ -374,6 +380,9 @@ input:focus, select:focus { border-color: var(--red); }
   </div>
   <div class="mobile-nav-item" onclick="switchTab('qa')" data-tab="qa">
     <span class="nav-icon">💬</span>问答
+  </div>
+  <div class="mobile-nav-item" onclick="switchTab('strategy')" data-tab="strategy">
+    <span class="nav-icon">🎯</span>策略
   </div>
   <div class="mobile-nav-item" onclick="exportPPT()" id="mobileExportBtn">
     <span class="nav-icon">📥</span>导出
@@ -650,11 +659,11 @@ let sids = new Set();
 // UI 逻辑
 // ============================================================
 function switchTab(tab) {
-  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts','notes','qa'].forEach(t => {
+  ['input','result','report','market','news','fund','clients','ai','dashboard','tech','scripts','notes','qa','strategy'].forEach(t => {
     document.getElementById('tab-'+t).style.display = (t===tab)?'block':'none';
   });
   document.querySelectorAll('.tab').forEach((el,i) => {
-    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts','notes','qa'][i]===tab);
+    el.classList.toggle('active', ['dashboard','news','market','fund','clients','ai','input','result','report','tech','scripts','notes','qa','strategy'][i]===tab);
   });
   // 同步移动端底部导航
   document.querySelectorAll('.mobile-nav-item').forEach(el => {
@@ -671,6 +680,7 @@ function switchTab(tab) {
   if (tab === 'scripts') renderScriptsTab();
   if (tab === 'notes') renderNotesTab();
   if (tab === 'qa') renderQaTab();
+  if (tab === 'strategy') renderStrategyTab();
   // 滚动到顶部
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -3883,6 +3893,283 @@ function saveQaToScripts(idx) {
 function deleteQaItem(idx) {
   _qaHistory.splice(idx, 1);
   renderQaTab();
+}
+
+// ============================================================
+// 销售策略助手
+// ============================================================
+let _stratHistory = [];
+const STRAT_EXAMPLES = [
+  '客户一直做低风险理财，怎么推荐股基？',
+  '客户只买定期存款，怎么引导做资产配置？',
+  '客户有钱但只信支付宝，怎么让他来银行买？',
+  '客户被上次亏损吓到了，怎么让他重新投资？',
+  '客户觉得基金手续费贵，怎么解释价值？',
+  '高净值客户只买理财，怎么推荐保险和信托？',
+  '客户说"我再想想"，怎么推动他下单？',
+  '客户是退休老人，怎么推荐稳健型组合？',
+  '客户只买黄金不买基金，怎么转换？',
+  '客户问他行VIP有什么专属服务，怎么答？',
+];
+
+function renderStrategyTab() {
+  var ctr = document.getElementById('strategyContent');
+  if (!ctr) return;
+  var hasKey = !!getAiKey();
+  var html = '';
+
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
+  html += '<div style="font-weight:700;font-size:0.95rem;">🎯 销售策略助手</div>';
+  html += '<div style="font-size:0.68rem;color:var(--gray);">输入场景 → AI拆解角度+输出话术</div>';
+  html += '</div>';
+
+  if (!hasKey) {
+    html += '<div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px;margin-bottom:12px;">';
+    html += '<div style="font-weight:600;font-size:0.85rem;">🔑 请先配置 DeepSeek API Key</div>';
+    html += '<div style="font-size:0.7rem;color:var(--gray);margin-top:4px;">与 AI 助手共用同一个 Key</div>';
+    html += '<input id="stratKeyInput" type="password" placeholder="sk-..." style="width:100%;padding:8px;border:1px solid #e5e7eb;border-radius:6px;font-size:0.82rem;margin:8px 0;">';
+    html += '<button onclick="saveStratKey()" style="padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">保存并开始</button></div>';
+    ctr.innerHTML = html;
+    return;
+  }
+
+  // 输入区
+  html += '<div style="background:#fff;border:2px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:12px;">';
+  html += '<div style="font-weight:600;font-size:0.82rem;margin-bottom:8px;">📋 你遇到了什么销售场景？</div>';
+  html += '<textarea id="stratInput" placeholder="描述你遇到的场景，比如：客户一直做低风险理财，怎么去跟他推荐股基？" style="width:100%;min-height:70px;padding:10px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.85rem;resize:vertical;font-family:inherit;"></textarea>';
+  html += '<div style="display:flex;gap:8px;margin-top:8px;align-items:center;">';
+  html += '<button onclick="analyzeStrategy()" id="stratBtn" style="padding:8px 20px;background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:600;">🎯 生成策略</button>';
+  html += '<span style="font-size:0.68rem;color:var(--gray);">回车也可以提交</span>';
+  html += '</div>';
+  // 快捷示例
+  html += '<div style="margin-top:10px;border-top:1px dashed #e5e7eb;padding-top:8px;">';
+  html += '<div style="font-size:0.68rem;color:var(--gray);margin-bottom:6px;">💡 常见销售场景（点击填入）：</div>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+  for (var i = 0; i < STRAT_EXAMPLES.length; i++) {
+    html += '<button onclick="fillStratExample(this)" data-s="' + STRAT_EXAMPLES[i].replace(/"/g, '&quot;') + '" style="font-size:0.68rem;padding:4px 10px;border:1px solid #e5e7eb;border-radius:12px;background:#f9fafb;cursor:pointer;white-space:nowrap;color:var(--gray);">' + STRAT_EXAMPLES[i] + '</button>';
+  }
+  html += '</div></div>';
+  html += '</div>';
+
+  // 历史记录
+  if (_stratHistory.length === 0) {
+    html += '<div style="text-align:center;color:var(--gray);padding:30px;">';
+    html += '<div style="font-size:2rem;margin-bottom:8px;">🎯</div>';
+    html += '<div style="font-size:0.85rem;">输入你遇到的销售场景，AI 帮你拆解切入角度 + 生成完整话术</div>';
+    html += '</div>';
+  } else {
+    for (var si = _stratHistory.length - 1; si >= 0; si--) {
+      var item = _stratHistory[si];
+      html += '<div class="card" style="padding:14px;margin-bottom:12px;">';
+      // 场景
+      html += '<div style="background:#eff6ff;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:0.68rem;color:var(--gray);margin-bottom:4px;">📋 销售场景：</div>';
+      html += '<div style="font-size:0.85rem;font-weight:600;">' + escapeHtml(item.scene) + '</div>';
+      html += '</div>';
+
+      if (item.loading) {
+        html += '<div style="text-align:center;padding:20px;color:var(--gray);"><span class="spinner"></span> AI 正在生成策略...</div>';
+      } else if (item.error) {
+        html += '<div style="background:#fee2e2;border-radius:8px;padding:10px;font-size:0.8rem;color:#dc2626;">⚠️ ' + escapeHtml(item.error) + '</div>';
+      } else if (item.result) {
+        var r = item.result;
+
+        // 1. 切入角度
+        if (r.angles && r.angles.length) {
+          html += '<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.8rem;color:#92400e;margin-bottom:8px;">🧭 从这几个角度切入</div>';
+          for (var ai = 0; ai < r.angles.length; ai++) {
+            var ang = r.angles[ai];
+            html += '<div style="margin-bottom:8px;padding:8px;background:#fff;border-radius:6px;border-left:3px solid #f59e0b;">';
+            html += '<div style="font-weight:600;font-size:0.78rem;color:#92400e;">' + (ai+1) + '. ' + escapeHtml(ang.title || '') + '</div>';
+            if (ang.reason) {
+              html += '<div style="font-size:0.72rem;color:#78350f;margin-top:3px;line-height:1.5;">' + escapeHtml(ang.reason) + '</div>';
+            }
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+
+        // 2. 注意事项
+        if (r.caution) {
+          html += '<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.75rem;color:#dc2626;margin-bottom:4px;">⚠️ 避坑提醒</div>';
+          html += '<div style="font-size:0.72rem;line-height:1.6;color:#991b1b;">' + escapeHtml(r.caution) + '</div>';
+          html += '</div>';
+        }
+
+        // 3. 完整话术
+        if (r.script) {
+          html += '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:10px;">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
+          html += '<div style="font-weight:700;font-size:0.8rem;color:#059669;">💬 完整话术（可以直接对客户说）</div>';
+          html += '<button onclick="copyStratScript(' + si + ')" style="padding:3px 10px;border:1px solid #bbf7d0;border-radius:6px;background:#f0fdf4;color:#059669;font-size:0.65rem;cursor:pointer;font-weight:600;">📋 复制</button>';
+          html += '</div>';
+          html += '<div style="font-size:0.82rem;line-height:1.8;color:#065f46;white-space:pre-wrap;" id="stratScript-' + si + '">' + escapeHtml(r.script) + '</div>';
+          html += '</div>';
+        }
+
+        // 4. 通俗类比
+        if (r.example) {
+          html += '<div style="background:linear-gradient(135deg,#fef9c3,#fef08a);border:1px solid #facc15;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.75rem;color:#a16207;margin-bottom:4px;">💡 打个比方（让客户秒懂）</div>';
+          html += '<div style="font-size:0.78rem;line-height:1.7;color:#854d0e;font-style:italic;">' + escapeHtml(r.example) + '</div>';
+          html += '</div>';
+        }
+
+        // 5. 后续追问预判
+        if (r.followups && r.followups.length) {
+          html += '<div style="background:#f5f3ff;border:1px solid #c4b5fd;border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+          html += '<div style="font-weight:700;font-size:0.75rem;color:#6d28d9;margin-bottom:6px;">🔮 客户可能会追问</div>';
+          for (var fi = 0; fi < r.followups.length; fi++) {
+            html += '<div style="font-size:0.75rem;color:#5b21b6;margin-bottom:4px;padding-left:12px;position:relative;">';
+            html += '<span style="position:absolute;left:0;">❓</span>' + escapeHtml(r.followups[fi]) + '</div>';
+          }
+          html += '</div>';
+        }
+
+        // 操作按钮
+        html += '<div style="display:flex;gap:6px;">';
+        html += '<button onclick="saveStratToScripts(' + si + ')" style="padding:5px 12px;border:1px solid #059669;border-radius:6px;background:#ecfdf5;color:#059669;font-size:0.7rem;cursor:pointer;font-weight:600;">➕ 收到话术库</button>';
+        html += '<button onclick="deleteStratItem(' + si + ')" style="padding:5px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;color:var(--gray);font-size:0.7rem;cursor:pointer;">🗑️ 删除</button>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+  }
+
+  ctr.innerHTML = html;
+
+  // 绑定回车
+  var inp = document.getElementById('stratInput');
+  if (inp) {
+    inp.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        analyzeStrategy();
+      }
+    });
+  }
+}
+
+function saveStratKey() {
+  var k = document.getElementById('stratKeyInput').value.trim();
+  if (!k || !k.indexOf('sk-') !== 0) { toast('请输入有效的Key (sk-开头)'); return; }
+  setAiKey(k);
+  toast('Key已保存');
+  renderStrategyTab();
+}
+
+function fillStratExample(btn) {
+  var s = btn.getAttribute('data-s');
+  var inp = document.getElementById('stratInput');
+  if (inp) { inp.value = s; inp.focus(); }
+}
+
+async function analyzeStrategy() {
+  var inp = document.getElementById('stratInput');
+  var s = (inp && inp.value || '').trim();
+  if (!s) { toast('请输入销售场景'); return; }
+  if (inp) inp.value = '';
+
+  var item = { scene: s, loading: true };
+  _stratHistory.push(item);
+  renderStrategyTab();
+
+  var prompt = '你是一位资深银行理财销售教练，拥有20年一线客户服务经验。一位新入行的客户经理遇到了一个销售场景，需要你帮忙制定策略和话术。\n\n' +
+    '【销售场景】' + s + '\n\n' +
+    '请严格按以下JSON格式回复（不要有任何多余文字，不要markdown代码块标记，直接输出JSON）：\n' +
+    '{\n' +
+    '  "angles": [\n' +
+    '    {"title": "切入角度1名称（8-15字）", "reason": "为什么从这个角度切入有效（1-2句话分析客户心理）"},\n' +
+    '    {"title": "切入角度2名称", "reason": "分析"},\n' +
+    '    {"title": "切入角度3名称", "reason": "分析"}\n' +
+    '  ],\n' +
+    '  "caution": "这个场景的避坑提醒：哪些话不能说，哪些做法会适得其反（2-3句话）",\n' +
+    '  "script": "完整的销售话术，可以直接对客户说（300-500字，像真实对话一样自然，用「您」称呼，语气专业有温度，要包含从破冰到促成建议的完整流程）",\n' +
+    '  "example": "一个通俗易懂的生活化类比，帮客户秒懂核心概念（30-80字，比如把资产配置比作吃饭荤素搭配、把定投比作每月固定买菜等）",\n' +
+    '  "followups": ["客户可能追问的问题1（15-25字）", "问题2", "问题3"]\n' +
+    '}\n\n' +
+    '要求：\n' +
+    '1. angles 至少3个，每个角度要站在客户心理角度分析，不能泛泛而谈\n' +
+    '2. script 必须包含 example 里的通俗类比，用「打个比方...」「就像...」这类自然过渡\n' +
+    '3. script 要有完整的对话流程：开场共情 → 引入概念（带类比）→ 给出方案 → 预设台阶\n' +
+    '4. followups 是客户听完话术后最可能追问的3个问题\n' +
+    '5. 语气像一个有温度的老理财经理在带新人，不要太官方';
+
+  try {
+    var resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getAiKey() },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'system', content: prompt }],
+        temperature: 0.6,
+        max_tokens: 2500
+      })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    var content = data.choices[0].message.content.trim();
+    content = content.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+
+    var result;
+    try {
+      result = JSON.parse(content);
+    } catch(e) {
+      var m = content.match(/\{[\s\S]*\}/);
+      if (m) { try { result = JSON.parse(m[0]); } catch(e2) { result = null; } }
+    }
+
+    if (result) {
+      item.loading = false;
+      item.result = result;
+    } else {
+      item.loading = false;
+      item.result = { angles: [], caution: '', script: content, example: '', followups: [] };
+    }
+  } catch(e) {
+    item.loading = false;
+    item.error = e.message + '（请检查 API Key 是否有效）';
+  }
+
+  renderStrategyTab();
+  setTimeout(function() {
+    var cards = document.querySelectorAll('#strategyContent .card');
+    if (cards.length) cards[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function copyStratScript(idx) {
+  var el = document.getElementById('stratScript-' + idx);
+  if (!el) return;
+  navigator.clipboard.writeText(el.textContent.trim()).then(function() {
+    toast('话术已复制到剪贴板');
+  }).catch(function() { toast('复制失败，请手动复制'); });
+}
+
+function saveStratToScripts(idx) {
+  var item = _stratHistory[idx];
+  if (!item || !item.result || !item.result.script) return;
+  var scripts = getMyScripts();
+  scripts.push({
+    id: 'strat_' + Date.now(),
+    title: item.scene.slice(0, 25),
+    category: '我的收藏',
+    customer_type: '销售场景',
+    scenario: item.scene.slice(0, 60),
+    script: item.result.script,
+    key_points: ['策略助手'],
+    tags: ['销售策略', 'AI生成'],
+    saved_at: new Date().toISOString()
+  });
+  setMyScripts(scripts);
+  toast('✅ 已收录到话术库「我的收藏」');
+}
+
+function deleteStratItem(idx) {
+  _stratHistory.splice(idx, 1);
+  renderStrategyTab();
 }
 
 // ============================================================

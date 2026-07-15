@@ -1517,17 +1517,31 @@ async function fetchFundPerformance(code) {
   var data = await resp.json();
   var d = data.Datas;
   if (!d) return null;
+  // Datas 可能是 list: [{title:'Z', syl:'-5.03', avg:'-1.07', hs300:'0.09', rank:'964', sc:'1088'}, ...]
+  // 也可能是 dict: {Z:'-5.03', Y:'-3.44', ...}
+  var map = {};
+  if (Array.isArray(d)) {
+    for (var i = 0; i < d.length; i++) {
+      var item = d[i];
+      map[item.title] = { syl: item.syl, avg: item.avg, hs300: item.hs300, rank: item.rank, sc: item.sc };
+    }
+  } else {
+    for (var k in d) { map[k] = { syl: d[k] }; }
+  }
+  function get(key) { return map[key] ? map[key].syl : ''; }
+  function getAvg(key) { return map[key] ? map[key].avg : ''; }
+  function getHS300(key) { return map[key] ? map[key].hs300 : ''; }
+  function getRank(key) { return map[key] ? (map[key].rank || '') : ''; }
+  function getSC(key) { return map[key] ? (map[key].sc || '') : ''; }
   return {
-    w1: d.Z || '',      // 近1周
-    m1: d.Y || '',      // 近1月
-    m3: d['3Y'] || '',  // 近3月
-    m6: d['6Y'] || '',  // 近6月
-    y1: d['1N'] || '',  // 近1年
-    y2: d['2N'] || '',  // 近2年
-    y3: d['3N'] || '',  // 近3年
-    y5: d['5N'] || '',  // 近5年
-    ytd: d.JN || '',    // 今年
-    since: d.LN || ''   // 成立来
+    w1: get('Z'), m1: get('Y'), m3: get('3Y'), m6: get('6Y'),
+    y1: get('1N'), y2: get('2N'), y3: get('3N'), y5: get('5N'),
+    ytd: get('JN'), since: get('LN'),
+    // 同类平均和排名
+    m1_avg: getAvg('Y'), m3_avg: getAvg('3Y'), m6_avg: getAvg('6Y'), y1_avg: getAvg('1N'), y3_avg: getAvg('3N'),
+    m1_hs300: getHS300('Y'), m3_hs300: getHS300('3Y'), m6_hs300: getHS300('6Y'), y1_hs300: getHS300('1N'), y3_hs300: getHS300('3N'),
+    y1_rank: getRank('1N'), y1_sc: getSC('1N'), m1_rank: getRank('Y'), m1_sc: getSC('Y'),
+    y3_rank: getRank('3N'), y3_sc: getSC('3N')
   };
 }
 
@@ -1780,13 +1794,24 @@ function renderFundDetail(code, basic, perf, navHistory) {
   html += '<div id="detailHoldings" style="background:#ecfeff;border-radius:8px;padding:12px;"><div style="text-align:center;padding:12px;color:var(--gray);font-size:0.8rem;"><span class="spinner" style="display:inline-block;width:16px;height:16px;border:2px solid #f0f0f0;border-top-color:#0891b2;border-radius:50%;animation:spin 0.8s linear infinite;"></span> 加载中...</div></div>';
   html += '</div>';
 
-  // ---- 8. 投资策略 ----
+  // ---- 9. 投资策略 ----
   if (basic && basic.investIdea && basic.investIdea !== '--') {
     html += '<div style="margin-bottom:16px;">';
     html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #4f46e5;padding-left:8px;">💡 投资策略</div>';
     html += '<div style="background:#eef2ff;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.6;color:var(--dark);">' + escapeHtml(basic.investIdea) + '</div>';
     html += '</div>';
   }
+
+  // ---- 10. AI 基金经理风格分析 ----
+  html += '<div style="margin-bottom:16px;">';
+  html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #db2777;padding-left:8px;">🤖 基金经理风格分析</div>';
+  html += '<div id="detailAiAnalysis" style="background:#fdf2f8;border-radius:8px;padding:12px;">';
+  html += '<div id="aiAnalysisInner" style="text-align:center;padding:20px;color:var(--gray);font-size:0.8rem;">';
+  html += '<button onclick="generateFundAiAnalysis(\'' + code + '\')" style="padding:8px 20px;background:#db2777;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.82rem;">🤖 AI 分析基金风格</button>';
+  html += '<div style="font-size:0.65rem;color:#9ca3af;margin-top:6px;">基于持仓、业绩、资产配置等数据，AI 分析投资风格</div>';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>';
 
   html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:center;padding:8px 0;">数据来源：天天基金 · 东方财富 | 仅供参考，不构成投资建议</div>';
   return html;
@@ -1841,6 +1866,140 @@ function buildAllocBar(label, value, color) {
     '<div style="font-size:0.6rem;color:var(--gray);margin-bottom:2px;">' + label + '</div>' +
     '<div style="background:' + color + ';color:#fff;border-radius:4px;padding:4px 6px;font-size:0.72rem;font-weight:700;">' + pct + '</div>' +
     '</div>';
+}
+
+// ---- AI 基金经理风格分析 ----
+async function generateFundAiAnalysis(code) {
+  var container = document.getElementById('aiAnalysisInner');
+  if (!container) return;
+  var key = getAiKey();
+  if (!key) {
+    container.innerHTML = '<p style="color:var(--gray);font-size:0.8rem;text-align:center;">需要先设置 DeepSeek API Key</p><p style="font-size:0.7rem;color:#9ca3af;text-align:center;">在其他功能（如智能问答、销售策略）中设置过即可通用</p>';
+    return;
+  }
+
+  container.innerHTML = '<div style="text-align:center;padding:16px;"><span class="spinner" style="display:inline-block;width:20px;height:20px;border:2px solid #f0f0f0;border-top-color:#db2777;border-radius:50%;animation:spin 0.8s linear infinite;"></span><p style="margin-top:8px;font-size:0.8rem;color:var(--gray);">AI 正在分析基金风格...</p></div>';
+
+  try {
+    // 并行获取所有数据
+    var results = await Promise.allSettled([
+      fetchFundBasicInfo(code),
+      fetchFundPerformance(code),
+      fetchFundHoldings(code),
+      fetchFundAssetAllocation(code),
+      fetchFundNavHistory(code, 60)
+    ]);
+    var basic = results[0].status === 'fulfilled' ? results[0].value : null;
+    var perf = results[1].status === 'fulfilled' ? results[1].value : null;
+    var holdings = results[2].status === 'fulfilled' ? results[2].value : null;
+    var alloc = results[3].status === 'fulfilled' ? results[3].value : null;
+    var navs = results[4].status === 'fulfilled' ? results[4].value : null;
+
+    // 组装数据摘要
+    var dataSummary = '';
+    if (basic) {
+      dataSummary += '基金名称：' + basic.name + '\n';
+      dataSummary += '基金类型：' + basic.type + '\n';
+      dataSummary += '基金公司：' + basic.company + '\n';
+      dataSummary += '成立日期：' + basic.establishDate + '\n';
+      dataSummary += '净资产规模：' + (basic.endNav ? (parseFloat(basic.endNav)/100000000).toFixed(2)+'亿元' : '未知') + '\n';
+      dataSummary += '风险等级：PR' + basic.riskLevel + '\n';
+      dataSummary += '业绩比较基准：' + basic.bench + '\n';
+      if (basic.sharp1) dataSummary += '夏普比率(1年)：' + basic.sharp1 + '\n';
+      if (basic.stddev1) dataSummary += '年化波动率(1年)：' + basic.stddev1 + '%\n';
+    }
+    if (perf) {
+      dataSummary += '\n业绩表现：\n';
+      dataSummary += '近1月：' + perf.m1 + '%  同类平均：' + (perf.m1_avg||'—') + '%  沪深300：' + (perf.m1_hs300||'—') + '%\n';
+      dataSummary += '近3月：' + perf.m3 + '%  同类平均：' + (perf.m3_avg||'—') + '%  沪深300：' + (perf.m3_hs300||'—') + '%\n';
+      dataSummary += '近6月：' + perf.m6 + '%  同类平均：' + (perf.m6_avg||'—') + '%  沪深300：' + (perf.m6_hs300||'—') + '%\n';
+      dataSummary += '近1年：' + perf.y1 + '%  同类平均：' + (perf.y1_avg||'—') + '%  沪深300：' + (perf.y1_hs300||'—') + '%\n';
+      dataSummary += '近3年：' + perf.y3 + '%  同类平均：' + (perf.y3_avg||'—') + '%  沪深300：' + (perf.y3_hs300||'—') + '%\n';
+      dataSummary += '今年：' + perf.ytd + '%  成立来：' + perf.since + '%\n';
+      if (perf.y1_rank) dataSummary += '近1年同类排名：' + perf.y1_rank + '/' + perf.y1_sc + '\n';
+    }
+    if (holdings && holdings.length > 0) {
+      var stocks = holdings.filter(function(h){return h.type==='stock';});
+      if (stocks.length > 0) {
+        dataSummary += '\n前十大股票持仓：\n';
+        for (var i = 0; i < stocks.length; i++) {
+          dataSummary += (i+1) + '. ' + stocks[i].name + '(' + stocks[i].code + ') 占比' + stocks[i].ratio + '% 行业:' + stocks[i].industry + ' ' + stocks[i].change + '\n';
+        }
+      }
+      var bonds = holdings.filter(function(h){return h.type==='bond';});
+      if (bonds.length > 0) {
+        dataSummary += '\n前五大债券持仓：\n';
+        for (var j = 0; j < Math.min(bonds.length, 5); j++) {
+          dataSummary += (j+1) + '. ' + bonds[j].name + ' 占比' + bonds[j].ratio + '%\n';
+        }
+      }
+    }
+    if (alloc && alloc.length > 0) {
+      var latest = alloc[0];
+      dataSummary += '\n最新资产配置(' + latest.date + ')：股票' + latest.stock.toFixed(1) + '% 债券' + latest.bond.toFixed(1) + '% 现金' + latest.cash.toFixed(1) + '%\n';
+      if (alloc.length > 1) {
+        var prev = alloc[alloc.length-1];
+        dataSummary += '资产配置趋势：从' + prev.date + '到' + latest.date + '，股票仓位从' + prev.stock.toFixed(1) + '%变为' + latest.stock.toFixed(1) + '%\n';
+      }
+    }
+    if (navs && navs.length > 1) {
+      var dd = calcMaxDrawdown(navs);
+      dataSummary += '\n近1年最大回撤：-' + (dd.value*100).toFixed(2) + '% (高点' + dd.peakDate + '→低点' + dd.troughDate + ')\n';
+    }
+
+    var prompt = '你是一位资深基金分析师，请根据以下基金数据，分析这只基金的投资风格和基金经理的管理特点。\n\n' + dataSummary + '\n\n请从以下几个维度分析（用通俗易懂的语言，适合银行客户经理向客户讲解）：\n\n1. 投资风格定位（价值/成长/均衡？大盘/中盘/小盘？）\n2. 行业偏好与持仓集中度\n3. 仓位管理风格（是否择时？仓位灵活还是稳定？）\n4. 风险控制能力（回撤控制、波动率评价）\n5. 业绩归因（超额收益来源是什么？选股还是择时？）\n6. 适合什么类型的投资者\n\n请输出JSON格式：\n{"style":"投资风格定位（1-2句话）","holdings_analysis":"行业偏好与持仓集中度分析","position_style":"仓位管理风格分析","risk_control":"风险控制能力评价","performance_attribution":"业绩归因分析","suitable":"适合的投资者类型描述"}';
+
+    var resp = await fetch('https://api.deepseek.com/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.3,
+        max_tokens: 1500
+      })
+    });
+    var aiData = await resp.json();
+    var content = (aiData.choices && aiData.choices[0] && aiData.choices[0].message && aiData.choices[0].message.content) || '';
+
+    // 提取 JSON
+    var jsonMatch = content.match(/\{[\s\S]*\}/);
+    var analysis = null;
+    if (jsonMatch) {
+      try { analysis = JSON.parse(jsonMatch[0]); } catch(e) {}
+    }
+
+    if (analysis) {
+      container.innerHTML = renderAiAnalysis(analysis);
+    } else {
+      // 如果 JSON 解析失败，直接显示文本
+      container.innerHTML = '<div style="font-size:0.78rem;line-height:1.7;color:var(--dark);white-space:pre-wrap;">' + escapeHtml(content) + '</div>';
+    }
+  } catch(e) {
+    container.innerHTML = '<p style="color:#dc2626;font-size:0.8rem;text-align:center;">分析失败：' + escapeHtml(e.message || '网络错误') + '</p><button onclick="generateFundAiAnalysis(\'' + code + '\')" style="margin-top:8px;padding:6px 16px;background:#db2777;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:0.8rem;">重试</button>';
+  }
+}
+
+function renderAiAnalysis(a) {
+  var html = '';
+  var sections = [
+    ['🎯 投资风格', a.style, '#fdf2f8'],
+    ['📊 持仓分析', a.holdings_analysis, '#ecfeff'],
+    ['⚖️ 仓位管理', a.position_style, '#f0fdfa'],
+    ['🛡️ 风险控制', a.risk_control, '#fffbeb'],
+    ['📈 业绩归因', a.performance_attribution, '#f0f9ff'],
+    ['👥 适合人群', a.suitable, '#f5f3ff']
+  ];
+  for (var i = 0; i < sections.length; i++) {
+    if (sections[i][1]) {
+      html += '<div style="margin-bottom:10px;">';
+      html += '<div style="font-size:0.75rem;font-weight:700;color:var(--dark);margin-bottom:4px;">' + sections[i][0] + '</div>';
+      html += '<div style="background:' + sections[i][2] + ';border-radius:6px;padding:8px 10px;font-size:0.75rem;line-height:1.6;color:var(--dark);">' + escapeHtml(sections[i][1]) + '</div>';
+      html += '</div>';
+    }
+  }
+  html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:right;">AI 分析基于公开数据，仅供参考</div>';
+  return html;
 }
 
 function judgeBias(market) {

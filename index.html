@@ -340,6 +340,17 @@ input:focus, select:focus { border-color: var(--red); }
   </div>
 </div>
 
+<!-- 基金详情弹窗 -->
+<div id="fundDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;overflow-y:auto;" onclick="if(event.target===this)closeFundDetail()">
+  <div style="background:#fff;max-width:680px;margin:20px auto;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #f0f0f0;position:sticky;top:0;background:#fff;z-index:10;">
+      <div id="fundDetailTitle" style="font-weight:700;font-size:1rem;">基金详情</div>
+      <button onclick="closeFundDetail()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--gray);padding:4px 8px;line-height:1;">✕</button>
+    </div>
+    <div id="fundDetailBody" style="padding:16px;"></div>
+  </div>
+</div>
+
 <!-- 移动端底部导航 -->
 <div class="mobile-bottom-nav" id="mobileNav">
   <div class="mobile-nav-item active" onclick="switchTab('dashboard')" data-tab="dashboard">
@@ -1132,8 +1143,10 @@ function buildFundCard(code, isMyFund) {
   html += '</div>';
   html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">—</span>';
   html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:55px;text-align:right;color:var(--gray);">—</span>';
+  // 详情分析按钮
+  html += '<button class="fund-detail-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #d1fae5;border-radius:5px;background:#ecfdf5;color:#059669;cursor:pointer;flex-shrink:0;">📊</button>';
   // 单只刷新按钮
-  html += '<button class="fund-refresh-btn" data-code="' + code + '" style="margin-left:6px;padding:4px 8px;font-size:0.7rem;border:1px solid #e5e7eb;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;">🔄</button>';
+  html += '<button class="fund-refresh-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #e5e7eb;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;">🔄</button>';
   // 删除按钮（仅自选基金）
   if (isMyFund) {
     html += '<button class="fund-del-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #fecaca;border-radius:5px;background:#fef2f2;color:#dc2626;cursor:pointer;flex-shrink:0;">✕</button>';
@@ -1169,6 +1182,8 @@ function buildFundCardFromProduct(f) {
   html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">—</span>';
   html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:55px;text-align:right;color:var(--gray);">—</span>';
   html += '<button class="fund-refresh-btn" data-code="' + code + '" style="margin-left:6px;padding:4px 8px;font-size:0.7rem;border:1px solid #e5e7eb;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;">🔄</button>';
+  // 详情分析按钮
+  html += '<button class="fund-detail-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #d1fae5;border-radius:5px;background:#ecfdf5;color:#059669;cursor:pointer;flex-shrink:0;">📊</button>';
   // 加入自选按钮
   html += '<button class="fund-add-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #bfdbfe;border-radius:5px;background:#eff6ff;color:#2563eb;cursor:pointer;flex-shrink:0;">⭐</button>';
   html += '</div>';
@@ -1303,13 +1318,17 @@ function updateHistRow(code, hist) {
   }
 }
 
-// ---- 事件委托：单只刷新 / 删除 / 加入自选 ----
+// ---- 事件委托：单只刷新 / 删除 / 加入自选 / 查看详情 ----
 document.addEventListener('click', function(e) {
   var t = e.target;
   if (t.classList && t.classList.contains('fund-refresh-btn')) {
     e.preventDefault();
     e.stopPropagation();
     refreshOneFund(t.dataset.code);
+  } else if (t.classList && t.classList.contains('fund-detail-btn')) {
+    e.preventDefault();
+    e.stopPropagation();
+    showFundDetail(t.dataset.code);
   } else if (t.classList && t.classList.contains('fund-del-btn')) {
     e.preventDefault();
     e.stopPropagation();
@@ -1326,6 +1345,503 @@ document.addEventListener('click', function(e) {
     }
   }
 });
+
+// ============================================================
+// 基金详情分析（弹窗）
+// ============================================================
+function closeFundDetail() {
+  var modal = document.getElementById('fundDetailModal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function showFundDetail(code) {
+  var modal = document.getElementById('fundDetailModal');
+  var title = document.getElementById('fundDetailTitle');
+  var body = document.getElementById('fundDetailBody');
+  if (!modal || !body) return;
+
+  // 先显示弹窗骨架 + loading
+  var cacheName = (_fundCache[code] && _fundCache[code].name) ? _fundCache[code].name : code;
+  title.textContent = cacheName + ' · 基金分析';
+  body.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--gray);"><span class="spinner" style="display:inline-block;width:24px;height:24px;border:3px solid #f0f0f0;border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;"></span><p style="margin-top:12px;font-size:0.85rem;">正在获取基金数据...</p></div>';
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+
+  try {
+    // 并行获取基本信息 + 业绩 + 历史净值
+    var results = await Promise.allSettled([
+      fetchFundBasicInfo(code),
+      fetchFundPerformance(code),
+      fetchFundNavHistory(code, 250)
+    ]);
+    var basic = results[0].status === 'fulfilled' ? results[0].value : null;
+    var perf = results[1].status === 'fulfilled' ? results[1].value : null;
+    var navHistory = results[2].status === 'fulfilled' ? results[2].value : null;
+
+    // 更新标题
+    if (basic && basic.name) title.textContent = basic.name + ' · 基金分析';
+
+    // 渲染详情
+    body.innerHTML = renderFundDetail(code, basic, perf, navHistory);
+
+    // 异步获取持仓（不阻塞首屏）
+    fetchFundHoldings(code).then(function(holdings) {
+      var el = document.getElementById('detailHoldings');
+      if (el) {
+        if (holdings && holdings.length > 0) {
+          var stocks = holdings.filter(function(h) { return h.type === 'stock'; });
+          var bonds = holdings.filter(function(h) { return h.type === 'bond'; });
+          var h = '';
+          if (stocks.length > 0) {
+            h += '<div style="font-size:0.72rem;font-weight:600;margin-bottom:6px;color:var(--dark);">📈 股票持仓（前' + stocks.length + '大）</div>';
+            h += '<div style="overflow-x:auto;"><table style="width:100%;font-size:0.72rem;border-collapse:collapse;">';
+            h += '<thead><tr style="background:#f9fafb;"><th style="padding:5px 6px;text-align:left;border-bottom:2px solid #e5e7eb;">#</th><th style="padding:5px 6px;text-align:left;border-bottom:2px solid #e5e7eb;">名称</th><th style="padding:5px 6px;text-align:left;border-bottom:2px solid #e5e7eb;">行业</th><th style="padding:5px 6px;text-align:right;border-bottom:2px solid #e5e7eb;">占比</th><th style="padding:5px 6px;text-align:center;border-bottom:2px solid #e5e7eb;">变动</th></tr></thead><tbody>';
+            for (var i = 0; i < stocks.length; i++) {
+              var s = stocks[i];
+              h += '<tr style="border-bottom:1px solid #f3f4f6;">';
+              h += '<td style="padding:4px 6px;color:var(--gray);">' + (i+1) + '</td>';
+              h += '<td style="padding:4px 6px;font-weight:600;">' + escapeHtml(s.name) + '<div style="font-size:0.6rem;color:var(--gray);font-weight:400;">' + s.code + '</div></td>';
+              h += '<td style="padding:4px 6px;color:var(--gray);font-size:0.68rem;">' + escapeHtml(s.industry || '—') + '</td>';
+              h += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:var(--red);">' + s.ratio + '%</td>';
+              var chgClr = s.change === '新增' ? '#059669' : (s.change === '减持' ? '#dc2626' : (s.change === '增持' ? '#c41230' : 'var(--gray)'));
+              h += '<td style="padding:4px 6px;text-align:center;font-size:0.65rem;color:' + chgClr + ';">' + escapeHtml(s.change || '—') + '</td>';
+              h += '</tr>';
+            }
+            h += '</tbody></table></div>';
+          }
+          if (bonds.length > 0) {
+            h += '<div style="font-size:0.72rem;font-weight:600;margin:8px 0 6px;color:var(--dark);">💰 债券持仓（前' + bonds.length + '大）</div>';
+            h += '<div style="overflow-x:auto;"><table style="width:100%;font-size:0.72rem;border-collapse:collapse;">';
+            h += '<thead><tr style="background:#f9fafb;"><th style="padding:5px 6px;text-align:left;border-bottom:2px solid #e5e7eb;">#</th><th style="padding:5px 6px;text-align:left;border-bottom:2px solid #e5e7eb;">名称</th><th style="padding:5px 6px;text-align:right;border-bottom:2px solid #e5e7eb;">占比</th></tr></thead><tbody>';
+            for (var j = 0; j < bonds.length; j++) {
+              var b = bonds[j];
+              h += '<tr style="border-bottom:1px solid #f3f4f6;">';
+              h += '<td style="padding:4px 6px;color:var(--gray);">' + (j+1) + '</td>';
+              h += '<td style="padding:4px 6px;font-weight:600;">' + escapeHtml(b.name) + '</td>';
+              h += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:#7c3aed;">' + b.ratio + '%</td>';
+              h += '</tr>';
+            }
+            h += '</tbody></table></div>';
+          }
+          h += '<div style="font-size:0.6rem;color:#9ca3af;margin-top:6px;">数据来源：天天基金 | 最新季报披露</div>';
+          el.innerHTML = h;
+        } else {
+          el.innerHTML = '<p style="color:var(--gray);font-size:0.8rem;text-align:center;padding:16px;">该基金暂无持仓数据（可能为债基/货基）</p>';
+        }
+      }
+    }).catch(function() {
+      var el = document.getElementById('detailHoldings');
+      if (el) el.innerHTML = '<p style="color:var(--gray);font-size:0.8rem;text-align:center;padding:16px;">持仓数据获取失败</p>';
+    });
+
+    // 异步获取资产配置
+    fetchFundAssetAllocation(code).then(function(alloc) {
+      var el = document.getElementById('detailAllocation');
+      if (el && alloc && alloc.length > 0) {
+        var latest = alloc[0];
+        var h = '<div style="display:flex;gap:6px;margin-bottom:8px;">';
+        h += buildAllocBar('股票', latest.stock, '#c41230');
+        h += buildAllocBar('债券', latest.bond, '#7c3aed');
+        h += buildAllocBar('现金', latest.cash, '#059669');
+        h += buildAllocBar('其他', latest.other, '#6b7280');
+        h += '</div>';
+        h += '<div style="font-size:0.6rem;color:#9ca3af;margin-bottom:8px;">截至 ' + latest.date + '</div>';
+        // 近4期配置变化
+        h += '<div style="font-size:0.7rem;font-weight:600;margin-bottom:4px;">近' + Math.min(alloc.length, 4) + '期资产配置变化</div>';
+        h += '<div style="overflow-x:auto;"><table style="width:100%;font-size:0.65rem;border-collapse:collapse;">';
+        h += '<thead><tr style="background:#f9fafb;"><th style="padding:4px 6px;text-align:left;">日期</th><th style="padding:4px 6px;text-align:right;">股票</th><th style="padding:4px 6px;text-align:right;">债券</th><th style="padding:4px 6px;text-align:right;">现金</th><th style="padding:4px 6px;text-align:right;">其他</th></tr></thead><tbody>';
+        for (var i = 0; i < Math.min(alloc.length, 4); i++) {
+          var a = alloc[i];
+          h += '<tr style="border-bottom:1px solid #f3f4f6;">';
+          h += '<td style="padding:3px 6px;">' + a.date + '</td>';
+          h += '<td style="padding:3px 6px;text-align:right;color:' + (a.stock > 0 ? '#c41230' : 'var(--gray)') + ';">' + (a.stock > 0 ? a.stock.toFixed(2) + '%' : '—') + '</td>';
+          h += '<td style="padding:3px 6px;text-align:right;color:' + (a.bond > 0 ? '#7c3aed' : 'var(--gray)') + ';">' + (a.bond > 0 ? a.bond.toFixed(2) + '%' : '—') + '</td>';
+          h += '<td style="padding:3px 6px;text-align:right;color:' + (a.cash > 0 ? '#059669' : 'var(--gray)') + ';">' + (a.cash > 0 ? a.cash.toFixed(2) + '%' : '—') + '</td>';
+          h += '<td style="padding:3px 6px;text-align:right;color:var(--gray);">' + (a.other > 0 ? a.other.toFixed(2) + '%' : '—') + '</td>';
+          h += '</tr>';
+        }
+        h += '</tbody></table></div>';
+        el.innerHTML = h;
+      } else if (el) {
+        el.innerHTML = '<p style="color:var(--gray);font-size:0.8rem;text-align:center;padding:12px;">暂无资产配置数据</p>';
+      }
+    }).catch(function() {
+      var el = document.getElementById('detailAllocation');
+      if (el) el.innerHTML = '<p style="color:var(--gray);font-size:0.8rem;text-align:center;padding:12px;">资产配置数据获取失败</p>';
+    });
+  } catch(e) {
+    body.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--gray);"><p>数据获取失败</p><p style="font-size:0.75rem;margin-top:6px;">' + escapeHtml(e.message || '') + '</p><button onclick="showFundDetail(\'' + code + '\')" style="margin-top:12px;padding:8px 20px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">重试</button></div>';
+  }
+}
+
+// 获取基金基本信息（CORS API）
+async function fetchFundBasicInfo(code) {
+  var url = 'https://fundmobapi.eastmoney.com/FundMNewApi/FundMNNBasicInformation?FCODE=' + code + '&deviceid=Wap&plat=Wap&product=EFund&version=2.0';
+  var resp = await fetch(url);
+  var data = await resp.json();
+  var d = data.Datas || {};
+  if (!d || !d.FCODE) return null;
+  return {
+    code: d.FCODE,
+    name: d.SHORTNAME || '',
+    type: d.FTYPE || '',
+    company: d.JJGS || '',
+    establishDate: d.ESTABDATE || '',
+    nav: d.DWJZ || '',
+    navDate: d.FSRQ || d.SYRQ || '',
+    dailyChange: d.RZDF || '',
+    endNav: d.ENDNAV || '',
+    bench: d.BENCH || '',
+    rate: d.RATE || '',
+    sourceRate: d.SOURCERATE || '',
+    riskLevel: d.RISKLEVEL || '',
+    buyStatus: d.SGZT || '',
+    sellStatus: d.SHZT || '',
+    minBuy: d.MINSG || '',
+    sharp1: d.SHARP1 || '',
+    sharp2: d.SHARP2 || '',
+    sharp3: d.SHARP3 || '',
+    stddev1: d.STDDEV1 || '',
+    stddev2: d.STDDEV2 || '',
+    stddev3: d.STDDEV3 || '',
+    investIdea: d.INVESTMENTIDEAR || '',
+    fundType: d.FUNDTYPE || ''
+  };
+}
+
+// 获取基金业绩（CORS API）
+async function fetchFundPerformance(code) {
+  var url = 'https://fundmobapi.eastmoney.com/FundMNewApi/FundMNPeriodIncrease?FCODE=' + code + '&deviceid=Wap&plat=Wap&product=EFund&version=2.0';
+  var resp = await fetch(url);
+  var data = await resp.json();
+  var d = data.Datas;
+  if (!d) return null;
+  return {
+    w1: d.Z || '',      // 近1周
+    m1: d.Y || '',      // 近1月
+    m3: d['3Y'] || '',  // 近3月
+    m6: d['6Y'] || '',  // 近6月
+    y1: d['1N'] || '',  // 近1年
+    y2: d['2N'] || '',  // 近2年
+    y3: d['3N'] || '',  // 近3年
+    y5: d['5N'] || '',  // 近5年
+    ytd: d.JN || '',    // 今年
+    since: d.LN || ''   // 成立来
+  };
+}
+
+// 获取历史净值（JSONP方式，分页获取近1年）
+async function fetchFundNavHistory(code, maxRecords) {
+  var allRecords = [];
+  var page = 1;
+  var pageSize = 20;
+  var endDate = new Date().toISOString().slice(0, 10);
+  var startDate = new Date(Date.now() - 365 * 86400000).toISOString().slice(0, 10);
+
+  while (allRecords.length < maxRecords && page <= 20) {
+    var url = 'https://api.fund.eastmoney.com/f10/lsjz?fundCode=' + code + '&pageIndex=' + page + '&pageSize=' + pageSize + '&startDate=' + startDate + '&endDate=' + endDate + '&callback=jsonp_nav' + page;
+    var data = await fetchJsonp(url, 'jsonp_nav' + page);
+    if (!data || !data.Data || !data.Data.LSJZList) break;
+    var records = data.Data.LSJZList;
+    if (records.length === 0) break;
+    allRecords = allRecords.concat(records);
+    var total = data.TotalCount || 0;
+    if (page * pageSize >= total) break;
+    page++;
+    if (page > 1) await new Promise(function(r) { setTimeout(r, 100); });
+  }
+
+  // 转为 {date, nav} 数组（按时间正序）
+  var navs = [];
+  for (var i = allRecords.length - 1; i >= 0; i--) {
+    var r = allRecords[i];
+    if (r.DWJZ) navs.push({ date: r.FSRQ, nav: parseFloat(r.DWJZ) });
+  }
+  return navs;
+}
+
+// JSONP fetch 封装
+function fetchJsonp(url, callbackName) {
+  return new Promise(function(resolve) {
+    var timeout = setTimeout(function() { resolve(null); }, 5000);
+    var prev = window[callbackName];
+    window[callbackName] = function(d) {
+      clearTimeout(timeout);
+      window[callbackName] = prev;
+      try { resolve(d); } catch(e) { resolve(null); }
+    };
+    var s = document.createElement('script');
+    s.src = url;
+    s.onerror = function() { clearTimeout(timeout); window[callbackName] = prev; resolve(null); };
+    document.head.appendChild(s);
+    s.onload = function() { if (s.parentNode) s.parentNode.removeChild(s); };
+  });
+}
+
+// 获取基金持仓（CORS API: FundMNInverstPosition）
+async function fetchFundHoldings(code) {
+  var url = 'https://fundmobapi.eastmoney.com/FundMNewApi/FundMNInverstPosition?FCODE=' + code + '&deviceid=Wap&plat=Wap&product=EFund&version=2.0';
+  var resp = await fetch(url);
+  var data = await resp.json();
+  var d = data.Datas || {};
+  var stocks = d.fundStocks || [];
+  var bonds = d.fundboods || [];
+  var result = [];
+  for (var i = 0; i < stocks.length; i++) {
+    var s = stocks[i];
+    result.push({
+      name: s.GPJC || '',
+      code: s.GPDM || '',
+      ratio: s.JZBL || '',
+      industry: s.INDEXNAME || '',
+      change: s.PCTNVCHGTYPE || '',
+      changeVal: s.PCTNVCHG || '',
+      type: 'stock'
+    });
+  }
+  for (var j = 0; j < bonds.length; j++) {
+    var b = bonds[j];
+    result.push({
+      name: b.ZQMC || '',
+      code: b.ZQDM || '',
+      ratio: b.ZJZB || '',
+      industry: '',
+      change: '',
+      changeVal: '',
+      type: 'bond'
+    });
+  }
+  return result;
+}
+
+// 获取资产配置（CORS API: FundMNAssetAllocation）
+async function fetchFundAssetAllocation(code) {
+  var url = 'https://fundmobapi.eastmoney.com/FundMNewApi/FundMNAssetAllocation?FCODE=' + code + '&deviceid=Wap&plat=Wap&product=EFund&version=2.0';
+  var resp = await fetch(url);
+  var data = await resp.json();
+  var d = data.Datas || [];
+  var result = [];
+  for (var i = 0; i < d.length; i++) {
+    result.push({
+      date: d[i].FSRQ || '',
+      stock: parseFloat(d[i].GP) || 0,
+      bond: parseFloat(d[i].ZQ) || 0,
+      cash: parseFloat(d[i].HB) || 0,
+      other: parseFloat(d[i].QT) || 0
+    });
+  }
+  return result;
+}
+
+// 计算最大回撤
+function calcMaxDrawdown(navs) {
+  if (!navs || navs.length < 2) return { value: 0, peakDate: '', troughDate: '' };
+  var peak = navs[0].nav;
+  var peakDate = navs[0].date;
+  var maxDD = 0;
+  var maxDDPeakDate = peakDate;
+  var maxDDTroughDate = peakDate;
+  for (var i = 1; i < navs.length; i++) {
+    if (navs[i].nav > peak) {
+      peak = navs[i].nav;
+      peakDate = navs[i].date;
+    }
+    var dd = (peak - navs[i].nav) / peak;
+    if (dd > maxDD) {
+      maxDD = dd;
+      maxDDPeakDate = peakDate;
+      maxDDTroughDate = navs[i].date;
+    }
+  }
+  return { value: maxDD, peakDate: maxDDPeakDate, troughDate: maxDDTroughDate };
+}
+
+// 渲染基金详情
+function renderFundDetail(code, basic, perf, navHistory) {
+  var html = '';
+
+  // ---- 1. 基金档案 ----
+  if (basic) {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid var(--red);padding-left:8px;">📋 基金档案</div>';
+    html += '<div style="background:#f9fafb;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.8;">';
+    var rows = [
+      ['基金名称', basic.name],
+      ['基金代码', basic.code],
+      ['基金类型', basic.type],
+      ['基金公司', basic.company],
+      ['成立日期', basic.establishDate],
+      ['净资产规模', basic.endNav ? (parseFloat(basic.endNav) / 100000000).toFixed(2) + ' 亿元' : '—'],
+      ['申购费率', (basic.rate || '—') + (basic.sourceRate && basic.sourceRate !== basic.rate ? '（原' + basic.sourceRate + '）' : '')],
+      ['最低申购', basic.minBuy ? basic.minBuy + ' 元' : '—'],
+      ['风险等级', basic.riskLevel ? 'PR' + basic.riskLevel : '—'],
+      ['申购状态', basic.buyStatus],
+      ['赎回状态', basic.sellStatus]
+    ];
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i][1]) {
+        html += '<div style="display:flex;"><span style="color:var(--gray);min-width:80px;flex-shrink:0;">' + rows[i][0] + '</span><span style="font-weight:600;flex:1;">' + escapeHtml(String(rows[i][1])) + '</span></div>';
+      }
+    }
+    html += '</div></div>';
+  }
+
+  // ---- 2. 业绩表现 ----
+  if (perf) {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #2563eb;padding-left:8px;">📊 业绩表现</div>';
+    var perfItems = [
+      ['近1周', perf.w1], ['近1月', perf.m1], ['近3月', perf.m3], ['近6月', perf.m6],
+      ['近1年', perf.y1], ['近2年', perf.y2], ['近3年', perf.y3], ['近5年', perf.y5],
+      ['今年', perf.ytd], ['成立来', perf.since]
+    ];
+    html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">';
+    for (var j = 0; j < perfItems.length; j++) {
+      var val = parseFloat(perfItems[j][1]);
+      var hasVal = !isNaN(val) && perfItems[j][1] !== '';
+      var clr = hasVal ? (val >= 0 ? '#c41230' : '#059669') : 'var(--gray)';
+      html += '<div style="text-align:center;background:#f9fafb;border-radius:6px;padding:8px 4px;">';
+      html += '<div style="font-size:0.65rem;color:var(--gray);margin-bottom:2px;">' + perfItems[j][0] + '</div>';
+      html += '<div style="font-size:0.8rem;font-weight:700;color:' + clr + ';">' + (hasVal ? (val > 0 ? '+' : '') + val.toFixed(2) + '%' : '—') + '</div>';
+      html += '</div>';
+    }
+    html += '</div></div>';
+  }
+
+  // ---- 3. 风险指标 ----
+  if (basic && (basic.sharp1 || basic.stddev1)) {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #f59e0b;padding-left:8px;">⚠️ 风险指标</div>';
+    html += '<div style="background:#fffbeb;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.8;">';
+    if (basic.sharp1) html += '<div style="display:flex;"><span style="color:var(--gray);min-width:120px;">夏普比率（近1年）</span><span style="font-weight:700;">' + basic.sharp1 + '</span></div>';
+    if (basic.sharp2) html += '<div style="display:flex;"><span style="color:var(--gray);min-width:120px;">夏普比率（近2年）</span><span style="font-weight:700;">' + basic.sharp2 + '</span></div>';
+    if (basic.sharp3) html += '<div style="display:flex;"><span style="color:var(--gray);min-width:120px;">夏普比率（近3年）</span><span style="font-weight:700;">' + basic.sharp3 + '</span></div>';
+    if (basic.stddev1) html += '<div style="display:flex;"><span style="color:var(--gray);min-width:120px;">年化波动率（近1年）</span><span style="font-weight:700;">' + basic.stddev1 + '%</span></div>';
+    if (basic.stddev2) html += '<div style="display:flex;"><span style="color:var(--gray);min-width:120px;">年化波动率（近2年）</span><span style="font-weight:700;">' + basic.stddev2 + '%</span></div>';
+    html += '<div style="font-size:0.65rem;color:#9ca3af;margin-top:4px;">夏普比率越高越好（>1为优），波动率越低越稳健</div>';
+    html += '</div></div>';
+  }
+
+  // ---- 4. 最大回撤 ----
+  if (navHistory && navHistory.length > 1) {
+    var dd = calcMaxDrawdown(navHistory);
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #dc2626;padding-left:8px;">📉 最大回撤分析（近1年）</div>';
+    html += '<div style="background:#fef2f2;border-radius:8px;padding:12px;">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
+    html += '<div>';
+    html += '<div style="font-size:0.65rem;color:var(--gray);">最大回撤</div>';
+    html += '<div style="font-size:1.4rem;font-weight:700;color:#dc2626;">-' + (dd.value * 100).toFixed(2) + '%</div>';
+    html += '</div>';
+    html += '<div style="text-align:right;font-size:0.7rem;color:var(--gray);">';
+    html += '<div>高点 ' + dd.peakDate + '</div>';
+    html += '<div>低点 ' + dd.troughDate + '</div>';
+    html += '</div>';
+    html += '</div>';
+    // 回撤说明
+    var ddLevel = dd.value;
+    var ddDesc = '';
+    if (ddLevel < 0.05) ddDesc = '回撤极小，适合稳健型投资者';
+    else if (ddLevel < 0.10) ddDesc = '回撤较小，风险可控';
+    else if (ddLevel < 0.20) ddDesc = '回撤适中，需有一定风险承受能力';
+    else if (ddLevel < 0.35) ddDesc = '回撤较大，适合能承受较大波动的投资者';
+    else ddDesc = '回撤极大，高风险产品，需谨慎评估';
+    html += '<div style="font-size:0.72rem;color:var(--dark);background:#fff;border-radius:6px;padding:8px;margin-top:6px;">💡 ' + ddDesc + '</div>';
+    html += '</div></div>';
+  }
+
+  // ---- 5. 净值走势（简易折线图） ----
+  if (navHistory && navHistory.length > 2) {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #059669;padding-left:8px;">📈 净值走势（近1年）</div>';
+    html += '<div style="background:#f0fdf4;border-radius:8px;padding:12px;">';
+    html += renderNavChart(navs);
+    html += '</div></div>';
+  }
+
+  // ---- 6. 业绩比较基准 ----
+  if (basic && basic.bench && basic.bench !== '--') {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #7c3aed;padding-left:8px;">🎯 业绩比较基准</div>';
+    html += '<div style="background:#faf5ff;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.6;color:var(--dark);">' + escapeHtml(basic.bench) + '</div>';
+    html += '</div>';
+  }
+
+  // ---- 7. 资产配置 ----
+  html += '<div style="margin-bottom:16px;">';
+  html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #0d9488;padding-left:8px;">🥧 资产配置</div>';
+  html += '<div id="detailAllocation" style="background:#f0fdfa;border-radius:8px;padding:12px;"><div style="text-align:center;padding:12px;color:var(--gray);font-size:0.8rem;"><span class="spinner" style="display:inline-block;width:16px;height:16px;border:2px solid #f0f0f0;border-top-color:#0d9488;border-radius:50%;animation:spin 0.8s linear infinite;"></span> 加载中...</div></div>';
+  html += '</div>';
+
+  // ---- 8. 前十大持仓 ----
+  html += '<div style="margin-bottom:16px;">';
+  html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #0891b2;padding-left:8px;">💼 前十大持仓</div>';
+  html += '<div id="detailHoldings" style="background:#ecfeff;border-radius:8px;padding:12px;"><div style="text-align:center;padding:12px;color:var(--gray);font-size:0.8rem;"><span class="spinner" style="display:inline-block;width:16px;height:16px;border:2px solid #f0f0f0;border-top-color:#0891b2;border-radius:50%;animation:spin 0.8s linear infinite;"></span> 加载中...</div></div>';
+  html += '</div>';
+
+  // ---- 8. 投资策略 ----
+  if (basic && basic.investIdea && basic.investIdea !== '--') {
+    html += '<div style="margin-bottom:16px;">';
+    html += '<div style="font-size:0.85rem;font-weight:700;margin-bottom:8px;border-left:3px solid #4f46e5;padding-left:8px;">💡 投资策略</div>';
+    html += '<div style="background:#eef2ff;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.6;color:var(--dark);">' + escapeHtml(basic.investIdea) + '</div>';
+    html += '</div>';
+  }
+
+  html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:center;padding:8px 0;">数据来源：天天基金 · 东方财富 | 仅供参考，不构成投资建议</div>';
+  return html;
+}
+
+// 渲染简易净值走势图（SVG）
+function renderNavChart(navs) {
+  if (!navs || navs.length < 2) return '<p style="color:var(--gray);font-size:0.8rem;text-align:center;">数据不足</p>';
+
+  var width = 600, height = 120, padding = 30;
+  var vals = navs.map(function(n) { return n.nav; });
+  var min = Math.min.apply(null, vals);
+  var max = Math.max.apply(null, vals);
+  var range = max - min || 1;
+  var step = (width - padding * 2) / (navs.length - 1);
+
+  var points = '';
+  for (var i = 0; i < navs.length; i++) {
+    var x = padding + i * step;
+    var y = padding + (1 - (navs[i].nav - min) / range) * (height - padding * 2);
+    points += x.toFixed(1) + ',' + y.toFixed(1) + ' ';
+  }
+
+  var firstVal = navs[0].nav;
+  var lastVal = navs[navs.length - 1].nav;
+  var changePct = ((lastVal - firstVal) / firstVal * 100).toFixed(2);
+  var lineColor = changePct >= 0 ? '#c41230' : '#059669';
+
+  var html = '<div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:4px;">';
+  html += '<span style="color:var(--gray);">起 ' + navs[0].date + ' 净值 ' + firstVal.toFixed(4) + '</span>';
+  html += '<span style="font-weight:700;color:' + lineColor + ';">' + (changePct >= 0 ? '+' : '') + changePct + '%</span>';
+  html += '<span style="color:var(--gray);">终 ' + navs[navs.length-1].date + ' 净值 ' + lastVal.toFixed(4) + '</span>';
+  html += '</div>';
+  html += '<svg viewBox="0 0 ' + width + ' ' + height + '" style="width:100%;height:auto;" preserveAspectRatio="none">';
+  // 网格线
+  html += '<line x1="' + padding + '" y1="' + padding + '" x2="' + (width-padding) + '" y2="' + padding + '" stroke="#f0f0f0" stroke-width="0.5"/>';
+  html += '<line x1="' + padding + '" y1="' + (height-padding) + '" x2="' + (width-padding) + '" y2="' + (height-padding) + '" stroke="#f0f0f0" stroke-width="0.5"/>';
+  // 净值线
+  html += '<polyline points="' + points + '" fill="none" stroke="' + lineColor + '" stroke-width="1.5" stroke-linejoin="round"/>';
+  // 起点终点
+  html += '<circle cx="' + padding + '" cy="' + (padding + (1 - (navs[0].nav - min) / range) * (height - padding*2)).toFixed(1) + '" r="2" fill="' + lineColor + '"/>';
+  html += '<circle cx="' + (width - padding) + '" cy="' + (padding + (1 - (navs[navs.length-1].nav - min) / range) * (height - padding*2)).toFixed(1) + '" r="2" fill="' + lineColor + '"/>';
+  html += '</svg>';
+  return html;
+}
+
+// 构建资产配置条
+function buildAllocBar(label, value, color) {
+  if (value <= 0) return '';
+  var pct = value.toFixed(1) + '%';
+  return '<div style="flex:1;text-align:center;">' +
+    '<div style="font-size:0.6rem;color:var(--gray);margin-bottom:2px;">' + label + '</div>' +
+    '<div style="background:' + color + ';color:#fff;border-radius:4px;padding:4px 6px;font-size:0.72rem;font-weight:700;">' + pct + '</div>' +
+    '</div>';
+}
 
 function judgeBias(market) {
   const dep = market.deposit_rate || {};

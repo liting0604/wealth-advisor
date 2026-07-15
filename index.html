@@ -972,214 +972,360 @@ function anyKw(text, keywords) {
 }
 
 // ============================================================
-// 基金估值Tab（JSONP方案，顺序加载）
+// 基金估值Tab（自选基金 + 实时估值 JSONP）
 // ============================================================
 let _compareMode = false, _compareList = [];
+let _fundCache = {}; // 代码 -> {name, gz, gszzl, dwjz, gztime, updated}
 
-async function renderFundTab() {
-  const container = document.getElementById('fundContent');
-  if (!container) return;
-  
-  const allProds = typeof PRODUCTS !== 'undefined' ? PRODUCTS : [];
-  const funds = allProds.filter(p => p.product_category === '基金');
-  
-  if (funds.length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:var(--gray);padding:40px;">未找到基金产品</p>';
-    return;
-  }
-
-  let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">';
-  html += '<div style="font-weight:700;">📈 基金估值（'+funds.length+'只）</div>';
-  html += '<div style="display:flex;gap:6px;">';
-  html += '<button onclick="toggleCompare()" id="btnCompare" style="font-size:0.75rem;padding:6px 12px;border:1px solid #e5e7eb;border-radius:6px;background:#fff;cursor:pointer;">📊 对比</button>';
-  html += '<button onclick="fetchFundEstimates()" id="btnEstimate" style="font-size:0.8rem;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">🔄 估值</button>';
-  html += '</div></div>';
-  
-  html += '<input id="fundSearch" oninput="filterFunds()" placeholder="🔍 搜索基金名称/代码..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;margin-bottom:10px;">';
-  
-  // 对比模式：渲染对比表
-  if (_compareMode && _compareList.length > 1) {
-    html += '<div style="overflow-x:auto;margin-bottom:12px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:10px;">';
-    html += '<div style="font-weight:600;font-size:0.8rem;margin-bottom:6px;">📊 对比 ('+_compareList.length+'只)</div>';
-    html += '<div style="display:flex;gap:8px;font-size:0.7rem;border-bottom:1px solid #fde68a;padding-bottom:4px;">';
-    html += '<div style="min-width:70px;font-weight:600;">指标</div>';
-    for (const c of _compareList) {
-      const f = funds.find(x=>x.product_id===c);
-      html += '<div style="min-width:90px;font-weight:600;">'+(f?f.product_name.slice(0,8):c)+'</div>';
-    }
-    html += '</div>';
-    const rows = [['近1月','1m'],['近3月','3m'],['近半年','6m'],['近1年','1y']];
-    for (const [label,key] of rows) {
-      html += '<div style="display:flex;gap:8px;font-size:0.7rem;margin-top:3px;">';
-      html += '<div style="min-width:70px;color:var(--gray);">'+label+'</div>';
-      for (const c of _compareList) {
-        const perf = (window._fundHistory||{})[c];
-        let val = '—';
-        if (perf && perf[key] != null) val = (perf[key]>=0?'+':'')+perf[key]+'%';
-        const cl = val.startsWith('+') ? '#c41230' : (val.startsWith('-') ? '#059669' : 'var(--gray)');
-        html += '<div style="min-width:90px;color:'+cl+';">'+val+'</div>';
-      }
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-  
-  // 基金卡片列表（竖排，每只基金独立）
-  for (const f of funds) {
-    const code = f.product_id || '';
-    const industry = f.sub_category || f.issuer || '';
-    const isSel = _compareList.includes(code);
-    html += '<div class="fund-card" data-code="'+code+'" style="background:'+(isSel?'#fef3c7':'#fff')+';border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid '+(isSel?'#f59e0b':'#e5e7eb')+';cursor:'+(_compareMode?'pointer':'default')+';" onclick="'+(_compareMode?'toggleCompareFund(\''+code+'\')':'')+'">';
-    // 第一行：名称 + 估值 + 涨跌
-    html += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
-    html += '<div style="flex:1;min-width:0;">';
-    html += '<div style="font-size:0.85rem;font-weight:600;color:var(--dark);">'+(f.product_name||'')+'</div>';
-    html += '<div style="font-size:0.65rem;color:var(--gray);">'+code+' · '+(industry.slice(0,10))+'</div>';
-    html += '</div>';
-    html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">点击获取</span>';
-    html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:60px;text-align:right;color:var(--gray);">—</span>';
-    html += '</div>';
-    // 第二行：净值+更新+历史业绩（可左右滑动）
-    html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">';
-    html += '<div style="display:flex;gap:10px;font-size:0.7rem;min-width:340px;">';
-    html += '<span class="fund-nav" style="color:var(--gray);white-space:nowrap;">净值 —</span>';
-    html += '<span class="fund-1m" style="color:var(--gray);white-space:nowrap;">近1月 —</span>';
-    html += '<span class="fund-3m" style="color:var(--gray);white-space:nowrap;">近3月 —</span>';
-    html += '<span class="fund-6m" style="color:var(--gray);white-space:nowrap;">近半年 —</span>';
-    html += '<span class="fund-1y" style="color:var(--gray);white-space:nowrap;">近1年 —</span>';
-    html += '</div></div>';
-    html += '</div>';
-  }
-  html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:right;margin-top:8px;">数据来源：天天基金 · 东方财富 | 估值仅供参考</div>';
-  container.innerHTML = html;
-
-function toggleCompare() {
-  _compareMode = !_compareMode; _compareList = [];
-  const btn = document.getElementById('btnCompare');
-  if (btn) { btn.style.background = _compareMode ? 'var(--red)' : '#fff'; btn.style.color = _compareMode ? '#fff' : 'var(--dark)'; }
-  if (_compareMode) toast('点击基金卡片加入对比（最多5只）');
+// ---- localStorage 自选基金管理 ----
+function getMyFunds() {
+  try { return JSON.parse(localStorage.getItem('wm_my_funds') || '[]'); } catch(e) { return []; }
+}
+function setMyFunds(arr) {
+  localStorage.setItem('wm_my_funds', JSON.stringify(arr));
+}
+function addMyFund(code) {
+  code = String(code).trim();
+  if (!/^\d{6}$/.test(code)) { toast('请输入6位数字基金代码'); return false; }
+  var list = getMyFunds();
+  if (list.indexOf(code) >= 0) { toast('该基金已在自选列表中'); return false; }
+  list.push(code);
+  setMyFunds(list);
+  return true;
+}
+function removeMyFund(code) {
+  var list = getMyFunds();
+  var idx = list.indexOf(code);
+  if (idx >= 0) { list.splice(idx, 1); setMyFunds(list); }
+  delete _fundCache[code];
   renderFundTab();
 }
 
-function toggleCompareFund(code) {
-  if (!_compareMode) return;
-  const idx = _compareList.indexOf(code);
-  if (idx >= 0) _compareList.splice(idx, 1);
-  else if (_compareList.length < 5) _compareList.push(code);
-  renderFundTab();
-}
-
-  // 异步加载历史业绩（从 fund_history.json）
-  loadFundHistory().then(hist => {
-    for (const card of document.querySelectorAll('.fund-card')) {
-      const code = card.dataset.code;
-      if (hist[code]) updateHistRow(code, hist[code]);
-    }
+// ---- 获取单只基金实时估值 (JSONP) ----
+function fetchFundGz(code) {
+  return new Promise(function(resolve) {
+    var timeout = setTimeout(function() { resolve(null); }, 5000);
+    var prev = window.jsonpgz;
+    window.jsonpgz = function(d) {
+      clearTimeout(timeout);
+      window.jsonpgz = prev;
+      try { resolve(d); } catch(e) { resolve(null); }
+    };
+    var s = document.createElement('script');
+    s.src = 'https://fundgz.1234567.com.cn/js/' + code + '.js?rt=' + Date.now();
+    s.onerror = function() { clearTimeout(timeout); window.jsonpgz = prev; resolve(null); };
+    document.head.appendChild(s);
+    s.onload = function() { if (s.parentNode) s.parentNode.removeChild(s); };
   });
 }
 
-async function fetchFundEstimates() {
-  const btn = document.getElementById('btnEstimate');
-  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 获取中...'; }
-  
-  const allProds = typeof PRODUCTS !== 'undefined' ? PRODUCTS : [];
-  const funds = allProds.filter(p => p.product_category === '基金');
-  const codes = funds.map(f => String(f.product_id)).filter(c => c.length >= 6);
-  
-  function updateProgress(done) {
-    if (btn) btn.innerHTML = '<span class="spinner"></span> ' + done + '/' + codes.length;
+// ---- 添加基金 ----
+async function addFund() {
+  var inp = document.getElementById('fundCodeInput');
+  if (!inp) return;
+  var code = inp.value.trim();
+  if (!/^\d{6}$/.test(code)) { toast('请输入6位数字基金代码'); return; }
+  var btn = document.getElementById('btnAddFund');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+
+  // 先调 API 验证基金是否存在、获取名称
+  var data = await fetchFundGz(code);
+  if (btn) { btn.disabled = false; btn.innerHTML = '➕ 添加'; }
+  if (!data || !data.fundcode) {
+    toast('未找到该基金，请检查代码是否正确');
+    return;
   }
-  
-  for (let i = 0; i < codes.length; i++) {
-    const code = codes[i];
-    updateProgress(i + 1);
-    
-    // 获取实时估值 (JSONP)
-    try {
-      const data = await new Promise((resolve) => {
-        const timeout = setTimeout(() => resolve(null), 4000);
-        const prev = window.jsonpgz;
-        window.jsonpgz = function(d) { 
-          clearTimeout(timeout); 
-          window.jsonpgz = prev; 
-          try { resolve(d); } catch(e) { resolve(null); }
-        };
-        const s = document.createElement('script');
-        s.src = 'https://fundgz.1234567.com.cn/js/' + code + '.js?rt=' + Date.now();
-        s.onerror = () => { clearTimeout(timeout); window.jsonpgz = prev; resolve(null); };
-        document.head.appendChild(s);
-        s.onload = () => { if (s.parentNode) s.parentNode.removeChild(s); };
-      });
-      
-      if (data && data.fundcode) {
-        try {
-          updateRow(code, data);
-        } catch(e2) {
-          // 单只基金更新失败不影响其他
-          console.warn('更新基金失败:', code, e2.message);
-        }
-      }
-    } catch(e) {
-      console.warn('基金JSONP失败:', codes[i], e.message);
-    }
-    
-    if (i > 0 && i % 10 === 0) await new Promise(r => setTimeout(r, 200));
+  // 缓存数据
+  _fundCache[code] = {
+    name: data.name || code,
+    gz: data.gz || '',
+    gszzl: data.gszzl || '0',
+    dwjz: data.dwjz || '',
+    gztime: data.gztime || '',
+    jzrq: data.jzrq || '',
+    updated: Date.now()
+  };
+  if (addMyFund(code)) {
+    toast('已添加：' + (data.name || code));
+    inp.value = '';
+    renderFundTab();
+    // 添加后立即显示估值
+    setTimeout(function() { updateFundCard(code, _fundCache[code]); }, 100);
   }
-  
-  delete window.jsonpgz;
-  if (btn) { btn.disabled = false; btn.innerHTML = '🔄 刷新估值'; }
 }
 
-function updateRow(code, data) {
-  const card = document.querySelector('.fund-card[data-code="'+code+'"]');
+// ---- 渲染基金Tab ----
+async function renderFundTab() {
+  var container = document.getElementById('fundContent');
+  if (!container) return;
+
+  var myFunds = getMyFunds();
+  var allProds = typeof PRODUCTS !== 'undefined' ? PRODUCTS : [];
+  var prodFunds = allProds.filter(function(p) { return p.product_category === '基金'; });
+
+  var html = '';
+  // 标题栏
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">';
+  html += '<div style="font-weight:700;font-size:0.95rem;">📈 基金实时估值</div>';
+  html += '<button onclick="refreshAllFunds()" id="btnRefreshAll" style="font-size:0.78rem;padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:6px;cursor:pointer;">🔄 全部刷新</button>';
+  html += '</div>';
+
+  // 添加基金输入区
+  html += '<div style="display:flex;gap:6px;margin-bottom:12px;">';
+  html += '<input id="fundCodeInput" placeholder="输入6位基金代码，如 006834" style="flex:1;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;" onkeydown="if(event.key===\'Enter\')addFund()">';
+  html += '<button onclick="addFund()" id="btnAddFund" style="padding:8px 16px;background:var(--dark);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.82rem;white-space:nowrap;">➕ 添加</button>';
+  html += '</div>';
+
+  // 搜索框
+  html += '<input id="fundSearch" oninput="filterFunds()" placeholder="🔍 搜索基金名称/代码..." style="width:100%;padding:8px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:0.82rem;margin-bottom:10px;">';
+
+  // 自选基金区域
+  if (myFunds.length > 0) {
+    html += '<div style="font-size:0.8rem;font-weight:600;color:var(--dark);margin-bottom:6px;border-left:3px solid var(--red);padding-left:8px;">⭐ 我的自选（' + myFunds.length + '只）</div>';
+    for (var i = 0; i < myFunds.length; i++) {
+      html += buildFundCard(myFunds[i], true);
+    }
+  } else {
+    html += '<div style="text-align:center;padding:20px;color:var(--gray);font-size:0.8rem;background:#f9fafb;border-radius:8px;margin-bottom:12px;">';
+    html += '📌 还没有自选基金<br>在上方输入基金代码，点击「添加」即可开始记录';
+    html += '</div>';
+  }
+
+  // 推荐基金区域（来自产品库）
+  if (prodFunds.length > 0) {
+    html += '<div style="font-size:0.8rem;font-weight:600;color:var(--dark);margin:12px 0 6px;border-left:3px solid #2563eb;padding-left:8px;">📋 推荐基金（' + prodFunds.length + '只）</div>';
+    for (var j = 0; j < prodFunds.length; j++) {
+      var code = prodFunds[j].product_id;
+      // 如果已在自选列表，跳过（避免重复）
+      if (myFunds.indexOf(code) >= 0) continue;
+      html += buildFundCardFromProduct(prodFunds[j]);
+    }
+  }
+
+  html += '<div style="font-size:0.6rem;color:#9ca3af;text-align:right;margin-top:8px;">数据来源：天天基金 · 东方财富 | 估值仅供参考，非最终净值</div>';
+  container.innerHTML = html;
+
+  // 异步加载历史业绩
+  loadFundHistory().then(function(hist) {
+    window._fundHistory = hist;
+    for (var card of document.querySelectorAll('.fund-card')) {
+      var c = card.dataset.code;
+      if (hist[c]) updateHistRow(c, hist[c]);
+    }
+  });
+
+  // 如果缓存里有数据，立即显示
+  for (var code2 in _fundCache) {
+    updateFundCard(code2, _fundCache[code2]);
+  }
+}
+
+// 构建自选基金卡片（只有代码，名称待获取）
+function buildFundCard(code, isMyFund) {
+  var name = (_fundCache[code] && _fundCache[code].name) ? _fundCache[code].name : '基金 ' + code;
+  var html = '<div class="fund-card" data-code="' + code + '" style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid #e5e7eb;">';
+  // 第一行：名称 + 估值 + 涨跌 + 操作按钮
+  html += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
+  html += '<div style="flex:1;min-width:0;">';
+  html += '<div class="fund-name" style="font-size:0.85rem;font-weight:600;color:var(--dark);">' + escapeHtml(name) + '</div>';
+  html += '<div style="font-size:0.65rem;color:var(--gray);">' + code + '</div>';
+  html += '</div>';
+  html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">—</span>';
+  html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:55px;text-align:right;color:var(--gray);">—</span>';
+  // 单只刷新按钮
+  html += '<button class="fund-refresh-btn" data-code="' + code + '" style="margin-left:6px;padding:4px 8px;font-size:0.7rem;border:1px solid #e5e7eb;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;">🔄</button>';
+  // 删除按钮（仅自选基金）
+  if (isMyFund) {
+    html += '<button class="fund-del-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #fecaca;border-radius:5px;background:#fef2f2;color:#dc2626;cursor:pointer;flex-shrink:0;">✕</button>';
+  }
+  html += '</div>';
+  // 第二行：净值 + 估值时间
+  html += '<div style="display:flex;gap:10px;font-size:0.7rem;">';
+  html += '<span class="fund-nav" style="color:var(--gray);white-space:nowrap;">净值 —</span>';
+  html += '<span class="fund-gztime" style="color:#9ca3af;white-space:nowrap;">未更新</span>';
+  html += '</div>';
+  // 第三行：历史业绩（可左右滑动）
+  html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;">';
+  html += '<div style="display:flex;gap:10px;font-size:0.7rem;min-width:340px;">';
+  html += '<span class="fund-1m" style="color:var(--gray);white-space:nowrap;">近1月 —</span>';
+  html += '<span class="fund-3m" style="color:var(--gray);white-space:nowrap;">近3月 —</span>';
+  html += '<span class="fund-6m" style="color:var(--gray);white-space:nowrap;">近半年 —</span>';
+  html += '<span class="fund-1y" style="color:var(--gray);white-space:nowrap;">近1年 —</span>';
+  html += '</div></div>';
+  html += '</div>';
+  return html;
+}
+
+// 构建推荐基金卡片（来自产品库，有名称和分类）
+function buildFundCardFromProduct(f) {
+  var code = f.product_id || '';
+  var industry = f.sub_category || f.issuer || '';
+  var html = '<div class="fund-card" data-code="' + code + '" style="background:#fff;border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid #e5e7eb;">';
+  html += '<div style="display:flex;align-items:center;margin-bottom:6px;">';
+  html += '<div style="flex:1;min-width:0;">';
+  html += '<div class="fund-name" style="font-size:0.85rem;font-weight:600;color:var(--dark);">' + escapeHtml(f.product_name || '') + '</div>';
+  html += '<div style="font-size:0.65rem;color:var(--gray);">' + code + ' · ' + escapeHtml(String(industry).slice(0, 12)) + '</div>';
+  html += '</div>';
+  html += '<span class="fund-gz" style="font-size:0.9rem;font-weight:700;color:var(--gray);text-align:right;min-width:60px;">—</span>';
+  html += '<span class="fund-chg" style="font-size:0.8rem;font-weight:600;min-width:55px;text-align:right;color:var(--gray);">—</span>';
+  html += '<button class="fund-refresh-btn" data-code="' + code + '" style="margin-left:6px;padding:4px 8px;font-size:0.7rem;border:1px solid #e5e7eb;border-radius:5px;background:#fff;cursor:pointer;flex-shrink:0;">🔄</button>';
+  // 加入自选按钮
+  html += '<button class="fund-add-btn" data-code="' + code + '" style="margin-left:4px;padding:4px 8px;font-size:0.7rem;border:1px solid #bfdbfe;border-radius:5px;background:#eff6ff;color:#2563eb;cursor:pointer;flex-shrink:0;">⭐</button>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:10px;font-size:0.7rem;">';
+  html += '<span class="fund-nav" style="color:var(--gray);white-space:nowrap;">净值 —</span>';
+  html += '<span class="fund-gztime" style="color:#9ca3af;white-space:nowrap;">未更新</span>';
+  html += '</div>';
+  html += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:4px;">';
+  html += '<div style="display:flex;gap:10px;font-size:0.7rem;min-width:340px;">';
+  html += '<span class="fund-1m" style="color:var(--gray);white-space:nowrap;">近1月 —</span>';
+  html += '<span class="fund-3m" style="color:var(--gray);white-space:nowrap;">近3月 —</span>';
+  html += '<span class="fund-6m" style="color:var(--gray);white-space:nowrap;">近半年 —</span>';
+  html += '<span class="fund-1y" style="color:var(--gray);white-space:nowrap;">近1年 —</span>';
+  html += '</div></div>';
+  html += '</div>';
+  return html;
+}
+
+// ---- 更新单张基金卡片 ----
+function updateFundCard(code, data) {
+  var card = document.querySelector('.fund-card[data-code="' + code + '"]');
   if (!card) return;
-  
-  const gz = data.gz ? parseFloat(data.gz).toFixed(4) : '—';
-  const gszzl = parseFloat(data.gszzl || 0);
-  const clr = gszzl >= 0 ? '#c41230' : '#059669';
-  const arr = gszzl >= 0 ? '▲' : (gszzl < 0 ? '▼' : '');
-  const dwjz = data.dwjz ? parseFloat(data.dwjz).toFixed(4) : '—';
-  
-  card.querySelector('.fund-gz').innerHTML = gz+'<div style="font-size:0.55rem;color:#9ca3af;font-weight:400;">'+(data.gztime||'').slice(-8)+'</div>';
-  card.querySelector('.fund-chg').innerHTML = '<span style="color:'+clr+';">'+arr+(gszzl>0?'+':'')+gszzl.toFixed(2)+'%</span>';
-  card.querySelector('.fund-nav').innerHTML = '净值 <span style="font-weight:600;color:var(--dark);">'+dwjz+'</span>';
+  var gz = data.gz ? parseFloat(data.gz).toFixed(4) : '—';
+  var gszzl = parseFloat(data.gszzl || 0);
+  var clr = gszzl >= 0 ? '#c41230' : '#059669';
+  var arr = gszzl >= 0 ? '▲' : (gszzl < 0 ? '▼' : '');
+  var dwjz = data.dwjz ? parseFloat(data.dwjz).toFixed(4) : '—';
+  var nameEl = card.querySelector('.fund-name');
+  if (nameEl && data.name) nameEl.textContent = data.name;
+  var gzEl = card.querySelector('.fund-gz');
+  if (gzEl) gzEl.innerHTML = gz + '<div style="font-size:0.55rem;color:#9ca3af;font-weight:400;">' + (data.gztime || '').slice(-8) + '</div>';
+  var chgEl = card.querySelector('.fund-chg');
+  if (chgEl) chgEl.innerHTML = '<span style="color:' + clr + ';">' + arr + (gszzl > 0 ? '+' : '') + gszzl.toFixed(2) + '%</span>';
+  var navEl = card.querySelector('.fund-nav');
+  if (navEl) navEl.innerHTML = '净值 <span style="font-weight:600;color:var(--dark);">' + dwjz + '</span>';
+  var timeEl = card.querySelector('.fund-gztime');
+  if (timeEl) timeEl.textContent = data.gztime ? '更新 ' + (data.gztime || '').slice(-8) : '未更新';
   card.style.background = '#f9fafb';
 }
 
+// ---- 单只基金刷新 ----
+async function refreshOneFund(code) {
+  var btn = document.querySelector('.fund-refresh-btn[data-code="' + code + '"]');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>'; }
+  var data = await fetchFundGz(code);
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔄'; }
+  if (data && data.fundcode) {
+    _fundCache[code] = {
+      name: data.name || code,
+      gz: data.gz || '',
+      gszzl: data.gszzl || '0',
+      dwjz: data.dwjz || '',
+      gztime: data.gztime || '',
+      jzrq: data.jzrq || '',
+      updated: Date.now()
+    };
+    updateFundCard(code, _fundCache[code]);
+  } else {
+    toast('获取失败，请检查代码或稍后重试');
+  }
+}
+
+// ---- 全部刷新（自选 + 推荐） ----
+async function refreshAllFunds() {
+  var btn = document.getElementById('btnRefreshAll');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> 刷新中...'; }
+
+  // 收集所有当前显示的基金代码（去重）
+  var codes = [];
+  document.querySelectorAll('.fund-card').forEach(function(card) {
+    var c = card.dataset.code;
+    if (c && codes.indexOf(c) < 0) codes.push(c);
+  });
+
+  for (var i = 0; i < codes.length; i++) {
+    var code = codes[i];
+    if (btn) btn.innerHTML = '<span class="spinner"></span> ' + (i + 1) + '/' + codes.length;
+    var data = await fetchFundGz(code);
+    if (data && data.fundcode) {
+      _fundCache[code] = {
+        name: data.name || code,
+        gz: data.gz || '',
+        gszzl: data.gszzl || '0',
+        dwjz: data.dwjz || '',
+        gztime: data.gztime || '',
+        jzrq: data.jzrq || '',
+        updated: Date.now()
+      };
+      updateFundCard(code, _fundCache[code]);
+    }
+    if (i > 0 && i % 10 === 0) await new Promise(function(r) { setTimeout(r, 150); });
+  }
+
+  if (btn) { btn.disabled = false; btn.innerHTML = '🔄 全部刷新'; }
+  toast('已刷新 ' + codes.length + ' 只基金');
+}
+
+// ---- 搜索过滤 ----
 function filterFunds() {
-  const q = (document.getElementById('fundSearch')?.value||'').toLowerCase();
-  document.querySelectorAll('.fund-card').forEach(c => {
-    c.style.display = q ? ((c.textContent||'').toLowerCase().includes(q) ? '' : 'none') : '';
+  var q = (document.getElementById('fundSearch') ? document.getElementById('fundSearch').value : '').toLowerCase();
+  document.querySelectorAll('.fund-card').forEach(function(c) {
+    c.style.display = q ? ((c.textContent || '').toLowerCase().indexOf(q) >= 0 ? '' : 'none') : '';
   });
 }
 
+// ---- 加载历史业绩 ----
 async function loadFundHistory() {
   try {
-    const resp = await fetch('data/fund_history.json?' + Date.now());
+    var resp = await fetch('data/fund_history.json?' + Date.now());
     if (resp.ok) return await resp.json();
   } catch(e) {}
   return {};
 }
 
 function updateHistRow(code, hist) {
-  const card = document.querySelector('.fund-card[data-code="'+code+'"]');
+  var card = document.querySelector('.fund-card[data-code="' + code + '"]');
   if (!card) return;
-  const setVal = (cls, label, val) => {
-    const el = card.querySelector('.'+cls);
+  var setVal = function(cls, label, val) {
+    var el = card.querySelector('.' + cls);
     if (!el || val == null) return;
-    const isUp = val >= 0, clr = isUp ? '#c41230' : '#059669';
-    el.innerHTML = label+' <span style="font-weight:600;color:'+clr+';">'+(isUp?'+':'')+val.toFixed(2)+'%</span>';
+    var isUp = val >= 0, clr = isUp ? '#c41230' : '#059669';
+    el.innerHTML = label + ' <span style="font-weight:600;color:' + clr + ';">' + (isUp ? '+' : '') + val.toFixed(2) + '%</span>';
   };
   setVal('fund-1m', '近1月', hist['1m']);
   setVal('fund-3m', '近3月', hist['3m']);
   setVal('fund-6m', '近半年', hist['6m']);
   setVal('fund-1y', '近1年', hist['1y']);
   if (hist.streak >= 3) {
-    const tag = hist.streak_up ? '🔥连'+hist.streak+'涨' : '❄连'+hist.streak+'跌';
-    const nd = card.querySelector('div div:last-child');
-    if (nd) nd.innerHTML += ' <span style="font-size:0.6rem;color:'+(hist.streak_up?'#c41230':'#059669')+';">'+tag+'</span>';
+    var tag = hist.streak_up ? '🔥连' + hist.streak + '涨' : '❄连' + hist.streak + '跌';
+    var nd = card.querySelector('.fund-1y');
+    if (nd) nd.innerHTML += ' <span style="font-size:0.6rem;color:' + (hist.streak_up ? '#c41230' : '#059669') + ';">' + tag + '</span>';
   }
 }
+
+// ---- 事件委托：单只刷新 / 删除 / 加入自选 ----
+document.addEventListener('click', function(e) {
+  var t = e.target;
+  if (t.classList && t.classList.contains('fund-refresh-btn')) {
+    e.preventDefault();
+    e.stopPropagation();
+    refreshOneFund(t.dataset.code);
+  } else if (t.classList && t.classList.contains('fund-del-btn')) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (confirm('确定从自选中移除 ' + t.dataset.code + ' ?')) {
+      removeMyFund(t.dataset.code);
+    }
+  } else if (t.classList && t.classList.contains('fund-add-btn')) {
+    e.preventDefault();
+    e.stopPropagation();
+    var code = t.dataset.code;
+    if (addMyFund(code)) {
+      toast('已加入自选');
+      renderFundTab();
+    }
+  }
+});
 
 function judgeBias(market) {
   const dep = market.deposit_rate || {};

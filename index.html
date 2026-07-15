@@ -4054,7 +4054,7 @@ function renderStrategyTab() {
 
 function saveStratKey() {
   var k = document.getElementById('stratKeyInput').value.trim();
-  if (!k || !k.indexOf('sk-') !== 0) { toast('请输入有效的Key (sk-开头)'); return; }
+  if (!k || k.indexOf('sk-') !== 0) { toast('请输入有效的Key (sk-开头)'); return; }
   setAiKey(k);
   toast('Key已保存');
   renderStrategyTab();

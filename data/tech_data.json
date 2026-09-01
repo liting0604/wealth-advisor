@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-01T16:17:42.231266+08:00",
-  "updated_display": "2026-09-01 16:17",
+  "updated": "2026-09-01T19:32:52.354641+08:00",
+  "updated_display": "2026-09-01 19:32",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -36,15 +36,15 @@
       "recent_news": "混元大模型已接入微信搜一搜和腾讯广告；海外游戏《王者荣耀》国际版日活创新高；微信视频号直播电商GMV增长超100%",
       "trend": "全面AI化转型：混元大模型将贯穿微信/QQ/腾讯云/广告全线产品。游戏出海+视频号电商是两大增量引擎。AI Agent（元宝）面向C端开放，可能成为新一代超级入口。",
       "stock": {
-        "price": 442.6,
-        "change_pct": -2.3,
+        "price": 441.4,
+        "change_pct": -2.56,
         "open": 446.4,
         "high": 447.6,
         "low": 440.6,
         "prev_close": 453.0,
-        "pe": 16.19,
+        "pe": 16.14,
         "market_cap": "4.0万亿",
-        "volume": 18716181,
+        "volume": 20289781,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -80,15 +80,15 @@
       "recent_news": "通义千问Qwen3系列开源登顶HuggingFace；阿里云AI收入连续5季度三位数增长；国际电商AIDC收入增速超30%",
       "trend": "「AI驱动」成核心战略：通义千问打造开源生态+商业化并行。阿里云借AI算力需求二次加速。国际电商（速卖通/Lazada）冲击盈利。",
       "stock": {
-        "price": 110.8,
-        "change_pct": -2.98,
+        "price": 110.4,
+        "change_pct": -3.33,
         "open": 112.2,
         "high": 112.7,
         "low": 109.5,
         "prev_close": 114.2,
-        "pe": 18.78,
+        "pe": 18.71,
         "market_cap": "2.2万亿",
-        "volume": 93572849,
+        "volume": 99751649,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -124,15 +124,15 @@
       "recent_news": "美团闪购日订单突破2000万单；无人机配送在深圳完成超50万单；到店业务利润率持续提升",
       "trend": "即时零售是最大增量（闪购从餐饮向日百拓展）。无人机配送有望2-3年内单均成本低于人力。优选业务减亏是关键。",
       "stock": {
-        "price": 77.35,
-        "change_pct": -1.96,
+        "price": 76.65,
+        "change_pct": -2.85,
         "open": 78.3,
         "high": 79.45,
         "low": 76.05,
         "prev_close": 78.9,
-        "pe": -18.47,
-        "market_cap": "4329亿",
-        "volume": 49949030,
+        "pe": -18.31,
+        "market_cap": "4290亿",
+        "volume": 52924730,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -168,15 +168,15 @@
       "recent_news": "文心大模型5.0发布；萝卜快跑在武汉全无人运营日均万单；百度智能云AI收入占比超30%",
       "trend": "AI原生重构搜索是最大看点（搜索结果由AI生成）。Apollo自动驾驶加速商业化，Robotaxi从武汉向全国复制。AI芯片昆仑芯三代量产是关键变量。",
       "stock": {
-        "price": 93.85,
-        "change_pct": -2.44,
+        "price": 93.7,
+        "change_pct": -2.6,
         "open": 93.8,
         "high": 94.45,
         "low": 92.8,
         "prev_close": 96.2,
-        "pe": 41.28,
-        "market_cap": "2063亿",
-        "volume": 12097039,
+        "pe": 41.22,
+        "market_cap": "2060亿",
+        "volume": 13111339,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -212,15 +212,15 @@
       "recent_news": "京东物流外部客户收入占比突破75%；百亿补贴战持续，低价策略拉动用户增长；言犀大模型已应用于智能客服和供应链",
       "trend": "低价策略+供应链效率双轮驱动对抗拼多多。京东物流对外开放是利润增长点。AI供应链降本增效空间大。",
       "stock": {
-        "price": 109.3,
-        "change_pct": -2.58,
+        "price": 108.6,
+        "change_pct": -3.21,
         "open": 112.0,
         "high": 112.0,
         "low": 108.3,
         "prev_close": 112.2,
-        "pe": 13.52,
-        "market_cap": "2586亿",
-        "volume": 7200375,
+        "pe": 13.43,
+        "market_cap": "2570亿",
+        "volume": 8394925,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -256,15 +256,15 @@
       "recent_news": "暴雪全家桶回归国服收入超预期；《蛋仔派对》全球化拓展；网易有道AI学习机销量翻倍",
       "trend": "游戏出海是核心增长引擎。暴雪回归贡献稳定现金流。AI+游戏（NPC/AIGC）和AI+教育是有道新增长极。云音乐盈利改善。",
       "stock": {
-        "price": 190.1,
-        "change_pct": -1.2,
+        "price": 188.8,
+        "change_pct": -1.87,
         "open": 191.4,
         "high": 192.3,
         "low": 188.2,
         "prev_close": 192.4,
-        "pe": 16.23,
-        "market_cap": "6065亿",
-        "volume": 4608274,
+        "pe": 16.12,
+        "market_cap": "6024亿",
+        "volume": 5100774,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -300,15 +300,15 @@
       "recent_news": "小米SU7累计交付突破40万辆；第二款车YU7 SUV上市预订火爆；澎湃OS 2.0打通手机×汽车×家居",
       "trend": "汽车是最大变量：SU7成功后快速扩产品线。手机高端化提升ASP。「人车家全生态」是最核心差异化。",
       "stock": {
-        "price": 27.64,
-        "change_pct": 0.07,
+        "price": 27.56,
+        "change_pct": -0.22,
         "open": 27.52,
         "high": 28.12,
         "low": 27.36,
         "prev_close": 27.62,
-        "pe": 15.44,
-        "market_cap": "5896亿",
-        "volume": 80873519,
+        "pe": 15.4,
+        "market_cap": "5879亿",
+        "volume": 86622519,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -565,14 +565,14 @@
       "trend": "战略转型中：传统AI收入萎缩，生成式AI是唯一增长引擎。SenseCore算力是核心资产。自动驾驶有望率先商业化。",
       "stock": {
         "price": 1.43,
-        "change_pct": -0.69,
+        "change_pct": -1.04,
         "open": 1.44,
         "high": 1.5,
         "low": 1.42,
         "prev_close": 1.44,
-        "pe": -30.88,
-        "market_cap": "596亿",
-        "volume": 449930050,
+        "pe": -30.77,
+        "market_cap": "594亿",
+        "volume": 469024050,
         "currency": "HKD"
       },
       "fetch_status": "ok"

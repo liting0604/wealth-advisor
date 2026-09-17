@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-17T16:23:08.443376+08:00",
-  "updated_display": "2026-09-17 16:23",
+  "updated": "2026-09-17T19:31:28.319559+08:00",
+  "updated_display": "2026-09-17 19:31",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -44,7 +44,7 @@
         "prev_close": 433.4,
         "pe": 15.56,
         "market_cap": "3.9万亿",
-        "volume": 14842947,
+        "volume": 16185147,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -88,7 +88,7 @@
         "prev_close": 106.2,
         "pe": 17.81,
         "market_cap": "2.1万亿",
-        "volume": 47142019,
+        "volume": 50647519,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -132,7 +132,7 @@
         "prev_close": 74.45,
         "pe": -17.41,
         "market_cap": "4080亿",
-        "volume": 24076955,
+        "volume": 27345155,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -176,7 +176,7 @@
         "prev_close": 88.05,
         "pe": 38.42,
         "market_cap": "1920亿",
-        "volume": 13568989,
+        "volume": 15356489,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -220,7 +220,7 @@
         "prev_close": 105.9,
         "pe": 12.99,
         "market_cap": "2485亿",
-        "volume": 4581200,
+        "volume": 5255350,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -264,7 +264,7 @@
         "prev_close": 186.8,
         "pe": 15.8,
         "market_cap": "5906亿",
-        "volume": 4438745,
+        "volume": 4979145,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -308,7 +308,7 @@
         "prev_close": 26.18,
         "pe": 14.6,
         "market_cap": "5576亿",
-        "volume": 85323450,
+        "volume": 89304650,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -572,7 +572,7 @@
         "prev_close": 1.21,
         "pe": -26.02,
         "market_cap": "503亿",
-        "volume": 280418864,
+        "volume": 288395864,
         "currency": "HKD"
       },
       "fetch_status": "ok"

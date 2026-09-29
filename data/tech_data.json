@@ -1,6 +1,6 @@
 {
-  "updated": "2026-09-29T17:27:55.937003+08:00",
-  "updated_display": "2026-09-29 17:27",
+  "updated": "2026-09-29T20:40:07.646119+08:00",
+  "updated_display": "2026-09-29 20:40",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -86,7 +86,7 @@
         "high": 107.2,
         "low": 105.2,
         "prev_close": 107.7,
-        "pe": 18.0,
+        "pe": 18.01,
         "market_cap": "2.1万亿",
         "volume": 57027476,
         "currency": "HKD"
@@ -306,8 +306,8 @@
         "high": 25.9,
         "low": 25.04,
         "prev_close": 25.86,
-        "pe": 14.08,
-        "market_cap": "5375亿",
+        "pe": 14.1,
+        "market_cap": "5384亿",
         "volume": 146204949,
         "currency": "HKD"
       },

@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-14T16:23:26.489588+08:00",
-  "updated_display": "2026-10-14 16:23",
+  "updated": "2026-10-14T19:40:49.803223+08:00",
+  "updated_display": "2026-10-14 19:40",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -44,7 +44,7 @@
         "prev_close": 425.2,
         "pe": 15.47,
         "market_cap": "3.8万亿",
-        "volume": 17703748,
+        "volume": 19933548,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -88,7 +88,7 @@
         "prev_close": 107.2,
         "pe": 18.74,
         "market_cap": "2.2万亿",
-        "volume": 94416953,
+        "volume": 101342353,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -132,7 +132,7 @@
         "prev_close": 72.3,
         "pe": -18.41,
         "market_cap": "4315亿",
-        "volume": 61177806,
+        "volume": 65472606,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -176,7 +176,7 @@
         "prev_close": 81.65,
         "pe": 36.07,
         "market_cap": "1802亿",
-        "volume": 9458744,
+        "volume": 11005794,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -220,7 +220,7 @@
         "prev_close": 104.9,
         "pe": 13.12,
         "market_cap": "2511亿",
-        "volume": 5000732,
+        "volume": 6892632,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -264,7 +264,7 @@
         "prev_close": 195.5,
         "pe": 16.89,
         "market_cap": "6314亿",
-        "volume": 4720061,
+        "volume": 5613361,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -308,7 +308,7 @@
         "prev_close": 25.04,
         "pe": 14.76,
         "market_cap": "5636亿",
-        "volume": 262029409,
+        "volume": 277522009,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -572,7 +572,7 @@
         "prev_close": 1.19,
         "pe": -25.7,
         "market_cap": "496亿",
-        "volume": 189632200,
+        "volume": 208259200,
         "currency": "HKD"
       },
       "fetch_status": "ok"

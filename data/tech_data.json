@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-15T15:59:23.211918+08:00",
-  "updated_display": "2026-10-15 15:59",
+  "updated": "2026-10-15T19:18:20.589462+08:00",
+  "updated_display": "2026-10-15 19:18",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -44,7 +44,7 @@
         "prev_close": 423.4,
         "pe": 15.26,
         "market_cap": "3.8万亿",
-        "volume": 17646348,
+        "volume": 20676017,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -80,15 +80,15 @@
       "recent_news": "通义千问Qwen3系列开源登顶HuggingFace；阿里云AI收入连续5季度三位数增长；国际电商AIDC收入增速超30%",
       "trend": "「AI驱动」成核心战略：通义千问打造开源生态+商业化并行。阿里云借AI算力需求二次加速。国际电商（速卖通/Lazada）冲击盈利。",
       "stock": {
-        "price": 106.6,
-        "change_pct": -3.53,
+        "price": 106.4,
+        "change_pct": -3.71,
         "open": 108.2,
         "high": 109.3,
         "low": 105.1,
         "prev_close": 110.5,
-        "pe": 18.08,
+        "pe": 18.05,
         "market_cap": "2.1万亿",
-        "volume": 68861304,
+        "volume": 79762680,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -124,15 +124,15 @@
       "recent_news": "美团闪购日订单突破2000万单；无人机配送在深圳完成超50万单；到店业务利润率持续提升",
       "trend": "即时零售是最大增量（闪购从餐饮向日百拓展）。无人机配送有望2-3年内单均成本低于人力。优选业务减亏是关键。",
       "stock": {
-        "price": 75.35,
-        "change_pct": -2.27,
+        "price": 75.45,
+        "change_pct": -2.14,
         "open": 75.95,
         "high": 77.5,
         "low": 74.85,
         "prev_close": 77.1,
-        "pe": -18.0,
-        "market_cap": "4217亿",
-        "volume": 29330807,
+        "pe": -18.02,
+        "market_cap": "4222亿",
+        "volume": 33710890,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -168,15 +168,15 @@
       "recent_news": "文心大模型5.0发布；萝卜快跑在武汉全无人运营日均万单；百度智能云AI收入占比超30%",
       "trend": "AI原生重构搜索是最大看点（搜索结果由AI生成）。Apollo自动驾驶加速商业化，Robotaxi从武汉向全国复制。AI芯片昆仑芯三代量产是关键变量。",
       "stock": {
-        "price": 78.45,
-        "change_pct": -4.39,
+        "price": 78.35,
+        "change_pct": -4.51,
         "open": 79.85,
         "high": 79.95,
         "low": 77.8,
         "prev_close": 82.05,
-        "pe": 34.48,
-        "market_cap": "1723亿",
-        "volume": 15199648,
+        "pe": 34.44,
+        "market_cap": "1721亿",
+        "volume": 19214098,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -220,7 +220,7 @@
         "prev_close": 106.1,
         "pe": 12.97,
         "market_cap": "2482亿",
-        "volume": 5044647,
+        "volume": 6689399,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -264,7 +264,7 @@
         "prev_close": 197.2,
         "pe": 16.81,
         "market_cap": "6282亿",
-        "volume": 3713990,
+        "volume": 4814110,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -300,15 +300,15 @@
       "recent_news": "小米SU7累计交付突破40万辆；第二款车YU7 SUV上市预订火爆；澎湃OS 2.0打通手机×汽车×家居",
       "trend": "汽车是最大变量：SU7成功后快速扩产品线。手机高端化提升ASP。「人车家全生态」是最核心差异化。",
       "stock": {
-        "price": 27.12,
-        "change_pct": 2.81,
+        "price": 27.08,
+        "change_pct": 2.65,
         "open": 26.0,
         "high": 27.26,
         "low": 25.98,
         "prev_close": 26.38,
-        "pe": 15.17,
-        "market_cap": "5794亿",
-        "volume": 244391788,
+        "pe": 15.15,
+        "market_cap": "5786亿",
+        "volume": 266494588,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -572,7 +572,7 @@
         "prev_close": 1.19,
         "pe": -24.62,
         "market_cap": "475亿",
-        "volume": 325757500,
+        "volume": 346260500,
         "currency": "HKD"
       },
       "fetch_status": "ok"

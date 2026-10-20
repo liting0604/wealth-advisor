@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-20T16:10:51.477426+08:00",
-  "updated_display": "2026-10-20 16:10",
+  "updated": "2026-10-20T19:23:18.791316+08:00",
+  "updated_display": "2026-10-20 19:23",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -36,15 +36,15 @@
       "recent_news": "混元大模型已接入微信搜一搜和腾讯广告；海外游戏《王者荣耀》国际版日活创新高；微信视频号直播电商GMV增长超100%",
       "trend": "全面AI化转型：混元大模型将贯穿微信/QQ/腾讯云/广告全线产品。游戏出海+视频号电商是两大增量引擎。AI Agent（元宝）面向C端开放，可能成为新一代超级入口。",
       "stock": {
-        "price": 411.2,
-        "change_pct": -1.58,
+        "price": 410.4,
+        "change_pct": -1.77,
         "open": 413.2,
         "high": 415.6,
         "low": 406.4,
         "prev_close": 417.8,
-        "pe": 15.02,
+        "pe": 14.99,
         "market_cap": "3.7万亿",
-        "volume": 21621513,
+        "volume": 22840013,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -80,15 +80,15 @@
       "recent_news": "通义千问Qwen3系列开源登顶HuggingFace；阿里云AI收入连续5季度三位数增长；国际电商AIDC收入增速超30%",
       "trend": "「AI驱动」成核心战略：通义千问打造开源生态+商业化并行。阿里云借AI算力需求二次加速。国际电商（速卖通/Lazada）冲击盈利。",
       "stock": {
-        "price": 105.1,
-        "change_pct": -3.4,
+        "price": 104.9,
+        "change_pct": -3.58,
         "open": 106.8,
         "high": 107.1,
         "low": 104.5,
         "prev_close": 108.8,
-        "pe": 17.83,
+        "pe": 17.79,
         "market_cap": "2.1万亿",
-        "volume": 54295540,
+        "volume": 59859490,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -124,15 +124,15 @@
       "recent_news": "美团闪购日订单突破2000万单；无人机配送在深圳完成超50万单；到店业务利润率持续提升",
       "trend": "即时零售是最大增量（闪购从餐饮向日百拓展）。无人机配送有望2-3年内单均成本低于人力。优选业务减亏是关键。",
       "stock": {
-        "price": 76.0,
-        "change_pct": 0.4,
+        "price": 76.1,
+        "change_pct": 0.53,
         "open": 75.05,
-        "high": 76.1,
+        "high": 76.2,
         "low": 73.6,
         "prev_close": 75.7,
-        "pe": -18.15,
-        "market_cap": "4253亿",
-        "volume": 21354799,
+        "pe": -18.17,
+        "market_cap": "4259亿",
+        "volume": 23678852,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -168,15 +168,15 @@
       "recent_news": "文心大模型5.0发布；萝卜快跑在武汉全无人运营日均万单；百度智能云AI收入占比超30%",
       "trend": "AI原生重构搜索是最大看点（搜索结果由AI生成）。Apollo自动驾驶加速商业化，Robotaxi从武汉向全国复制。AI芯片昆仑芯三代量产是关键变量。",
       "stock": {
-        "price": 78.65,
-        "change_pct": -1.01,
+        "price": 78.6,
+        "change_pct": -1.07,
         "open": 77.95,
         "high": 79.0,
         "low": 77.4,
         "prev_close": 79.45,
-        "pe": 34.57,
-        "market_cap": "1727亿",
-        "volume": 7508986,
+        "pe": 34.55,
+        "market_cap": "1726亿",
+        "volume": 8462103,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -220,7 +220,7 @@
         "prev_close": 106.1,
         "pe": 12.91,
         "market_cap": "2470亿",
-        "volume": 3676408,
+        "volume": 4489408,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -256,15 +256,15 @@
       "recent_news": "暴雪全家桶回归国服收入超预期；《蛋仔派对》全球化拓展；网易有道AI学习机销量翻倍",
       "trend": "游戏出海是核心增长引擎。暴雪回归贡献稳定现金流。AI+游戏（NPC/AIGC）和AI+教育是有道新增长极。云音乐盈利改善。",
       "stock": {
-        "price": 195.5,
-        "change_pct": -1.11,
+        "price": 195.2,
+        "change_pct": -1.26,
         "open": 197.7,
         "high": 198.9,
         "low": 195.1,
         "prev_close": 197.7,
-        "pe": 16.75,
-        "market_cap": "6259亿",
-        "volume": 3958878,
+        "pe": 16.72,
+        "market_cap": "6250亿",
+        "volume": 4693778,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -300,15 +300,15 @@
       "recent_news": "小米SU7累计交付突破40万辆；第二款车YU7 SUV上市预订火爆；澎湃OS 2.0打通手机×汽车×家居",
       "trend": "汽车是最大变量：SU7成功后快速扩产品线。手机高端化提升ASP。「人车家全生态」是最核心差异化。",
       "stock": {
-        "price": 27.02,
-        "change_pct": 1.35,
+        "price": 27.06,
+        "change_pct": 1.5,
         "open": 26.84,
         "high": 27.46,
         "low": 26.56,
         "prev_close": 26.66,
-        "pe": 15.12,
-        "market_cap": "5773亿",
-        "volume": 98884219,
+        "pe": 15.14,
+        "market_cap": "5782亿",
+        "volume": 106176019,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -572,7 +572,7 @@
         "prev_close": 1.16,
         "pe": -24.72,
         "market_cap": "478亿",
-        "volume": 234012885,
+        "volume": 246622885,
         "currency": "HKD"
       },
       "fetch_status": "ok"

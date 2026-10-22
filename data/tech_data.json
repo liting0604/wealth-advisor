@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-22T16:18:01.173539+08:00",
-  "updated_display": "2026-10-22 16:18",
+  "updated": "2026-10-22T19:38:50.618734+08:00",
+  "updated_display": "2026-10-22 19:38",
   "total": 30,
   "success": 30,
   "failed": 0,
@@ -36,15 +36,15 @@
       "recent_news": "混元大模型已接入微信搜一搜和腾讯广告；海外游戏《王者荣耀》国际版日活创新高；微信视频号直播电商GMV增长超100%",
       "trend": "全面AI化转型：混元大模型将贯穿微信/QQ/腾讯云/广告全线产品。游戏出海+视频号电商是两大增量引擎。AI Agent（元宝）面向C端开放，可能成为新一代超级入口。",
       "stock": {
-        "price": 381.6,
-        "change_pct": -3.1,
+        "price": 382.4,
+        "change_pct": -2.89,
         "open": 387.0,
         "high": 391.2,
         "low": 378.4,
         "prev_close": 393.8,
-        "pe": 13.94,
+        "pe": 13.97,
         "market_cap": "3.5万亿",
-        "volume": 58382234,
+        "volume": 60791747,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -80,15 +80,15 @@
       "recent_news": "通义千问Qwen3系列开源登顶HuggingFace；阿里云AI收入连续5季度三位数增长；国际电商AIDC收入增速超30%",
       "trend": "「AI驱动」成核心战略：通义千问打造开源生态+商业化并行。阿里云借AI算力需求二次加速。国际电商（速卖通/Lazada）冲击盈利。",
       "stock": {
-        "price": 98.05,
-        "change_pct": -5.45,
+        "price": 97.35,
+        "change_pct": -6.12,
         "open": 101.6,
         "high": 101.8,
         "low": 96.8,
         "prev_close": 103.7,
-        "pe": 16.63,
-        "market_cap": "2.0万亿",
-        "volume": 123291084,
+        "pe": 16.51,
+        "market_cap": "1.9万亿",
+        "volume": 131777384,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -132,7 +132,7 @@
         "prev_close": 74.7,
         "pe": -17.03,
         "market_cap": "3990亿",
-        "volume": 34288688,
+        "volume": 37832088,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -168,15 +168,15 @@
       "recent_news": "文心大模型5.0发布；萝卜快跑在武汉全无人运营日均万单；百度智能云AI收入占比超30%",
       "trend": "AI原生重构搜索是最大看点（搜索结果由AI生成）。Apollo自动驾驶加速商业化，Robotaxi从武汉向全国复制。AI芯片昆仑芯三代量产是关键变量。",
       "stock": {
-        "price": 75.65,
-        "change_pct": -2.64,
+        "price": 75.1,
+        "change_pct": -3.35,
         "open": 77.5,
         "high": 77.5,
         "low": 74.85,
         "prev_close": 77.7,
-        "pe": 33.25,
-        "market_cap": "1661亿",
-        "volume": 14348440,
+        "pe": 33.01,
+        "market_cap": "1649亿",
+        "volume": 15680790,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -212,15 +212,15 @@
       "recent_news": "京东物流外部客户收入占比突破75%；百亿补贴战持续，低价策略拉动用户增长；言犀大模型已应用于智能客服和供应链",
       "trend": "低价策略+供应链效率双轮驱动对抗拼多多。京东物流对外开放是利润增长点。AI供应链降本增效空间大。",
       "stock": {
-        "price": 101.0,
-        "change_pct": -1.66,
+        "price": 98.3,
+        "change_pct": -4.28,
         "open": 100.6,
         "high": 100.7,
         "low": 97.4,
         "prev_close": 102.7,
-        "pe": 12.49,
-        "market_cap": "2390亿",
-        "volume": 9646829,
+        "pe": 12.16,
+        "market_cap": "2326亿",
+        "volume": 11463429,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -256,15 +256,15 @@
       "recent_news": "暴雪全家桶回归国服收入超预期；《蛋仔派对》全球化拓展；网易有道AI学习机销量翻倍",
       "trend": "游戏出海是核心增长引擎。暴雪回归贡献稳定现金流。AI+游戏（NPC/AIGC）和AI+教育是有道新增长极。云音乐盈利改善。",
       "stock": {
-        "price": 184.8,
-        "change_pct": -4.99,
+        "price": 181.8,
+        "change_pct": -6.53,
         "open": 191.4,
         "high": 192.5,
         "low": 180.6,
         "prev_close": 194.5,
-        "pe": 15.83,
-        "market_cap": "5917亿",
-        "volume": 7293107,
+        "pe": 15.57,
+        "market_cap": "5821亿",
+        "volume": 8238007,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -300,15 +300,15 @@
       "recent_news": "小米SU7累计交付突破40万辆；第二款车YU7 SUV上市预订火爆；澎湃OS 2.0打通手机×汽车×家居",
       "trend": "汽车是最大变量：SU7成功后快速扩产品线。手机高端化提升ASP。「人车家全生态」是最核心差异化。",
       "stock": {
-        "price": 26.1,
-        "change_pct": -2.61,
+        "price": 25.8,
+        "change_pct": -3.73,
         "open": 26.6,
         "high": 26.62,
         "low": 25.66,
         "prev_close": 26.8,
-        "pe": 14.6,
-        "market_cap": "5577亿",
-        "volume": 138914560,
+        "pe": 14.44,
+        "market_cap": "5513亿",
+        "volume": 149385160,
         "currency": "HKD"
       },
       "fetch_status": "ok"
@@ -564,15 +564,15 @@
       "recent_news": "日日新大模型5.0发布，多模态能力大幅提升；绝影自动驾驶获多家车企量产定点；生成式AI收入同比增长超200%",
       "trend": "战略转型中：传统AI收入萎缩，生成式AI是唯一增长引擎。SenseCore算力是核心资产。自动驾驶有望率先商业化。",
       "stock": {
-        "price": 1.1,
-        "change_pct": -3.91,
+        "price": 1.11,
+        "change_pct": -3.48,
         "open": 1.15,
         "high": 1.15,
         "low": 1.09,
         "prev_close": 1.15,
-        "pe": -23.88,
-        "market_cap": "461亿",
-        "volume": 355878314,
+        "pe": -23.99,
+        "market_cap": "463亿",
+        "volume": 374482314,
         "currency": "HKD"
       },
       "fetch_status": "ok"

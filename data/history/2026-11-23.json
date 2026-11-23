@@ -1,0 +1,773 @@
+{
+  "date": "2026-11-23",
+  "generated_at": "2026-11-23T19:47:56.769490+08:00",
+  "market": {
+    "asset_prices": {
+      "a_share": {
+        "level": "3538点附近",
+        "trend": "窄幅震荡",
+        "ytd": "+约5%"
+      },
+      "bond": {
+        "cn_10y": "2.05%",
+        "us_10y": "约4.55%",
+        "trend": "下行"
+      },
+      "gold": {
+        "price": "约3621美元/盎司",
+        "trend": "震荡",
+        "outlook": "短期震荡，中长期避险配置价值存在"
+      },
+      "fx": {
+        "usd_cny": "约6.68",
+        "dxy": "约99.8",
+        "trend": "温和震荡"
+      }
+    },
+    "deposit_rate": {
+      "current": "1年期定存基准约1.1%，3年期约1.5%",
+      "trend": "持续下行（银行净息差历史低位）",
+      "outlook": "存款利率中长期下行趋势明确，储蓄型保险锁定利率价值持续凸显。"
+    },
+    "macro": {
+      "lpr_1y": "3.10%",
+      "lpr_5y": "3.60%",
+      "cpi_status": "物价温和回升",
+      "pmi_status": "制造业PMI维持扩张区间"
+    },
+    "capital_market": {
+      "policy_stance": "中央经济工作会议明确持续深化资本市场投融资综合改革，推动中长期资金入市。全球流动性因美联储政策受关注。",
+      "market_outlook": "A股结构性机会丰富，科技成长主线明确。AI/半导体/机器人等新质生产力方向持续活跃。"
+    },
+    "sector_rotation": {
+      "current_hotspots": [
+        {
+          "sector": "AI算力/大模型",
+          "driver": "大模型降价+算力需求爆发",
+          "momentum": "强"
+        },
+        {
+          "sector": "半导体/芯片",
+          "driver": "国产替代加速+周期复苏",
+          "momentum": "强"
+        },
+        {
+          "sector": "机器人/自动化",
+          "driver": "产业规模化落地+政策支持",
+          "momentum": "中强"
+        },
+        {
+          "sector": "新能源/新材料",
+          "driver": "技术突破+出口高增长",
+          "momentum": "中"
+        },
+        {
+          "sector": "高股息红利",
+          "driver": "低利率环境+险资增配",
+          "momentum": "中强"
+        }
+      ],
+      "risk_factors": [
+        "美联储政策不确定性",
+        "中美利差倒挂持续",
+        "A股短期涨幅较快存在回调风险",
+        "地缘政治不确定性"
+      ]
+    }
+  },
+  "market_bias": {
+    "equity": "中性",
+    "bond": "中性",
+    "gold": "中性",
+    "deposit": "偏空（利率下行中）",
+    "fx": "中性"
+  },
+  "allocation": {
+    "PR2": {
+      "债基/固收+": "50-70%",
+      "宽基指数": "20-30%",
+      "行业主题": "0-20%"
+    },
+    "PR3": {
+      "债基/固收+": "30-40%",
+      "宽基指数": "30-40%",
+      "行业主题": "20-30%",
+      "QDII": "0-15%"
+    },
+    "PR4": {
+      "债基/固收+": "10-20%",
+      "宽基指数": "20-30%",
+      "行业主题": "30-50%",
+      "QDII": "10-20%"
+    },
+    "PR5": {
+      "债基/固收+": "5-10%",
+      "宽基指数": "10-20%",
+      "行业主题": "40-60%",
+      "QDII": "15-25%"
+    }
+  },
+  "product_matches": {
+    "PR2": [
+      {
+        "product_id": "017592",
+        "product_name": "汇添富添添乐双盈A",
+        "product_category": "基金",
+        "sub_category": "二级债基 中低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 73,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "固收+策略，可适度参与权益增厚收益",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "二级债基",
+          "中低波"
+        ]
+      },
+      {
+        "product_id": "016869",
+        "product_name": "景顺长城稳健增益A",
+        "product_category": "基金",
+        "sub_category": "二级债基 中低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 73,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "固收+策略，可适度参与权益增厚收益",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "二级债基",
+          "中低波"
+        ]
+      },
+      {
+        "product_id": "018448",
+        "product_name": "中欧琪和A",
+        "product_category": "基金",
+        "sub_category": "偏债混合 中低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 73,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "固收+策略，可适度参与权益增厚收益",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "偏债混合",
+          "中低波"
+        ]
+      },
+      {
+        "product_id": "006834",
+        "product_name": "工银尊享短债A",
+        "product_category": "基金",
+        "sub_category": "中短债基 低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 68,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "中短债基",
+          "低波"
+        ]
+      },
+      {
+        "product_id": "022007",
+        "product_name": "国泰利民安悦30天",
+        "product_category": "基金",
+        "sub_category": "中短债基 低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 68,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "中短债基",
+          "低波"
+        ]
+      },
+      {
+        "product_id": "164808",
+        "product_name": "工银四季收益债券",
+        "product_category": "基金",
+        "sub_category": "一级债基 中低波",
+        "issuer": "",
+        "risk_level": "PR2",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 68,
+        "reasons": [
+          "利率下行周期，债基仍具配置价值",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "一级债基",
+          "中低波"
+        ]
+      }
+    ],
+    "PR3": [
+      {
+        "product_id": "000979",
+        "product_name": "景顺长城沪港深精选",
+        "product_category": "基金",
+        "sub_category": "AI 科技",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 68,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "全球配置分散A股单一市场风险",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "AI",
+          "科技",
+          "主动权益（科技）",
+          "港股"
+        ]
+      },
+      {
+        "product_id": "481012",
+        "product_name": "工银深证红利ETF联接",
+        "product_category": "基金",
+        "sub_category": "指数（宽基） 高波",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 66,
+        "reasons": [
+          "宽基指数分散风险，适合长期定投",
+          "低利率环境利好高股息策略",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（宽基）",
+          "高波",
+          "红利"
+        ]
+      },
+      {
+        "product_id": "009707",
+        "product_name": "工银新兴制造混合A",
+        "product_category": "基金",
+        "sub_category": "半导体 主动权益（科技）",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「半导体/芯片」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "半导体",
+          "主动权益（科技）"
+        ]
+      },
+      {
+        "product_id": "000793",
+        "product_name": "工银高端制造股票",
+        "product_category": "基金",
+        "sub_category": "科技 主动权益（科技）",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「新能源/新材料」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "科技",
+          "主动权益（科技）",
+          "新能源"
+        ]
+      },
+      {
+        "product_id": "011614",
+        "product_name": "工银上证科创50ETF联接A",
+        "product_category": "基金",
+        "sub_category": "科创 高波",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 63,
+        "reasons": [
+          "宽基指数分散风险，适合长期定投",
+          "成长风格弹性大，科技牛市弹性突出",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "科创",
+          "高波",
+          "指数（宽基）"
+        ]
+      },
+      {
+        "product_id": "481009",
+        "product_name": "工银沪深300A",
+        "product_category": "基金",
+        "sub_category": "指数（宽基） 高波",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 58,
+        "reasons": [
+          "宽基指数分散风险，适合长期定投",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（宽基）",
+          "高波",
+          "沪深300"
+        ]
+      },
+      {
+        "product_id": "021231",
+        "product_name": "工银中证A50",
+        "product_category": "基金",
+        "sub_category": "指数（宽基） 高波",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 58,
+        "reasons": [
+          "宽基指数分散风险，适合长期定投",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（宽基）",
+          "高波"
+        ]
+      },
+      {
+        "product_id": "022442",
+        "product_name": "工银中证A500",
+        "product_category": "基金",
+        "sub_category": "指数（宽基） 高波",
+        "issuer": "",
+        "risk_level": "PR3",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 58,
+        "reasons": [
+          "宽基指数分散风险，适合长期定投",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（宽基）",
+          "高波"
+        ]
+      }
+    ],
+    "PR4": [
+      {
+        "product_id": "007674",
+        "product_name": "工银产业升级股票A",
+        "product_category": "基金",
+        "sub_category": "AI 主动权益（科技）",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 77,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "标的覆盖当前热点「半导体/芯片」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "AI",
+          "主动权益（科技）",
+          "半导体"
+        ]
+      },
+      {
+        "product_id": "020356",
+        "product_name": "华夏半导体材料设备ETF联接A",
+        "product_category": "基金",
+        "sub_category": "指数（主题） 半导体",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「半导体/芯片」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（主题）",
+          "半导体"
+        ]
+      },
+      {
+        "product_id": "015873",
+        "product_name": "广发国证新能源车电池ETF联接A",
+        "product_category": "基金",
+        "sub_category": "指数（主题） 新能源",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「新能源/新材料」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "指数（主题）",
+          "新能源"
+        ]
+      },
+      {
+        "product_id": "001048",
+        "product_name": "富国新兴产业股票A",
+        "product_category": "基金",
+        "sub_category": "主动权益（科技） AI",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "主动权益（科技）",
+          "AI"
+        ]
+      },
+      {
+        "product_id": "002168",
+        "product_name": "嘉实智能汽车股票",
+        "product_category": "基金",
+        "sub_category": "主动权益（能源） 新能源",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「新能源/新材料」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "主动权益（能源）",
+          "新能源"
+        ]
+      },
+      {
+        "product_id": "010115",
+        "product_name": "易方达远见成长A",
+        "product_category": "基金",
+        "sub_category": "主动权益（科技） AI",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "主动权益（科技）",
+          "AI"
+        ]
+      },
+      {
+        "product_id": "025328",
+        "product_name": "诺安稳健回报混合A",
+        "product_category": "基金",
+        "sub_category": "算力 主动权益（科技）",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "算力",
+          "主动权益（科技）"
+        ]
+      },
+      {
+        "product_id": "720001",
+        "product_name": "财通价值动量混合",
+        "product_category": "基金",
+        "sub_category": "算力 主动权益（科技）",
+        "issuer": "",
+        "risk_level": "PR4",
+        "expected_return_low": 0,
+        "expected_return_high": 0,
+        "term_days": 0,
+        "min_investment": 0,
+        "score": 65,
+        "reasons": [
+          "标的覆盖当前热点「AI算力/大模型」",
+          "无风险利率下行，权益资产相对吸引力提升"
+        ],
+        "private_bank_only": 0,
+        "liquidity_type": "T+1",
+        "tags": [
+          "算力",
+          "主动权益（科技）"
+        ]
+      }
+    ],
+    "PR5": []
+  },
+  "news": [
+    {
+      "title": "受负反馈冲击，理财规模单周缩水5067亿元，多家机构发信安抚",
+      "summary": "财联社11月23日讯（王蔚 实习生 吴思瑶）银行理财市场近期迎来新一轮调整。 财联社据机构数据，11月16日至20日，全市场理财规模环比减少5067亿元至36.59万亿元...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "搭乘APEC东风 深化燕窝产业合作 小仙炖与印尼签署合作备忘共推品质燕窝输华",
+      "summary": "11月20日，2026印尼-中国商业论坛在深圳举办，印尼总统普拉博沃・苏比安托、中国商务部副部长鄢东出席并致辞，见证两国在能源、工业制造...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "稳市措施“对症下药”，科创资产引领A股探底回升",
+      "summary": "周一A股市场出现了低开探底回升的态势。 其中，上证综指在盘中一度探至3476点的本轮调整新低。不过，随着以人形机器人为代表的科创资产强劲复苏，市场人气渐趋聚集起来...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "南京银行：江苏交控持股比例由15%增加至15.09%",
+      "summary": "11月23日金融一线消息，南京银行今日发布公告称，近日该行收到大股东江苏交通控股有限公司（以下简称“江苏交控”）《关于增持南京银行股份有限公司股份的告知函》...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "腾讯的筹码：模型训练还在继续，资本支出还得增加",
+      "summary": "（来源：财闻）“感觉就像把筹码全押上，结果真的赢了”，这是腾讯混元团队在Hy4训练顺利完成后的感受。11月21日凌晨，腾讯首席AI科学家...",
+      "category": "行业动态",
+      "capital_view": "科技主线持续强化，相关主题基金和ETF具备配置机会。",
+      "plain_text": "AI和芯片相关公司最近很火，背后是国产替代的大趋势——以前依赖进口的，现在要自己造了。"
+    },
+    {
+      "title": "摩尔线程拟5亿—10亿元回购公司股份",
+      "summary": "11月23日晚间，摩尔线程（688795）披露公告称，当日，公司召开第一届董事会第二十一次会议，会议审议通过了《关于以集中竞价交易方式回购公司股份方案的议案》。",
+      "category": "上市公司",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "“拼手速”不如“走长路”：商汤林达华的AI复利论",
+      "summary": "（来源：经济观察报）11月17日，在一场名为《中国AI从追赶到原创，真正的难题是什么？》的播客中，商汤联合创始人、执行董事、首席科学家林达华提出了自己的观察：AI竞争不...",
+      "category": "行业动态",
+      "capital_view": "科技主线持续强化，相关主题基金和ETF具备配置机会。",
+      "plain_text": "AI和芯片相关公司最近很火，背后是国产替代的大趋势——以前依赖进口的，现在要自己造了。"
+    },
+    {
+      "title": "险资三季度逆势加仓股票：市场波动下耐心资本稳信心",
+      "summary": "来源：中保新知 险资第三季度仍在加仓股票，彰显了对中国经济和中国资本市场的信心。 金融监管总局11月20日披露的数据显示，截至2026年三季度末...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "揭秘恒昌系商业版图：曾经的“四大”之一，网贷行业最后的“活化石”",
+      "summary": "恒昌财富停兑事件发酵10余天后，迎来了司法介入。 11月22日晚间，北京市公安局朝阳分局发布警情通报。通报称，近期朝阳分局依法对“恒昌系”相关公司涉嫌违法犯罪立案侦查...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "德国约450所学校收到炸弹威胁",
+      "summary": "据地区警方消息报道，德国约450所学校周一上午通过电子邮件收到炸弹威胁。 所有邮件措辞相同，主题均为“死亡在等着你”。 弗赖堡警方表示，超过450所学校收到炸弹威胁邮件...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "集体公告，明天停牌1小时",
+      "summary": "来源：中新经纬 23日晚间，多只热门ETF发布公告，明天（24日）将停牌1小时，具体如下： 纳斯达克ETF华安（159632）将于2026年11月24日开市起停牌，自24日10：30起复牌...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "*ST卓然财务造假4年，时任董秘被罚235万",
+      "summary": "近日，*ST卓然（688121.SH）发布公告称，公司收到上海证监局下发的40号《决定书》。 经查明，*ST卓然存在三项信息披露违法事实： 一...",
+      "category": "行业动态",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "信披违规，这家*ST公司董秘被罚190万",
+      "summary": "近日，*ST仕净（301030.SZ）发布公告称，公司收到江苏证监局下发的《行政处罚事先告知书》。 经查明，*ST仕净存在以下信息披露违法事实： 一...",
+      "category": "上市公司",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "富创精密：实控人提议回购1亿至2亿元股份",
+      "summary": "富创精密(688409.SH)公告称，公司实际控制人、董事长、总经理郑广文提议公司以自有资金及自筹资金回购股份，回购资金总额不低于1亿元且不超过2亿元...",
+      "category": "上市公司",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    },
+    {
+      "title": "南京银行：大股东江苏交控增持股份至15.09%",
+      "summary": "南京银行(601009.SH)公告称，公司大股东江苏交通控股基于对公司长期投资价值的认可，自2026年7月18日至11月20日期间以自有资金通过集中竞价方式增持公司股份1063.66万股...",
+      "category": "上市公司",
+      "capital_view": "关注该事件对市场情绪和资产配置方向的短期影响。",
+      "plain_text": "这条新闻值得关注，可能会影响接下来的市场走势和投资方向。"
+    }
+  ],
+  "daily_outlook": {
+    "债券": {
+      "label": "震荡偏强",
+      "analysis": "国债收益率窄幅震荡，基本面对债市仍有支撑。后续聚焦内需复苏节奏和货币政策信号。"
+    },
+    "股票": {
+      "label": "震荡蓄力",
+      "analysis": "A股窄幅震荡，结构性行情延续。科技成长与高股息两条主线交替活跃。耐心等待市场选择方向，均衡配置、分散风险。"
+    },
+    "黄金": {
+      "label": "弱势震荡",
+      "analysis": "黄金短期缺乏方向性驱动，美联储政策与地缘风险交织。建议控制仓位，等待更明确的入场信号。中长期避险配置价值不变。"
+    },
+    "汇率": {
+      "label": "温和震荡",
+      "analysis": "人民币短期缺乏方向性突破，在岸汇率维持区间波动。出口数据和中美关系是核心变量。建议保持汇率中性策略。"
+    }
+  },
+  "summary": {
+    "equity_outlook": "权益市场震荡格局，精选个股和主题基金为上",
+    "bond_outlook": "债券市场债市平稳，利率债和信用债均有配置机会",
+    "strategy": "在利率下行大背景下，建议：1) 适当增加债基/固收+配置比例；2) 宽基指数定投降低择时难度；3) 精选科技/成长主题基金参与结构性机会；4) 配置QDII分散单一市场风险",
+    "key_reminder": [
+      "利率持续下行，债基和固收+产品的相对吸引力提升",
+      "关注风险：美联储政策不确定性、中美利差倒挂持续、A股短期涨幅较快存在回调风险"
+    ]
+  }
+}
